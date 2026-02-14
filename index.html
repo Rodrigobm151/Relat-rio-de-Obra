@@ -116,7 +116,7 @@
         .app-container {
             display: none;
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
         }
 
         .app-container.active {
@@ -154,12 +154,22 @@
             margin-top: 0.2rem;
         }
 
-        .mode-badge {
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
             background: rgba(255,255,255,0.2);
             padding: 0.3rem 0.8rem;
             border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
+        }
+
+        .sync-status.offline {
+            background: rgba(231, 76, 60, 0.3);
+        }
+
+        .sync-status.syncing {
+            background: rgba(255, 152, 0, 0.3);
         }
 
         /* Panels */
@@ -192,48 +202,27 @@
             font-size: 0.9rem;
         }
 
-        /* Fiscal Panel - Date Status */
-        .date-status {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        /* Loading */
+        .loading-container {
             text-align: center;
+            padding: 3rem 1rem;
         }
 
-        .date-status.enviado {
-            background: #e8f5e9;
-            border: 2px solid var(--verde-vale);
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--cinza-mais-claro);
+            border-top-color: var(--azul-vale);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
 
-        .date-status-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .date-status.enviado .date-status-icon {
-            color: var(--verde-vale);
-        }
-
-        .date-status-title {
-            color: var(--azul-vale);
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-style: italic;
-        }
-
-        .date-status.enviado .date-status-title {
-            color: var(--verde-vale);
-        }
-
-        .date-status-text {
-            color: var(--cinza-medio);
-            font-size: 0.9rem;
-        }
-
-        /* Date Selector */
+        /* Date Card */
         .date-card {
             background: white;
             border-radius: 16px;
@@ -271,37 +260,60 @@
             border-color: var(--azul-vale);
         }
 
-        /* Progress */
-        .progress-section {
-            background: white;
-            border-radius: 16px;
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        .btn-carregar {
+            background: var(--verde-vale);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 0.5rem;
+            font-family: 'Inter', sans-serif;
         }
 
-        .progress-header {
+        .btn-carregar:disabled {
+            background: var(--cinza-claro);
+            cursor: not-allowed;
+        }
+
+        /* Alertas */
+        .alert {
+            background: #fff3e0;
+            border-left: 4px solid var(--laranja);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.8rem;
-            font-size: 0.9rem;
+            align-items: center;
+            gap: 0.8rem;
         }
 
-        .progress-bar {
-            background: var(--cinza-mais-claro);
-            height: 10px;
-            border-radius: 5px;
-            overflow: hidden;
+        .alert i {
+            color: var(--laranja);
+            font-size: 1.2rem;
         }
 
-        .progress-fill {
-            background: linear-gradient(90deg, var(--verde-vale), var(--azul-vale));
-            height: 100%;
-            border-radius: 5px;
-            transition: width 0.5s ease;
+        .alert.error {
+            background: #ffebee;
+            border-left-color: var(--vermelho);
         }
 
-        /* Simple List */
+        .alert.error i {
+            color: var(--vermelho);
+        }
+
+        .alert.success {
+            background: #e8f5e9;
+            border-left-color: var(--verde-vale);
+        }
+
+        .alert.success i {
+            color: var(--verde-vale);
+        }
+
+        /* Equipment List */
         .simple-list {
             background: white;
             border-radius: 16px;
@@ -489,28 +501,69 @@
             background: #006b66;
         }
 
-        .btn-primary {
+        /* Sync Button */
+        .sync-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .btn-sync {
             background: var(--azul-vale);
             color: white;
             border: none;
-            padding: 1rem 2rem;
+            padding: 1rem;
+            border-radius: 10px;
             font-size: 1rem;
             font-weight: 600;
-            border-radius: 10px;
             cursor: pointer;
             width: 100%;
-            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
             font-family: 'Inter', sans-serif;
             font-style: italic;
         }
 
-        .btn-primary:hover {
-            background: #2a9bc9;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(60, 181, 229, 0.3);
+        .btn-sync:disabled {
+            background: var(--cinza-claro);
+            cursor: not-allowed;
         }
 
-        /* Admin Panel Styles */
+        .btn-sync.pendente {
+            background: var(--laranja);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Pending Badge */
+        .pending-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--vermelho);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Admin Panel */
         .admin-form {
             background: white;
             border-radius: 16px;
@@ -546,6 +599,44 @@
         .form-input:focus {
             outline: none;
             border-color: var(--azul-vale);
+        }
+
+        .btn-primary {
+            background: var(--azul-vale);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+        }
+
+        .btn-primary:hover {
+            background: #2a9bc9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(60, 181, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--verde-vale);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-secondary:hover {
+            background: #006b66;
         }
 
         .admin-item {
@@ -591,87 +682,10 @@
             color: white;
         }
 
-        .btn-secondary {
-            background: var(--verde-vale);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-secondary:hover {
-            background: #006b66;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--azul-vale);
-            border: 2px solid var(--azul-vale);
-            padding: 0.8rem 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-outline:hover {
-            background: var(--azul-vale);
-            color: white;
-        }
-
-        /* Export Section */
-        .export-section {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .export-title {
-            color: var(--azul-vale);
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .export-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .export-stat {
-            text-align: center;
-            padding: 1rem;
-            background: var(--cinza-mais-claro);
-            border-radius: 8px;
-        }
-
-        .export-stat-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--azul-vale);
-        }
-
-        .export-stat-label {
-            font-size: 0.8rem;
-            color: var(--cinza-medio);
-        }
-
         /* Footer */
         .footer {
             text-align: center;
-            padding: 2rem 1rem;
+            padding: 2rem 1rem 6rem;
             color: var(--cinza-claro);
             font-size: 0.75rem;
         }
@@ -740,9 +754,9 @@
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 100px;
+            top: 100px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
+            transform: translateX(-50%) translateY(-100px);
             background: var(--cinza-texto);
             color: white;
             padding: 1rem 2rem;
@@ -805,7 +819,10 @@
                     <div class="header-title">Relatório de Obra</div>
                     <div class="header-subtitle">Squad Geotecnia</div>
                 </div>
-                <span class="mode-badge" id="modeBadge">Fiscal</span>
+                <div class="sync-status" id="syncStatus">
+                    <i class="fas fa-wifi"></i>
+                    <span>Online</span>
+                </div>
             </div>
         </header>
 
@@ -813,54 +830,38 @@
         <div class="panel active" id="fiscalPanel">
             <div class="panel-header">
                 <h2 class="panel-title">Apontamento Diário</h2>
-                <p class="panel-subtitle">Toque no equipamento para apontar</p>
+                <p class="panel-subtitle">Selecione a data e carregue os equipamentos do contrato</p>
             </div>
 
-            <!-- Date Status -->
-            <div class="date-status" id="dateStatus">
-                <div class="date-status-icon">
-                    <i class="fas fa-clipboard-list"></i>
-                </div>
-                <div class="date-status-title">Novo relatório</div>
-                <div class="date-status-text">Selecione a data e preencha os equipamentos</div>
-            </div>
-
-            <!-- Date Selector -->
-            <div class="date-card" id="dateCard">
+            <!-- Date Selection -->
+            <div class="date-card">
                 <div class="date-header">
                     <span class="date-label">Data do relatório</span>
                     <i class="fas fa-calendar-alt" style="color: var(--azul-vale);"></i>
                 </div>
-                <input type="date" class="date-input" id="reportDate" onchange="checkDateStatus()">
+                <input type="date" class="date-input" id="reportDate">
+                <button class="btn-carregar" id="btnCarregar" onclick="carregarEquipamentos()">
+                    <i class="fas fa-download" style="margin-right: 8px;"></i>
+                    Carregar equipamentos do contrato
+                </button>
             </div>
 
-            <!-- Form Content (hidden when report exists) -->
-            <div id="formContent">
-                <!-- Progress -->
-                <div class="progress-section">
-                    <div class="progress-header">
-                        <span style="color: var(--cinza-medio); font-style: italic;">Progresso do apontamento</span>
-                        <span style="color: var(--azul-vale); font-weight: 600;" id="progressText">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                    </div>
-                </div>
+            <!-- Alerts -->
+            <div id="alertsContainer"></div>
 
-                <!-- Equipment List -->
-                <div class="simple-list" id="fiscalList">
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <p>Aguardando cadastro de equipamentos</p>
-                    </div>
-                </div>
+            <!-- Loading -->
+            <div class="loading-container hidden" id="loadingContainer">
+                <div class="loading-spinner"></div>
+                <p style="color: var(--cinza-medio); font-style: italic;">Carregando dados do contrato...</p>
+            </div>
 
-                <div style="margin-top: 2rem; margin-bottom: 2rem;">
-                    <button class="btn-primary" onclick="finalizeReport()">
-                        <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
-                        Finalizar relatório
-                    </button>
-                </div>
+            <!-- Equipment List -->
+            <div class="simple-list hidden" id="equipmentList"></div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-clipboard-list"></i>
+                <p>Selecione uma data e carregue os equipamentos</p>
             </div>
         </div>
 
@@ -868,60 +869,31 @@
         <div class="panel" id="adminPanel">
             <div class="panel-header">
                 <h2 class="panel-title">Painel Administrativo</h2>
-                <p class="panel-subtitle">Gerencie equipamentos e exporte dados</p>
+                <p class="panel-subtitle">Gerencie equipamentos e visualize relatórios</p>
             </div>
 
-            <div class="admin-form">
-                <form id="adminForm" onsubmit="addEquipment(event)">
-                    <div class="form-group">
-                        <label class="form-label">Nome do equipamento</label>
-                        <input type="text" class="form-input" id="eqName" placeholder="Ex: Escavadeira 35T" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Quantidade contratada</label>
-                        <input type="number" class="form-input" id="eqQtd" min="1" placeholder="Quantidade prevista" required>
-                    </div>
-
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-plus" style="margin-right: 8px;"></i>
-                        Adicionar equipamento
-                    </button>
-                </form>
-            </div>
-
-            <div class="panel-header" style="margin-top: 2rem;">
-                <h3 class="panel-title" style="font-size: 1.2rem;">Equipamentos cadastrados</h3>
-            </div>
-
-            <div id="adminList">
-                <div class="empty-state">
-                    <i class="fas fa-box-open"></i>
-                    <p>Nenhum equipamento cadastrado</p>
+            <div class="alert">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Atenção:</strong> Edite a planilha Google Sheets diretamente para adicionar equipamentos do contrato. Esta área é apenas para visualização.
                 </div>
             </div>
 
-            <!-- Export Section -->
-            <div class="export-section">
-                <div class="export-title">
-                    <i class="fas fa-download" style="margin-right: 8px;"></i>
-                    Exportar histórico
-                </div>
-                <div class="export-stats">
-                    <div class="export-stat">
-                        <div class="export-stat-number" id="totalRelatorios">0</div>
-                        <div class="export-stat-label">relatórios</div>
-                    </div>
-                    <div class="export-stat">
-                        <div class="export-stat-number" id="totalEquipamentos">0</div>
-                        <div class="export-stat-label">equipamentos</div>
-                    </div>
-                </div>
-                <button class="btn-secondary" onclick="exportCSV()" style="width: 100%;">
-                    <i class="fas fa-file-csv" style="margin-right: 8px;"></i>
-                    Baixar CSV completo
+            <div style="margin-top: 2rem; text-align: center;">
+                <button class="btn-secondary" onclick="abrirPlanilha()">
+                    <i class="fas fa-external-link-alt" style="margin-right: 8px;"></i>
+                    Abrir Planilha Google Sheets
                 </button>
             </div>
+        </div>
+
+        <!-- Sync Button -->
+        <div class="sync-section" id="syncSection" style="display: none;">
+            <button class="btn-sync" id="btnSync" onclick="sincronizar()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Sincronizar com nuvem</span>
+                <span id="pendingCount" class="pending-badge hidden">0</span>
+            </button>
         </div>
 
         <!-- Footer -->
@@ -949,36 +921,42 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Data
-        let equipments = JSON.parse(localStorage.getItem('geo_equipments')) || [];
-        let reports = JSON.parse(localStorage.getItem('geo_reports')) || [];
-        let currentApontamentos = {};
+        // Configuração
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwx5td4WLilFn2iP1mHu3MwdX901VjtXcwORWkZ30aLMK3NlW_6xw5QJc0Jtgk0elt/exec';
+        const PLANILHA_URL = 'https://docs.google.com/spreadsheets/d/14agVA0JMwT93OrZkkzM1leAqPjFDMrHaBs148zoEMZY/edit';
+        
+        // Estado
+        let equipamentosContrato = [];
+        let apontamentos = {};
+        let equipamentosCarregados = [];
         let openItemId = null;
         let isAdmin = false;
+        let pendingSync = [];
 
-        // Check URL param for admin
+        // Verificar admin
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('admin') === '1') {
             isAdmin = true;
         }
 
-        // Initialize
+        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('reportDate').value = today;
             document.getElementById('reportDate').max = today;
             
+            // Carregar pendentes do localStorage
+            pendingSync = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+            updatePendingCount();
+            
             if (isAdmin) {
                 document.getElementById('fiscalPanel').classList.remove('active');
                 document.getElementById('adminPanel').classList.add('active');
-                document.getElementById('modeBadge').textContent = 'Administrador';
-                document.getElementById('modeBadge').style.background = 'var(--verde-vale)';
-                renderAdminList();
-                updateExportStats();
-            } else {
-                checkDateStatus();
-                renderFiscalList();
             }
+            
+            checkOnlineStatus();
+            window.addEventListener('online', () => updateSyncStatus(true));
+            window.addEventListener('offline', () => updateSyncStatus(false));
         });
 
         function enterApp() {
@@ -992,169 +970,120 @@
         function showAdminLink(e) {
             e.preventDefault();
             const currentUrl = window.location.href.split('?')[0];
-            prompt('Link de acesso administrativo (copie e guarde em local seguro):', 
-                   currentUrl + '?admin=1');
+            prompt('Link de acesso administrativo:', currentUrl + '?admin=1');
         }
 
-        // Date Status Check
-        function checkDateStatus() {
-            const date = document.getElementById('reportDate').value;
-            if (!date) return;
-            
-            const existingReport = reports.find(r => r.data === date);
-            const statusDiv = document.getElementById('dateStatus');
-            const formDiv = document.getElementById('formContent');
-            const dateCard = document.getElementById('dateCard');
-            
-            if (existingReport) {
-                // Relatório já enviado
-                statusDiv.className = 'date-status enviado';
-                statusDiv.innerHTML = `
-                    <div class="date-status-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="date-status-title">Relatório enviado</div>
-                    <div class="date-status-text">
-                        Relatório do dia ${formatDate(date)} já foi enviado.<br>
-                        Altere a data para criar novo relatório.
-                    </div>
-                `;
-                formDiv.style.display = 'none';
-                dateCard.style.display = 'block';
+        function abrirPlanilha() {
+            window.open(PLANILHA_URL, '_blank');
+        }
+
+        // Status de conexão
+        function checkOnlineStatus() {
+            updateSyncStatus(navigator.onLine);
+        }
+
+        function updateSyncStatus(online) {
+            const statusEl = document.getElementById('syncStatus');
+            if (online) {
+                statusEl.innerHTML = '<i class="fas fa-wifi"></i><span>Online</span>';
+                statusEl.classList.remove('offline');
             } else {
-                // Novo relatório
-                statusDiv.className = 'date-status';
-                statusDiv.innerHTML = `
-                    <div class="date-status-icon">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                    <div class="date-status-title">Novo relatório</div>
-                    <div class="date-status-text">
-                        Preencha os dados abaixo para o dia ${formatDate(date)}
-                    </div>
-                `;
-                formDiv.style.display = 'block';
-                dateCard.style.display = 'block';
+                statusEl.innerHTML = '<i class="fas fa-wifi-slash"></i><span>Offline</span>';
+                statusEl.classList.add('offline');
+            }
+        }
+
+        // Carregar equipamentos do contrato
+        async function carregarEquipamentos() {
+            const data = document.getElementById('reportDate').value;
+            if (!data) {
+                showAlert('Selecione uma data', 'error');
+                return;
+            }
+
+            if (!navigator.onLine) {
+                showAlert('Sem conexão. Verifique a internet.', 'error');
+                return;
+            }
+
+            document.getElementById('btnCarregar').disabled = true;
+            document.getElementById('loadingContainer').classList.remove('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('equipmentList').classList.add('hidden');
+
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const todosEquipamentos = await response.json();
                 
-                // Limpa apontamentos ao mudar data
-                currentApontamentos = {};
-                renderFiscalList();
-            }
-        }
-
-        function formatDate(dateString) {
-            const [year, month, day] = dateString.split('-');
-            return `${day}/${month}/${year}`;
-        }
-
-        // Admin Functions
-        function addEquipment(e) {
-            e.preventDefault();
-            
-            const equipment = {
-                id: Date.now(),
-                name: document.getElementById('eqName').value,
-                previsto: parseInt(document.getElementById('eqQtd').value),
-                createdAt: new Date().toISOString()
-            };
-
-            equipments.push(equipment);
-            localStorage.setItem('geo_equipments', JSON.stringify(equipments));
-            
-            document.getElementById('adminForm').reset();
-            renderAdminList();
-            updateExportStats();
-            showToast('Equipamento adicionado');
-        }
-
-        function renderAdminList() {
-            const list = document.getElementById('adminList');
-            
-            if (equipments.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <p>Nenhum equipamento cadastrado</p>
-                    </div>
-                `;
-                return;
-            }
-
-            list.innerHTML = equipments.map(eq => `
-                <div class="admin-item">
-                    <div class="admin-item-info">
-                        <h4>${eq.name}</h4>
-                        <div class="admin-item-meta">
-                            Quantidade contratada: ${eq.previsto} unidade(s)
-                        </div>
-                    </div>
-                    <button class="btn-icon" onclick="deleteEquipment(${eq.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function deleteEquipment(id) {
-            if (confirm('Deseja remover este equipamento?')) {
-                equipments = equipments.filter(e => e.id !== id);
-                localStorage.setItem('geo_equipments', JSON.stringify(equipments));
-                renderAdminList();
-                showToast('Equipamento removido');
-            }
-        }
-
-        function updateExportStats() {
-            document.getElementById('totalRelatorios').textContent = reports.length;
-            document.getElementById('totalEquipamentos').textContent = equipments.length;
-        }
-
-        function exportCSV() {
-            if (reports.length === 0) {
-                showModal('Não há relatórios para exportar');
-                return;
-            }
-
-            let csv = 'Data,Equipamento,Previsto,Real,Manutencao,Observacoes\n';
-            
-            reports.forEach(report => {
-                report.equipamentos.forEach(eq => {
-                    csv += `${report.data},${eq.nome},${eq.previsto},${eq.real},${eq.manutencao || 0},"${(eq.obs || '').replace(/"/g, '""')}"\n`;
+                // Filtrar pela data selecionada (formato DD/MM/YYYY na planilha)
+                const dataFormatada = formatarData(data);
+                equipamentosContrato = todosEquipamentos.filter(eq => {
+                    const dataEq = formatarDataBanco(eq.data);
+                    return dataEq === data;
                 });
-            });
 
-            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `historico_relatorios_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            
-            showToast('CSV exportado com sucesso');
+                if (equipamentosContrato.length === 0) {
+                    showAlert(`Nenhum equipamento encontrado para ${dataFormatada}. Verifique a aba Contrato na planilha.`, 'error');
+                    document.getElementById('emptyState').classList.remove('hidden');
+                    document.getElementById('loadingContainer').classList.add('hidden');
+                    document.getElementById('btnCarregar').disabled = false;
+                    return;
+                }
+
+                // Preparar lista para exibição
+                equipamentosCarregados = equipamentosContrato.map(eq => ({
+                    id: eq.equipamento + '_' + data,
+                    nome: eq.equipamento,
+                    previsto: eq.previsto,
+                    data: data
+                }));
+
+                renderEquipmentList();
+                document.getElementById('syncSection').style.display = 'block';
+                showAlert(`${equipamentosCarregados.length} equipamento(s) carregado(s)`, 'success');
+
+            } catch (error) {
+                console.error(error);
+                showAlert('Erro ao carregar dados. Tente novamente.', 'error');
+                document.getElementById('emptyState').classList.remove('hidden');
+            } finally {
+                document.getElementById('loadingContainer').classList.add('hidden');
+                document.getElementById('btnCarregar').disabled = false;
+            }
         }
 
-        // Fiscal Functions
-        function renderFiscalList() {
-            const list = document.getElementById('fiscalList');
-            
-            if (equipments.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <p>Aguardando cadastro de equipamentos</p>
-                    </div>
-                `;
-                return;
-            }
+        function formatarData(dataISO) {
+            const [ano, mes, dia] = dataISO.split('-');
+            return `${dia}/${mes}/${ano}`;
+        }
 
-            list.innerHTML = equipments.map(eq => {
-                const apont = currentApontamentos[eq.id];
-                const isApontado = apont && apont.real !== undefined;
+        function formatarDataBanco(data) {
+            // Converte various formatos para YYYY-MM-DD
+            if (data.includes('-')) {
+                const parts = data.split('-');
+                if (parts[0].length === 4) return data; // já está YYYY-MM-DD
+                return `${parts[2]}-${parts[1]}-${parts[0]}`; // DD-MM-YYYY -> YYYY-MM-DD
+            }
+            if (data.includes('/')) {
+                const parts = data.split('/');
+                return `${parts[2]}-${parts[1]}-${parts[0]}`; // DD/MM/YYYY -> YYYY-MM-DD
+            }
+            return data;
+        }
+
+        function renderEquipmentList() {
+            const list = document.getElementById('equipmentList');
+            list.classList.remove('hidden');
+
+            list.innerHTML = equipamentosCarregados.map(eq => {
+                const apont = apontamentos[eq.id] || {};
+                const isApontado = apont.real !== undefined;
                 const isOpen = openItemId === eq.id;
                 
                 let qtdClass = '';
                 let checkIcon = '';
                 if (isApontado) {
-                    if (apont.real === eq.previsto) {
+                    if (apont.real == eq.previsto) {
                         qtdClass = 'apontado';
                         checkIcon = '<i class="fas fa-check-circle check-icon"></i>';
                     } else {
@@ -1162,11 +1091,11 @@
                         checkIcon = '<i class="fas fa-exclamation-circle check-icon" style="color: var(--laranja);"></i>';
                     }
                 }
-                
+
                 return `
                 <div style="border-bottom: 1px solid var(--cinza-mais-claro);">
-                    <div class="simple-item ${isOpen ? 'active' : ''}" onclick="toggleItem(${eq.id})">
-                        <span class="simple-name">${eq.name}</span>
+                    <div class="simple-item ${isOpen ? 'active' : ''}" onclick="toggleItem('${eq.id}')">
+                        <span class="simple-name">${eq.nome}</span>
                         <div class="simple-qtd ${qtdClass}">
                             ${isApontado ? checkIcon : ''}
                             <span>${eq.previsto}</span>
@@ -1177,15 +1106,15 @@
                     <div class="detail-panel ${isOpen ? 'open' : ''}" id="detail-${eq.id}">
                         <div class="detail-grid">
                             <div class="detail-box">
-                                <div class="detail-label">Previsto (contrato)</div>
+                                <div class="detail-label">Previsto contrato</div>
                                 <div class="detail-value previsto">${eq.previsto}</div>
                             </div>
                             <div class="detail-box">
-                                <div class="detail-label">Real (em campo)</div>
+                                <div class="detail-label">Real em campo</div>
                                 <input type="number" 
                                        class="input-real" 
                                        id="real-${eq.id}"
-                                       value="${apont?.real || ''}"
+                                       value="${apont.real || ''}"
                                        min="0"
                                        placeholder="0">
                             </div>
@@ -1196,7 +1125,7 @@
                             <input type="number" 
                                    class="manutencao-input" 
                                    id="manut-${eq.id}"
-                                   value="${apont?.manutencao || '0'}"
+                                   value="${apont.manutencao || '0'}"
                                    min="0"
                                    placeholder="0">
                         </div>
@@ -1204,18 +1133,16 @@
                         <textarea class="obs-input" 
                                   id="obs-${eq.id}"
                                   rows="2" 
-                                  placeholder="Observações (opcional)...">${apont?.obs || ''}</textarea>
+                                  placeholder="Observações (opcional)...">${apont.obs || ''}</textarea>
 
-                        <button class="btn-salvar-item" onclick="saveItem(${eq.id})">
+                        <button class="btn-salvar-item" onclick="salvarItem('${eq.id}')">
                             <i class="fas fa-save" style="margin-right: 8px;"></i>
-                            Salvar apontamento
+                            Confirmar apontamento
                         </button>
                     </div>
                 </div>
                 `;
             }).join('');
-
-            updateProgress();
         }
 
         function toggleItem(id) {
@@ -1224,80 +1151,129 @@
             } else {
                 openItemId = id;
             }
-            renderFiscalList();
+            renderEquipmentList();
             
             if (openItemId === id) {
                 setTimeout(() => {
-                    document.getElementById(`detail-${id}`).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    document.getElementById(`detail-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }, 100);
             }
         }
 
-        function saveItem(id) {
+        function salvarItem(id) {
             const real = parseInt(document.getElementById(`real-${id}`).value) || 0;
             const manutencao = parseInt(document.getElementById(`manut-${id}`).value) || 0;
             const obs = document.getElementById(`obs-${id}`).value;
-            
+            const eq = equipamentosCarregados.find(e => e.id === id);
+
             if (manutencao > real) {
-                showModal('Manutenção não pode ser maior que o real presente');
+                showAlert('Manutenção não pode ser maior que o real presente', 'error');
                 return;
             }
-            
-            currentApontamentos[id] = {
+
+            apontamentos[id] = {
+                nome: eq.nome,
+                data: eq.data,
+                previsto: eq.previsto,
                 real: real,
                 manutencao: manutencao,
-                obs: obs
+                obs: obs,
+                timestamp: new Date().toISOString()
             };
+
+            // Adicionar à fila de sincronização
+            const existingIndex = pendingSync.findIndex(p => p.id === id);
+            if (existingIndex >= 0) {
+                pendingSync[existingIndex] = apontamentos[id];
+            } else {
+                pendingSync.push(apontamentos[id]);
+            }
             
+            localStorage.setItem('pendingSync', JSON.stringify(pendingSync));
+            updatePendingCount();
+
             openItemId = null;
-            renderFiscalList();
-            showToast('Apontamento salvo');
+            renderEquipmentList();
+            showToast('Apontamento salvo! Aguardando sincronização...');
         }
 
-        function updateProgress() {
-            const total = equipments.length;
-            const apontados = Object.keys(currentApontamentos).length;
-            const percent = total > 0 ? Math.round((apontados / total) * 100) : 0;
+        function updatePendingCount() {
+            const count = pendingSync.length;
+            const badge = document.getElementById('pendingCount');
+            const btn = document.getElementById('btnSync');
             
-            document.getElementById('progressFill').style.width = `${percent}%`;
-            document.getElementById('progressText').textContent = `${percent}%`;
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+                btn.classList.add('pendente');
+            } else {
+                badge.classList.add('hidden');
+                btn.classList.remove('pendente');
+            }
         }
 
-        function finalizeReport() {
-            const date = document.getElementById('reportDate').value;
-            if (!date) {
-                showModal('Selecione a data');
+        async function sincronizar() {
+            if (pendingSync.length === 0) {
+                showAlert('Nenhum apontamento pendente', 'error');
                 return;
             }
 
-            if (Object.keys(currentApontamentos).length === 0) {
-                showModal('Realize pelo menos um apontamento');
+            if (!navigator.onLine) {
+                showAlert('Sem conexão. Os dados ficarão salvos para envio posterior.', 'error');
                 return;
             }
 
-            const report = {
-                data: date,
-                equipamentos: equipments.map(eq => {
-                    const a = currentApontamentos[eq.id] || { real: 0, manutencao: 0, obs: '' };
-                    return {
-                        nome: eq.name,
-                        previsto: eq.previsto,
-                        real: a.real,
-                        manutencao: a.manutencao,
-                        obs: a.obs
-                    };
-                }),
-                enviadoEm: new Date().toISOString()
-            };
+            const btn = document.getElementById('btnSync');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Sincronizando...</span>';
 
-            reports.push(report);
-            localStorage.setItem('geo_reports', JSON.stringify(reports));
-            
-            showToast('Relatório enviado com sucesso!');
-            checkDateStatus(); // Atualiza UI para mostrar como enviado
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        data: document.getElementById('reportDate').value,
+                        equipamentos: pendingSync
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.result === 'success') {
+                    pendingSync = [];
+                    localStorage.removeItem('pendingSync');
+                    updatePendingCount();
+                    showAlert('Sincronizado com sucesso! Dados enviados para planilha.', 'success');
+                    apontamentos = {};
+                    renderEquipmentList();
+                } else {
+                    throw new Error('Erro no servidor');
+                }
+
+            } catch (error) {
+                console.error(error);
+                showAlert('Erro ao sincronizar. Tentaremos novamente automaticamente.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i><span>Sincronizar com nuvem</span><span id="pendingCount" class="pending-badge hidden">0</span>';
+                updatePendingCount();
+            }
         }
 
-        // UI Helpers
+        function showAlert(message, type) {
+            const container = document.getElementById('alertsContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+            alert.innerHTML = `<i class="fas fa-${icon}"></i><div>${message}</div>`;
+            
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1313,6 +1289,14 @@
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
         }
+
+        // Tentar sincronizar pendentes quando voltar online
+        window.addEventListener('online', () => {
+            if (pendingSync.length > 0) {
+                showToast('Conexão restabelecida. Sincronizando...');
+                sincronizar();
+            }
+        });
 
         document.getElementById('modal').addEventListener('click', (e) => {
             if (e.target.id === 'modal') closeModal();
