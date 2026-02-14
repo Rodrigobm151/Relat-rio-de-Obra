@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Relatório de Obra - Squad Geotecnia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --azul-vale: #3CB5E5;
+            --verde-vale: #007E79;
+            --cinza-texto: #555555;
+            --branco: #FFFFFF;
+            --cinza-medio: #747678;
+            --cinza-claro: #BCBEC0;
+            --cinza-mais-claro: #E6E7E8;
+            --laranja: #ff9800;
+            --vermelho: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cinza-mais-claro);
+            color: var(--cinza-texto);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--azul-vale) 0%, #2a9bc9 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        .splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .logo-container {
+            text-align: center;
+            padding: 2rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .logo-placeholder {
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-placeholder i {
+            font-size: 4rem;
+            color: white;
+        }
+
+        .splash-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .splash-subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        .btn-iniciar {
+            background: white;
+            color: var(--azul-vale);
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-iniciar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Main App */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            background: var(--azul-vale);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .header-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-top: 0.2rem;
+        }
+
+        .mode-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Panels */
+        .panel {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .panel.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .panel-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-title {
+            color: var(--azul-vale);
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .panel-subtitle {
+            color: var(--cinza-medio);
+            font-size: 0.9rem;
+        }
+
+        /* Fiscal Panel - Date Status */
+        .date-status {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .date-status.enviado {
+            background: #e8f5e9;
+            border: 2px solid var(--verde-vale);
+        }
+
+        .date-status-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .date-status.enviado .date-status-icon {
+            color: var(--verde-vale);
+        }
+
+        .date-status-title {
+            color: var(--azul-vale);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .date-status.enviado .date-status-title {
+            color: var(--verde-vale);
+        }
+
+        .date-status-text {
+            color: var(--cinza-medio);
+            font-size: 0.9rem;
+        }
+
+        /* Date Selector */
+        .date-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .date-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .date-label {
+            color: var(--cinza-medio);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--cinza-mais-claro);
+            border-radius: 10px;
+            font-size: 1rem;
+            color: var(--azul-vale);
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: var(--azul-vale);
+        }
+
+        /* Progress */
+        .progress-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            background: var(--cinza-mais-claro);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--verde-vale), var(--azul-vale));
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Simple List */
+        .simple-list {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .simple-item {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--cinza-mais-claro);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .simple-item:last-child {
+            border-bottom: none;
+        }
+
+        .simple-item:hover {
+            background: rgba(60, 181, 229, 0.05);
+        }
+
+        .simple-item.active {
+            background: rgba(60, 181, 229, 0.1);
+        }
+
+        .simple-name {
+            color: var(--azul-vale);
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .simple-qtd {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--cinza-texto);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .simple-qtd.apontado {
+            color: var(--verde-vale);
+        }
+
+        .simple-qtd.parcial {
+            color: var(--laranja);
+        }
+
+        .check-icon {
+            color: var(--verde-vale);
+            font-size: 1.2rem;
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            background: #f8f9fa;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .detail-panel.open {
+            padding: 1.5rem;
+            max-height: 400px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-box {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--cinza-medio);
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .detail-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--cinza-texto);
+        }
+
+        .detail-value.previsto {
+            color: var(--cinza-medio);
+        }
+
+        .input-real {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--azul-vale);
+            font-family: 'Inter', sans-serif;
+            border-bottom: 2px solid var(--cinza-claro);
+            padding: 0.2rem;
+        }
+
+        .input-real:focus {
+            outline: none;
+            border-bottom-color: var(--azul-vale);
+        }
+
+        .manutencao-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .manutencao-label {
+            font-size: 0.9rem;
+            color: var(--cinza-medio);
+            font-style: italic;
+        }
+
+        .manutencao-input {
+            width: 80px;
+            padding: 0.5rem;
+            border: 2px solid var(--cinza-mais-claro);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--laranja);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .manutencao-input:focus {
+            outline: none;
+            border-color: var(--laranja);
+        }
+
+        .obs-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--cinza-mais-claro);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            resize: none;
+            margin-bottom: 1rem;
+        }
+
+        .obs-input:focus {
+            outline: none;
+            border-color: var(--azul-vale);
+        }
+
+        .btn-salvar-item {
+            background: var(--verde-vale);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-salvar-item:hover {
+            background: #006b66;
+        }
+
+        .btn-primary {
+            background: var(--azul-vale);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+        }
+
+        .btn-primary:hover {
+            background: #2a9bc9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(60, 181, 229, 0.3);
+        }
+
+        /* Admin Panel Styles */
+        .admin-form {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--cinza-texto);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 2px solid var(--cinza-mais-claro);
+            border-radius: 10px;
+            font-size: 1rem;
+            color: var(--cinza-texto);
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--azul-vale);
+        }
+
+        .admin-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--verde-vale);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-item-info h4 {
+            color: var(--azul-vale);
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            font-style: italic;
+        }
+
+        .admin-item-meta {
+            color: var(--cinza-medio);
+            font-size: 0.85rem;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            background: #fee;
+            color: #e74c3c;
+        }
+
+        .btn-icon:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--verde-vale);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-secondary:hover {
+            background: #006b66;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--azul-vale);
+            border: 2px solid var(--azul-vale);
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-outline:hover {
+            background: var(--azul-vale);
+            color: white;
+        }
+
+        /* Export Section */
+        .export-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .export-title {
+            color: var(--azul-vale);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .export-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .export-stat {
+            text-align: center;
+            padding: 1rem;
+            background: var(--cinza-mais-claro);
+            border-radius: 8px;
+        }
+
+        .export-stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--azul-vale);
+        }
+
+        .export-stat-label {
+            font-size: 0.8rem;
+            color: var(--cinza-medio);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--cinza-claro);
+            font-size: 0.75rem;
+        }
+
+        .admin-link {
+            color: var(--cinza-claro);
+            text-decoration: none;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .admin-link:hover {
+            opacity: 1;
+            color: var(--azul-vale);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--cinza-medio);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-title {
+            color: var(--azul-vale);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--cinza-texto);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 300;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="logo-container">
+            <div class="logo-placeholder">
+                <i class="fas fa-mountain"></i>
+            </div>
+            <h1 class="splash-title">Relatório de Obra</h1>
+            <p class="splash-subtitle">Squad Geotecnia</p>
+            <button class="btn-iniciar" onclick="enterApp()">
+                <i class="fas fa-play" style="margin-right: 8px;"></i>
+                Iniciar
+            </button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="mainApp">
+        
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <div class="header-title">Relatório de Obra</div>
+                    <div class="header-subtitle">Squad Geotecnia</div>
+                </div>
+                <span class="mode-badge" id="modeBadge">Fiscal</span>
+            </div>
+        </header>
+
+        <!-- Fiscal Panel -->
+        <div class="panel active" id="fiscalPanel">
+            <div class="panel-header">
+                <h2 class="panel-title">Apontamento Diário</h2>
+                <p class="panel-subtitle">Toque no equipamento para apontar</p>
+            </div>
+
+            <!-- Date Status -->
+            <div class="date-status" id="dateStatus">
+                <div class="date-status-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="date-status-title">Novo relatório</div>
+                <div class="date-status-text">Selecione a data e preencha os equipamentos</div>
+            </div>
+
+            <!-- Date Selector -->
+            <div class="date-card" id="dateCard">
+                <div class="date-header">
+                    <span class="date-label">Data do relatório</span>
+                    <i class="fas fa-calendar-alt" style="color: var(--azul-vale);"></i>
+                </div>
+                <input type="date" class="date-input" id="reportDate" onchange="checkDateStatus()">
+            </div>
+
+            <!-- Form Content (hidden when report exists) -->
+            <div id="formContent">
+                <!-- Progress -->
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span style="color: var(--cinza-medio); font-style: italic;">Progresso do apontamento</span>
+                        <span style="color: var(--azul-vale); font-weight: 600;" id="progressText">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Equipment List -->
+                <div class="simple-list" id="fiscalList">
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Aguardando cadastro de equipamentos</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; margin-bottom: 2rem;">
+                    <button class="btn-primary" onclick="finalizeReport()">
+                        <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+                        Finalizar relatório
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="panel" id="adminPanel">
+            <div class="panel-header">
+                <h2 class="panel-title">Painel Administrativo</h2>
+                <p class="panel-subtitle">Gerencie equipamentos e exporte dados</p>
+            </div>
+
+            <div class="admin-form">
+                <form id="adminForm" onsubmit="addEquipment(event)">
+                    <div class="form-group">
+                        <label class="form-label">Nome do equipamento</label>
+                        <input type="text" class="form-input" id="eqName" placeholder="Ex: Escavadeira 35T" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Quantidade contratada</label>
+                        <input type="number" class="form-input" id="eqQtd" min="1" placeholder="Quantidade prevista" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-plus" style="margin-right: 8px;"></i>
+                        Adicionar equipamento
+                    </button>
+                </form>
+            </div>
+
+            <div class="panel-header" style="margin-top: 2rem;">
+                <h3 class="panel-title" style="font-size: 1.2rem;">Equipamentos cadastrados</h3>
+            </div>
+
+            <div id="adminList">
+                <div class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <p>Nenhum equipamento cadastrado</p>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="export-section">
+                <div class="export-title">
+                    <i class="fas fa-download" style="margin-right: 8px;"></i>
+                    Exportar histórico
+                </div>
+                <div class="export-stats">
+                    <div class="export-stat">
+                        <div class="export-stat-number" id="totalRelatorios">0</div>
+                        <div class="export-stat-label">relatórios</div>
+                    </div>
+                    <div class="export-stat">
+                        <div class="export-stat-number" id="totalEquipamentos">0</div>
+                        <div class="export-stat-label">equipamentos</div>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="exportCSV()" style="width: 100%;">
+                    <i class="fas fa-file-csv" style="margin-right: 8px;"></i>
+                    Baixar CSV completo
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Relatório de Obra - Squad Geotecnia</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="#" class="admin-link" onclick="showAdminLink(event)">
+                    <i class="fas fa-lock" style="margin-right: 4px;"></i>
+                    Acesso restrito
+                </a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Atenção</h3>
+            <p id="modalText" style="color: var(--cinza-texto); margin-bottom: 1.5rem;"></p>
+            <button class="btn-primary" onclick="closeModal()" style="width: auto; padding: 0.8rem 2rem;">OK</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Data
+        let equipments = JSON.parse(localStorage.getItem('geo_equipments')) || [];
+        let reports = JSON.parse(localStorage.getItem('geo_reports')) || [];
+        let currentApontamentos = {};
+        let openItemId = null;
+        let isAdmin = false;
+
+        // Check URL param for admin
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('admin') === '1') {
+            isAdmin = true;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reportDate').value = today;
+            document.getElementById('reportDate').max = today;
+            
+            if (isAdmin) {
+                document.getElementById('fiscalPanel').classList.remove('active');
+                document.getElementById('adminPanel').classList.add('active');
+                document.getElementById('modeBadge').textContent = 'Administrador';
+                document.getElementById('modeBadge').style.background = 'var(--verde-vale)';
+                renderAdminList();
+                updateExportStats();
+            } else {
+                checkDateStatus();
+                renderFiscalList();
+            }
+        });
+
+        function enterApp() {
+            document.getElementById('splashScreen').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('splashScreen').style.display = 'none';
+                document.getElementById('mainApp').classList.add('active');
+            }, 500);
+        }
+
+        function showAdminLink(e) {
+            e.preventDefault();
+            const currentUrl = window.location.href.split('?')[0];
+            prompt('Link de acesso administrativo (copie e guarde em local seguro):', 
+                   currentUrl + '?admin=1');
+        }
+
+        // Date Status Check
+        function checkDateStatus() {
+            const date = document.getElementById('reportDate').value;
+            if (!date) return;
+            
+            const existingReport = reports.find(r => r.data === date);
+            const statusDiv = document.getElementById('dateStatus');
+            const formDiv = document.getElementById('formContent');
+            const dateCard = document.getElementById('dateCard');
+            
+            if (existingReport) {
+                // Relatório já enviado
+                statusDiv.className = 'date-status enviado';
+                statusDiv.innerHTML = `
+                    <div class="date-status-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="date-status-title">Relatório enviado</div>
+                    <div class="date-status-text">
+                        Relatório do dia ${formatDate(date)} já foi enviado.<br>
+                        Altere a data para criar novo relatório.
+                    </div>
+                `;
+                formDiv.style.display = 'none';
+                dateCard.style.display = 'block';
+            } else {
+                // Novo relatório
+                statusDiv.className = 'date-status';
+                statusDiv.innerHTML = `
+                    <div class="date-status-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="date-status-title">Novo relatório</div>
+                    <div class="date-status-text">
+                        Preencha os dados abaixo para o dia ${formatDate(date)}
+                    </div>
+                `;
+                formDiv.style.display = 'block';
+                dateCard.style.display = 'block';
+                
+                // Limpa apontamentos ao mudar data
+                currentApontamentos = {};
+                renderFiscalList();
+            }
+        }
+
+        function formatDate(dateString) {
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        // Admin Functions
+        function addEquipment(e) {
+            e.preventDefault();
+            
+            const equipment = {
+                id: Date.now(),
+                name: document.getElementById('eqName').value,
+                previsto: parseInt(document.getElementById('eqQtd').value),
+                createdAt: new Date().toISOString()
+            };
+
+            equipments.push(equipment);
+            localStorage.setItem('geo_equipments', JSON.stringify(equipments));
+            
+            document.getElementById('adminForm').reset();
+            renderAdminList();
+            updateExportStats();
+            showToast('Equipamento adicionado');
+        }
+
+        function renderAdminList() {
+            const list = document.getElementById('adminList');
+            
+            if (equipments.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>Nenhum equipamento cadastrado</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = equipments.map(eq => `
+                <div class="admin-item">
+                    <div class="admin-item-info">
+                        <h4>${eq.name}</h4>
+                        <div class="admin-item-meta">
+                            Quantidade contratada: ${eq.previsto} unidade(s)
+                        </div>
+                    </div>
+                    <button class="btn-icon" onclick="deleteEquipment(${eq.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function deleteEquipment(id) {
+            if (confirm('Deseja remover este equipamento?')) {
+                equipments = equipments.filter(e => e.id !== id);
+                localStorage.setItem('geo_equipments', JSON.stringify(equipments));
+                renderAdminList();
+                showToast('Equipamento removido');
+            }
+        }
+
+        function updateExportStats() {
+            document.getElementById('totalRelatorios').textContent = reports.length;
+            document.getElementById('totalEquipamentos').textContent = equipments.length;
+        }
+
+        function exportCSV() {
+            if (reports.length === 0) {
+                showModal('Não há relatórios para exportar');
+                return;
+            }
+
+            let csv = 'Data,Equipamento,Previsto,Real,Manutencao,Observacoes\n';
+            
+            reports.forEach(report => {
+                report.equipamentos.forEach(eq => {
+                    csv += `${report.data},${eq.nome},${eq.previsto},${eq.real},${eq.manutencao || 0},"${(eq.obs || '').replace(/"/g, '""')}"\n`;
+                });
+            });
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `historico_relatorios_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            
+            showToast('CSV exportado com sucesso');
+        }
+
+        // Fiscal Functions
+        function renderFiscalList() {
+            const list = document.getElementById('fiscalList');
+            
+            if (equipments.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Aguardando cadastro de equipamentos</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = equipments.map(eq => {
+                const apont = currentApontamentos[eq.id];
+                const isApontado = apont && apont.real !== undefined;
+                const isOpen = openItemId === eq.id;
+                
+                let qtdClass = '';
+                let checkIcon = '';
+                if (isApontado) {
+                    if (apont.real === eq.previsto) {
+                        qtdClass = 'apontado';
+                        checkIcon = '<i class="fas fa-check-circle check-icon"></i>';
+                    } else {
+                        qtdClass = 'parcial';
+                        checkIcon = '<i class="fas fa-exclamation-circle check-icon" style="color: var(--laranja);"></i>';
+                    }
+                }
+                
+                return `
+                <div style="border-bottom: 1px solid var(--cinza-mais-claro);">
+                    <div class="simple-item ${isOpen ? 'active' : ''}" onclick="toggleItem(${eq.id})">
+                        <span class="simple-name">${eq.name}</span>
+                        <div class="simple-qtd ${qtdClass}">
+                            ${isApontado ? checkIcon : ''}
+                            <span>${eq.previsto}</span>
+                            <i class="fas fa-chevron-${isOpen ? 'up' : 'down'}" style="color: var(--cinza-claro); font-size: 0.9rem; margin-left: 0.5rem;"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-panel ${isOpen ? 'open' : ''}" id="detail-${eq.id}">
+                        <div class="detail-grid">
+                            <div class="detail-box">
+                                <div class="detail-label">Previsto (contrato)</div>
+                                <div class="detail-value previsto">${eq.previsto}</div>
+                            </div>
+                            <div class="detail-box">
+                                <div class="detail-label">Real (em campo)</div>
+                                <input type="number" 
+                                       class="input-real" 
+                                       id="real-${eq.id}"
+                                       value="${apont?.real || ''}"
+                                       min="0"
+                                       placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="manutencao-section">
+                            <span class="manutencao-label">Em manutenção</span>
+                            <input type="number" 
+                                   class="manutencao-input" 
+                                   id="manut-${eq.id}"
+                                   value="${apont?.manutencao || '0'}"
+                                   min="0"
+                                   placeholder="0">
+                        </div>
+
+                        <textarea class="obs-input" 
+                                  id="obs-${eq.id}"
+                                  rows="2" 
+                                  placeholder="Observações (opcional)...">${apont?.obs || ''}</textarea>
+
+                        <button class="btn-salvar-item" onclick="saveItem(${eq.id})">
+                            <i class="fas fa-save" style="margin-right: 8px;"></i>
+                            Salvar apontamento
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            updateProgress();
+        }
+
+        function toggleItem(id) {
+            if (openItemId === id) {
+                openItemId = null;
+            } else {
+                openItemId = id;
+            }
+            renderFiscalList();
+            
+            if (openItemId === id) {
+                setTimeout(() => {
+                    document.getElementById(`detail-${id}`).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        }
+
+        function saveItem(id) {
+            const real = parseInt(document.getElementById(`real-${id}`).value) || 0;
+            const manutencao = parseInt(document.getElementById(`manut-${id}`).value) || 0;
+            const obs = document.getElementById(`obs-${id}`).value;
+            
+            if (manutencao > real) {
+                showModal('Manutenção não pode ser maior que o real presente');
+                return;
+            }
+            
+            currentApontamentos[id] = {
+                real: real,
+                manutencao: manutencao,
+                obs: obs
+            };
+            
+            openItemId = null;
+            renderFiscalList();
+            showToast('Apontamento salvo');
+        }
+
+        function updateProgress() {
+            const total = equipments.length;
+            const apontados = Object.keys(currentApontamentos).length;
+            const percent = total > 0 ? Math.round((apontados / total) * 100) : 0;
+            
+            document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('progressText').textContent = `${percent}%`;
+        }
+
+        function finalizeReport() {
+            const date = document.getElementById('reportDate').value;
+            if (!date) {
+                showModal('Selecione a data');
+                return;
+            }
+
+            if (Object.keys(currentApontamentos).length === 0) {
+                showModal('Realize pelo menos um apontamento');
+                return;
+            }
+
+            const report = {
+                data: date,
+                equipamentos: equipments.map(eq => {
+                    const a = currentApontamentos[eq.id] || { real: 0, manutencao: 0, obs: '' };
+                    return {
+                        nome: eq.name,
+                        previsto: eq.previsto,
+                        real: a.real,
+                        manutencao: a.manutencao,
+                        obs: a.obs
+                    };
+                }),
+                enviadoEm: new Date().toISOString()
+            };
+
+            reports.push(report);
+            localStorage.setItem('geo_reports', JSON.stringify(reports));
+            
+            showToast('Relatório enviado com sucesso!');
+            checkDateStatus(); // Atualiza UI para mostrar como enviado
+        }
+
+        // UI Helpers
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function showModal(text) {
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') closeModal();
+        });
+    </script>
+</body>
+</html>
