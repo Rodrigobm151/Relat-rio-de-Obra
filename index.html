@@ -1070,24 +1070,27 @@
             carregarEquipamentos();
         }
 
-        async function carregarEquipamentos() {
-            if (!currentObra) return;
-            
-            document.getElementById('loadingContainer').classList.remove('hidden');
-            document.getElementById('equipmentList').classList.add('hidden');
+async function carregarEquipamentos() {
+    if (!currentObra) return;
+    
+    console.log('Carregando obra:', currentObra);
+    alert('Debug: Carregando obra: ' + currentObra); // Remover depois
+    
+    document.getElementById('loadingContainer').classList.remove('hidden');
+    document.getElementById('equipmentList').classList.add('hidden');
 
-            try {
-                const mesBusca = formatarMesBusca(new Date());
-                const contratoRef = window.dbRef(window.db, `obras/${currentObra}/contrato/${mesBusca}`);
-                
-                const snapshot = await window.dbGet(contratoRef);
-                
-                if (snapshot.exists()) {
-                    const dados = snapshot.val();
-                    equipamentosMes = Object.keys(dados).map(key => ({
-                        id: key,
-                        ...dados[key]
-                    }));
+    try {
+        const mesBusca = formatarMesBusca(new Date());
+        console.log('Buscando mês:', mesBusca);
+        alert('Debug: Buscando mês: ' + mesBusca); // Remover depois
+        
+        const contratoRef = window.dbRef(window.db, `obras/${currentObra}/contrato/${mesBusca}`);
+        
+        const snapshot = await window.dbGet(contratoRef);
+        console.log('Snapshot:', snapshot.exists(), snapshot.val());
+        alert('Debug: Encontrou dados? ' + snapshot.exists()); // Remover depois
+        
+        // ... resto do código
                     
                     renderEquipmentList();
                     document.getElementById('syncSection').style.display = 'block';
@@ -1436,3 +1439,4 @@
     </script>
 </body>
 </html>
+
