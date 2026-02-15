@@ -168,6 +168,33 @@
             background: rgba(231, 76, 60, 0.3);
         }
 
+        /* Obra Selector */
+        .obra-selector {
+            background: white;
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .obra-label {
+            color: var(--cinza-medio);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .obra-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--cinza-mais-claro);
+            border-radius: 10px;
+            font-size: 1rem;
+            color: var(--azul-vale);
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
         /* Month Info */
         .month-info {
             background: white;
@@ -566,7 +593,7 @@
         }
 
         /* Admin Panel */
-        .admin-info {
+        .admin-section {
             background: white;
             border-radius: 16px;
             padding: 1.5rem;
@@ -574,22 +601,58 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .btn-planilha {
+        .admin-title {
+            color: var(--azul-vale);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .btn-admin {
             background: var(--verde-vale);
             color: white;
             border: none;
-            padding: 1rem;
-            border-radius: 10px;
-            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            margin-top: 1rem;
+            margin-bottom: 0.5rem;
             font-family: 'Inter', sans-serif;
         }
 
-        .btn-planilha:hover {
+        .btn-admin:hover {
             background: #006b66;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--cinza-texto);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--cinza-mais-claro);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--cinza-texto);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--azul-vale);
         }
 
         /* Footer */
@@ -727,7 +790,7 @@
             <div class="header-content">
                 <div>
                     <div class="header-title">Relatório de Obra</div>
-                    <div class="header-subtitle">Squad Geotecnia</div>
+                    <div class="header-subtitle" id="obraSubtitle">Selecione a obra</div>
                 </div>
                 <div class="sync-status" id="syncStatus">
                     <i class="fas fa-wifi"></i>
@@ -743,28 +806,37 @@
                 <p class="panel-subtitle">Toque no equipamento para apontar</p>
             </div>
 
+            <!-- Obra Selector -->
+            <div class="obra-selector" id="obraSelector">
+                <div class="obra-label">Selecione a obra</div>
+                <select class="obra-select" id="obraSelect" onchange="changeObra()">
+                    <option value="">-- Escolha uma obra --</option>
+                    <option value="obra-geotecnia-squad1">Geotecnia - Squad 1</option>
+                </select>
+            </div>
+
             <!-- Month Info -->
-            <div class="month-info">
+            <div class="month-info hidden" id="monthInfo">
                 <div>
                     <div class="month-label">Mês de referência</div>
-                    <div class="month-value" id="monthValue">Carregando...</div>
+                    <div class="month-value" id="monthValue">--</div>
                 </div>
-                <button class="btn-recarregar" onclick="carregarDados()">
+                <button class="btn-recarregar" onclick="carregarEquipamentos()">
                     <i class="fas fa-sync-alt"></i>
                 </button>
             </div>
 
             <!-- Date Display -->
-            <div class="date-display">
+            <div class="date-display hidden" id="dateDisplay">
                 <div class="date-label">Data do relatório</div>
-                <div class="date-value" id="dateValue">--/--/----</div>
+                <div class="date-value" id="dateValue">--</div>
             </div>
 
             <!-- Alerts -->
             <div id="alertsContainer"></div>
 
             <!-- Loading -->
-            <div class="loading-container" id="loadingContainer">
+            <div class="loading-container hidden" id="loadingContainer">
                 <div class="loading-spinner"></div>
                 <p style="color: var(--cinza-medio); font-style: italic;">Carregando equipamentos...</p>
             </div>
@@ -773,10 +845,9 @@
             <div class="simple-list hidden" id="equipmentList"></div>
 
             <!-- Empty State -->
-            <div class="empty-state hidden" id="emptyState">
-                <i class="fas fa-clipboard-list"></i>
-                <p>Nenhum equipamento encontrado para este mês</p>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Verifique a aba Contrato na planilha</p>
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-hard-hat"></i>
+                <p>Selecione uma obra para começar</p>
             </div>
         </div>
 
@@ -784,16 +855,50 @@
         <div class="panel" id="adminPanel">
             <div class="panel-header">
                 <h2 class="panel-title">Painel Administrativo</h2>
-                <p class="panel-subtitle">Acesso aos dados</p>
+                <p class="panel-subtitle">Gerencie obras e equipamentos</p>
             </div>
 
-            <div class="admin-info">
-                <p style="color: var(--cinza-texto); margin-bottom: 1rem;">
-                    Gerencie os equipamentos e visualize relatórios diretamente na planilha Google Sheets.
-                </p>
-                <button class="btn-planilha" onclick="abrirPlanilha()">
-                    <i class="fas fa-external-link-alt" style="margin-right: 8px;"></i>
-                    Abrir Planilha
+            <!-- Add Obra -->
+            <div class="admin-section">
+                <div class="admin-title">Nova Obra</div>
+                <div class="form-group">
+                    <label class="form-label">ID da obra (único, sem espaços)</label>
+                    <input type="text" class="form-input" id="novaObraId" placeholder="ex: obra-mineracao-sul">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nome da obra</label>
+                    <input type="text" class="form-input" id="novaObraNome" placeholder="ex: Mineração Sul">
+                </div>
+                <button class="btn-admin" onclick="criarObra()">
+                    <i class="fas fa-plus" style="margin-right: 8px;"></i>
+                    Criar Obra
+                </button>
+            </div>
+
+            <!-- Add Equipamento -->
+            <div class="admin-section">
+                <div class="admin-title">Adicionar Equipamento</div>
+                <div class="form-group">
+                    <label class="form-label">Obra</label>
+                    <select class="form-select" id="adminObraSelect">
+                        <option value="">Selecione...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mês (MM/AAAA)</label>
+                    <input type="text" class="form-input" id="equipMes" placeholder="02/2026">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nome do equipamento</label>
+                    <input type="form-input" class="form-input" id="equipNome" placeholder="Escavadeira 35T">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quantidade prevista</label>
+                    <input type="number" class="form-input" id="equipPrevisto" placeholder="5">
+                </div>
+                <button class="btn-admin" onclick="adicionarEquipamento()">
+                    <i class="fas fa-save" style="margin-right: 8px;"></i>
+                    Salvar Equipamento
                 </button>
             </div>
         </div>
@@ -808,7 +913,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Relatório de Obra - Squad Geotecnia</p>
+            <p>Relatório de Obra - Firebase</p>
             <p style="margin-top: 0.5rem;">
                 <a href="#" class="admin-link" onclick="showAdminLink(event)">
                     <i class="fas fa-lock" style="margin-right: 4px;"></i>
@@ -830,19 +935,45 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set, push, get, child } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
+            authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
+            databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
+            projectId: "relatorio-obra-geotecnia",
+            storageBucket: "relatorio-obra-geotecnia.firebasestorage.app",
+            messagingSenderId: "765646735604",
+            appId: "1:765646735604:web:59424d5353813939e976a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Tornar db global para as funções
+        window.db = db;
+        window.dbRef = ref;
+        window.dbOnValue = onValue;
+        window.dbSet = set;
+        window.dbPush = push;
+        window.dbGet = get;
+        window.dbChild = child;
+    </script>
+
     <script>
-        // Configuração
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqOjtsgp1CdU8vcJ5_sE9Q7KSqmub7sI2chqlG8Agrimk_ji0gCAHSjrjBLksIaugd/exec';
-        const PLANILHA_URL = 'https://docs.google.com/spreadsheets/d/14agVA0JMwT93OrZkkzM1leAqPjFDMrHaBs148zoEMZY/edit';
-        
-        // Estado
+        // Estado global
+        let currentObra = '';
+        let currentObraNome = '';
         let equipamentosMes = [];
         let apontamentos = {};
         let openItemId = null;
-        let isAdmin = false;
         let pendingSync = [];
         let currentMes = '';
         let currentDate = '';
+        let isAdmin = false;
 
         // Verificar admin
         const urlParams = new URLSearchParams(window.location.search);
@@ -852,7 +983,6 @@
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
-            // Define mês e data atuais
             const hoje = new Date();
             currentMes = formatarMes(hoje);
             currentDate = formatarData(hoje);
@@ -860,15 +990,12 @@
             document.getElementById('monthValue').textContent = currentMes;
             document.getElementById('dateValue').textContent = currentDate;
             
-            // Carregar pendentes do localStorage
             pendingSync = JSON.parse(localStorage.getItem('pendingSync') || '[]');
             
             if (isAdmin) {
                 document.getElementById('fiscalPanel').classList.remove('active');
                 document.getElementById('adminPanel').classList.add('active');
-            } else {
-                // Carregar dados automaticamente
-                carregarDados();
+                carregarObrasAdmin();
             }
             
             checkOnlineStatus();
@@ -890,10 +1017,6 @@
             prompt('Link de acesso administrativo:', currentUrl + '?admin=1');
         }
 
-        function abrirPlanilha() {
-            window.open(PLANILHA_URL, '_blank');
-        }
-
         function formatarMes(data) {
             const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
                           'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -903,14 +1026,13 @@
         function formatarData(data) {
             return data.toLocaleDateString('pt-BR');
         }
-//--------------------------------------------------------------------------------------------------------------------------------
-      function formatarMesBusca(data) {
+
+        function formatarMesBusca(data) {
             const mes = String(data.getMonth() + 1).padStart(2, '0');
             const ano = data.getFullYear();
             return `${mes}/${ano}`;
         }
 
-        // Status de conexão
         function checkOnlineStatus() {
             updateSyncStatus(navigator.onLine);
         }
@@ -926,67 +1048,95 @@
             }
         }
 
-        // Carregar dados do contrato
-       async function carregarDados() {
-    if (!navigator.onLine) {
-        showAlert('Sem conexão. Verifique a internet.', 'error');
-        return;
-    }
-
-    document.getElementById('loadingContainer').classList.remove('hidden');
-    document.getElementById('equipmentList').classList.add('hidden');
-    document.getElementById('emptyState').classList.add('hidden');
-
-    // DEBUG: Mostra o que está buscando
-    const mesBusca = formatarMesBusca(new Date());
-    console.log('Buscando mês:', mesBusca);
-    alert('Debug: Buscando mês: ' + mesBusca); // Remover depois
-
-    try {
-        const response = await fetch(SCRIPT_URL);
-        const todosEquipamentos = await response.json();
-        
-        // DEBUG: Mostra o que recebeu
-        console.log('Recebido:', todosEquipamentos);
-        alert('Debug: Recebido ' + todosEquipamentos.length + ' equipamentos'); // Remover depois
-        
-        // Mostra primeiro item para ver formato
-        if (todosEquipamentos.length > 0) {
-            alert('Debug: Primeiro item: ' + JSON.stringify(todosEquipamentos[0]));
+        function changeObra() {
+            const select = document.getElementById('obraSelect');
+            currentObra = select.value;
+            currentObraNome = select.options[select.selectedIndex].text;
+            
+            if (!currentObra) {
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('monthInfo').classList.add('hidden');
+                document.getElementById('dateDisplay').classList.add('hidden');
+                document.getElementById('equipmentList').classList.add('hidden');
+                document.getElementById('syncSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('obraSubtitle').textContent = currentObraNome;
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('monthInfo').classList.remove('hidden');
+            document.getElementById('dateDisplay').classList.remove('hidden');
+            
+            carregarEquipamentos();
         }
 
-        // Filtrar pelo mês atual
-        equipamentosMes = todosEquipamentos.filter(eq => {
-            const match = eq.mes === mesBusca;
-            console.log('Comparando:', eq.mes, '===', mesBusca, '?', match);
-            return match;
-        });
+        async function carregarEquipamentos() {
+            if (!currentObra) return;
+            
+            document.getElementById('loadingContainer').classList.remove('hidden');
+            document.getElementById('equipmentList').classList.add('hidden');
 
-        alert('Debug: Filtrados para mês ' + mesBusca + ': ' + equipamentosMes.length); // Remover depois
+            try {
+                const mesBusca = formatarMesBusca(new Date());
+                const contratoRef = window.dbRef(window.db, `obras/${currentObra}/contrato/${mesBusca}`);
+                
+                const snapshot = await window.dbGet(contratoRef);
+                
+                if (snapshot.exists()) {
+                    const dados = snapshot.val();
+                    equipamentosMes = Object.keys(dados).map(key => ({
+                        id: key,
+                        ...dados[key]
+                    }));
+                    
+                    renderEquipmentList();
+                    document.getElementById('syncSection').style.display = 'block';
+                    updatePendingBadge();
+                } else {
+                    equipamentosMes = [];
+                    document.getElementById('emptyState').classList.remove('hidden');
+                    document.getElementById('emptyState').innerHTML = `
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Nenhum equipamento cadastrado para ${currentMes}</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Entre em contato com o administrador</p>
+                    `;
+                    document.getElementById('syncSection').style.display = 'none';
+                }
 
-        if (equipamentosMes.length === 0) {
-            document.getElementById('emptyState').classList.remove('hidden');
-            document.getElementById('syncSection').style.display = 'none';
-        } else {
-            renderEquipmentList();
-            document.getElementById('syncSection').style.display = 'block';
-            updatePendingBadge();
+            } catch (error) {
+                console.error(error);
+                showAlert('Erro ao carregar dados. Verifique a conexão.', 'error');
+                document.getElementById('emptyState').classList.remove('hidden');
+            } finally {
+                document.getElementById('loadingContainer').classList.add('hidden');
+            }
         }
 
-    } catch (error) {
-        console.error(error);
-        alert('Debug: Erro: ' + error.message); // Remover depois
-        showAlert('Erro ao carregar dados. Tente novamente.', 'error');
-        document.getElementById('emptyState').classList.remove('hidden');
-    } finally {
-        document.getElementById('loadingContainer').classList.add('hidden');
-    }
-}
+        function renderEquipmentList() {
+            const list = document.getElementById('equipmentList');
+            list.classList.remove('hidden');
+
+            list.innerHTML = equipamentosMes.map((eq) => {
+                const apont = apontamentos[eq.id] || {};
+                const isApontado = apont.real !== undefined;
+                const isOpen = openItemId === eq.id;
+                
+                let qtdClass = '';
+                let checkIcon = '';
+                if (isApontado) {
+                    if (apont.real == eq.previsto) {
+                        qtdClass = 'apontado';
+                        checkIcon = '<i class="fas fa-check-circle check-icon"></i>';
+                    } else {
+                        qtdClass = 'parcial';
+                        checkIcon = '<i class="fas fa-exclamation-circle check-icon" style="color: var(--laranja);"></i>';
+                    }
+                }
 
                 return `
                 <div style="border-bottom: 1px solid var(--cinza-mais-claro);">
-                    <div class="simple-item ${isOpen ? 'active' : ''}" onclick="toggleItem('${id}')">
-                        <span class="simple-name">${eq.equipamento}</span>
+                    <div class="simple-item ${isOpen ? 'active' : ''}" onclick="toggleItem('${eq.id}')">
+                        <span class="simple-name">${eq.nome}</span>
                         <div class="simple-qtd ${qtdClass}">
                             ${isApontado ? checkIcon : ''}
                             <span>${eq.previsto}</span>
@@ -994,7 +1144,7 @@
                         </div>
                     </div>
                     
-                    <div class="detail-panel ${isOpen ? 'open' : ''}" id="detail-${id}">
+                    <div class="detail-panel ${isOpen ? 'open' : ''}" id="detail-${eq.id}">
                         <div class="detail-grid">
                             <div class="detail-box">
                                 <div class="detail-label">Previsto contrato</div>
@@ -1004,7 +1154,7 @@
                                 <div class="detail-label">Real em campo</div>
                                 <input type="number" 
                                        class="input-real" 
-                                       id="real-${id}"
+                                       id="real-${eq.id}"
                                        value="${apont.real || ''}"
                                        min="0"
                                        placeholder="0">
@@ -1015,18 +1165,18 @@
                             <span class="manutencao-label">Em manutenção</span>
                             <input type="number" 
                                    class="manutencao-input" 
-                                   id="manut-${id}"
+                                   id="manut-${eq.id}"
                                    value="${apont.manutencao || '0'}"
                                    min="0"
                                    placeholder="0">
                         </div>
 
                         <textarea class="obs-input" 
-                                  id="obs-${id}"
+                                  id="obs-${eq.id}"
                                   rows="2" 
                                   placeholder="Observações (opcional)...">${apont.obs || ''}</textarea>
 
-                        <button class="btn-salvar-item" onclick="salvarItem('${id}', ${index})">
+                        <button class="btn-salvar-item" onclick="salvarItem('${eq.id}')">
                             <i class="fas fa-save" style="margin-right: 8px;"></i>
                             Confirmar apontamento
                         </button>
@@ -1051,11 +1201,11 @@
             }
         }
 
-        function salvarItem(id, index) {
+        function salvarItem(id) {
             const real = parseInt(document.getElementById(`real-${id}`).value) || 0;
             const manutencao = parseInt(document.getElementById(`manut-${id}`).value) || 0;
             const obs = document.getElementById(`obs-${id}`).value;
-            const eq = equipamentosMes[index];
+            const eq = equipamentosMes.find(e => e.id === id);
 
             if (manutencao > real) {
                 showAlert('Manutenção não pode ser maior que o real presente', 'error');
@@ -1066,7 +1216,7 @@
                 id: id,
                 data: currentDate,
                 mes: currentMes,
-                nome: eq.equipamento,
+                nome: eq.nome,
                 previsto: eq.previsto,
                 real: real,
                 manutencao: manutencao,
@@ -1076,7 +1226,6 @@
 
             apontamentos[id] = apontamento;
 
-            // Adicionar à fila de sincronização
             const existingIndex = pendingSync.findIndex(p => p.id === id);
             if (existingIndex >= 0) {
                 pendingSync[existingIndex] = apontamento;
@@ -1089,14 +1238,13 @@
 
             openItemId = null;
             renderEquipmentList();
-            showToast('Apontamento salvo! Clique em Enviar relatório quando finalizar.');
+            showToast('Apontamento salvo! Clique em Enviar relatório.');
         }
 
         function updatePendingBadge() {
             const btn = document.getElementById('btnSync');
             const count = pendingSync.length;
             
-            // Remove badge anterior se existir
             const existingBadge = btn.querySelector('.pending-badge');
             if (existingBadge) existingBadge.remove();
             
@@ -1118,7 +1266,7 @@
             }
 
             if (!navigator.onLine) {
-                showAlert('Sem conexão. Os dados ficarão salvos para envio posterior.', 'error');
+                showAlert('Sem conexão. Os dados ficarão salvos.', 'error');
                 return;
             }
 
@@ -1128,30 +1276,33 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Enviando...</span>';
 
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        data: currentDate,
-                        equipamentos: pendingSync
-                    })
-                });
+                const dataRelatorio = {
+                    data: currentDate,
+                    mes: formatarMesBusca(new Date()),
+                    fiscal: 'Fiscal Campo',
+                    timestamp: new Date().toISOString()
+                };
 
-                const result = await response.json();
+                // Salvar metadados do relatório
+                const relatorioRef = window.dbPush(window.dbRef(window.db, `obras/${currentObra}/relatorios`));
+                await window.dbSet(relatorioRef, dataRelatorio);
 
-                if (result.result === 'success') {
-                    pendingSync = [];
-                    localStorage.removeItem('pendingSync');
-                    updatePendingBadge();
-                    showAlert('Relatório enviado com sucesso!', 'success');
-                    apontamentos = {};
-                    renderEquipmentList();
-                } else {
-                    throw new Error(result.message || 'Erro no servidor');
+                // Salvar cada equipamento
+                for (const eq of pendingSync) {
+                    const equipRef = window.dbRef(window.db, `obras/${currentObra}/relatorios/${relatorioRef.key}/equipamentos/${eq.id}`);
+                    await window.dbSet(equipRef, eq);
                 }
+
+                pendingSync = [];
+                localStorage.removeItem('pendingSync');
+                updatePendingBadge();
+                showAlert('Relatório enviado com sucesso!', 'success');
+                apontamentos = {};
+                renderEquipmentList();
 
             } catch (error) {
                 console.error(error);
-                showAlert('Erro ao enviar. Tentaremos novamente automaticamente.', 'error');
+                showAlert('Erro ao enviar. Tentaremos novamente.', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
@@ -1159,13 +1310,87 @@
             }
         }
 
-        // Tentar sincronizar quando voltar online
-        window.addEventListener('online', () => {
-            if (pendingSync.length > 0) {
-                showToast('Conexão restabelecida. Enviando dados...');
-                sincronizar();
+        // Admin functions
+        async function carregarObrasAdmin() {
+            const obrasRef = window.dbRef(window.db, 'obras');
+            window.dbOnValue(obrasRef, (snapshot) => {
+                const select = document.getElementById('adminObraSelect');
+                select.innerHTML = '<option value="">Selecione...</option>';
+                
+                if (snapshot.exists()) {
+                    const obras = snapshot.val();
+                    Object.keys(obras).forEach(key => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = obras[key].nome || key;
+                        select.appendChild(option);
+                        
+                        // Adicionar ao select fiscal também
+                        const fiscalSelect = document.getElementById('obraSelect');
+                        if (!fiscalSelect.querySelector(`option[value="${key}"]`)) {
+                            const fiscalOption = document.createElement('option');
+                            fiscalOption.value = key;
+                            fiscalOption.textContent = obras[key].nome || key;
+                            fiscalSelect.appendChild(fiscalOption);
+                        }
+                    });
+                }
+            });
+        }
+
+        async function criarObra() {
+            const id = document.getElementById('novaObraId').value.trim();
+            const nome = document.getElementById('novaObraNome').value.trim();
+            
+            if (!id || !nome) {
+                showAlert('Preencha ID e nome da obra', 'error');
+                return;
             }
-        });
+            
+            try {
+                const obraRef = window.dbRef(window.db, `obras/${id}`);
+                await window.dbSet(obraRef, {
+                    nome: nome,
+                    criadaEm: new Date().toISOString()
+                });
+                
+                document.getElementById('novaObraId').value = '';
+                document.getElementById('novaObraNome').value = '';
+                showAlert('Obra criada com sucesso!', 'success');
+                
+            } catch (error) {
+                showAlert('Erro ao criar obra', 'error');
+            }
+        }
+
+        async function adicionarEquipamento() {
+            const obra = document.getElementById('adminObraSelect').value;
+            const mes = document.getElementById('equipMes').value.trim();
+            const nome = document.getElementById('equipNome').value.trim();
+            const previsto = parseInt(document.getElementById('equipPrevisto').value);
+            
+            if (!obra || !mes || !nome || !previsto) {
+                showAlert('Preencha todos os campos', 'error');
+                return;
+            }
+            
+            try {
+                const equipId = nome.toLowerCase().replace(/\s+/g, '-');
+                const equipRef = window.dbRef(window.db, `obras/${obra}/contrato/${mes}/${equipId}`);
+                
+                await window.dbSet(equipRef, {
+                    nome: nome,
+                    previsto: previsto
+                });
+                
+                document.getElementById('equipNome').value = '';
+                document.getElementById('equipPrevisto').value = '';
+                showAlert('Equipamento adicionado!', 'success');
+                
+            } catch (error) {
+                showAlert('Erro ao adicionar equipamento', 'error');
+            }
+        }
 
         function showAlert(message, type) {
             const container = document.getElementById('alertsContainer');
@@ -1198,13 +1423,16 @@
             document.getElementById('modal').classList.remove('active');
         }
 
+        window.addEventListener('online', () => {
+            if (pendingSync.length > 0) {
+                showToast('Conexão restabelecida. Enviando...');
+                sincronizar();
+            }
+        });
+
         document.getElementById('modal').addEventListener('click', (e) => {
             if (e.target.id === 'modal') closeModal();
         });
     </script>
 </body>
 </html>
-
-
-
-
