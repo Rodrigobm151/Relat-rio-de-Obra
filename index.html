@@ -903,12 +903,12 @@
         function formatarData(data) {
             return data.toLocaleDateString('pt-BR');
         }
-
-       function formatarMesBusca(data) {
-    const mes = String(data.getMonth() + 1).padStart(2, '0');
-    const ano = data.getFullYear();
-    return `${mes}/${ano}`;
-}
+//--------------------------------------------------------------------------------------------------------------------------------
+      function formatarMesBusca(data) {
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            return `${mes}/${ano}`;
+        }
 
         // Status de conexão
         function checkOnlineStatus() {
@@ -1204,6 +1204,7 @@
     </script>
 </body>
 </html>
+
 
 
 
