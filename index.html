@@ -811,7 +811,6 @@
                 <div class="obra-label">Selecione a obra</div>
                 <select class="obra-select" id="obraSelect" onchange="changeObra()">
                     <option value="">-- Escolha uma obra --</option>
-                    <option value="obra-geotecnia-squad1">Geotecnia - Squad 1</option>
                 </select>
             </div>
 
@@ -890,7 +889,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Nome do equipamento</label>
-                    <input type="form-input" class="form-input" id="equipNome" placeholder="Escavadeira 35T">
+                    <input type="text" class="form-input" id="equipNome" placeholder="Escavadeira 35T">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Quantidade prevista</label>
@@ -953,7 +952,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Tornar db global para as funções
         window.db = db;
         window.dbRef = ref;
         window.dbOnValue = onValue;
@@ -996,6 +994,8 @@
                 document.getElementById('fiscalPanel').classList.remove('active');
                 document.getElementById('adminPanel').classList.add('active');
                 carregarObrasAdmin();
+            } else {
+                carregarObrasFiscal();
             }
             
             checkOnlineStatus();
@@ -1027,10 +1027,11 @@
             return data.toLocaleDateString('pt-BR');
         }
 
+        // CORREÇÃO: Formato MM-AAAA com hífen
         function formatarMesBusca(data) {
             const mes = String(data.getMonth() + 1).padStart(2, '0');
             const ano = data.getFullYear();
-            return `${mes}/${ano}`;
+            return `${mes}-${ano}`;
         }
 
         function checkOnlineStatus() {
@@ -1046,6 +1047,25 @@
                 statusEl.innerHTML = '<i class="fas fa-wifi-slash"></i><span>Offline</span>';
                 statusEl.classList.add('offline');
             }
+        }
+
+        // Carregar obras para o fiscal
+        function carregarObrasFiscal() {
+            const obrasRef = window.dbRef(window.db, 'obras');
+            window.dbOnValue(obrasRef, (snapshot) => {
+                const select = document.getElementById('obraSelect');
+                select.innerHTML = '<option value="">-- Escolha uma obra --</option>';
+                
+                if (snapshot.exists()) {
+                    const obras = snapshot.val();
+                    Object.keys(obras).forEach(key => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = obras[key].nome || key;
+                        select.appendChild(option);
+                    });
+                }
+            });
         }
 
         function changeObra() {
@@ -1070,27 +1090,24 @@
             carregarEquipamentos();
         }
 
-async function carregarEquipamentos() {
-    if (!currentObra) return;
-    
-    console.log('Carregando obra:', currentObra);
-    alert('Debug: Carregando obra: ' + currentObra); // Remover depois
-    
-    document.getElementById('loadingContainer').classList.remove('hidden');
-    document.getElementById('equipmentList').classList.add('hidden');
+        async function carregarEquipamentos() {
+            if (!currentObra) return;
+            
+            document.getElementById('loadingContainer').classList.remove('hidden');
+            document.getElementById('equipmentList').classList.add('hidden');
 
-    try {
-        const mesBusca = formatarMesBusca(new Date());
-        console.log('Buscando mês:', mesBusca);
-        alert('Debug: Buscando mês: ' + mesBusca); // Remover depois
-        
-        const contratoRef = window.dbRef(window.db, `obras/${currentObra}/contrato/${mesBusca}`);
-        
-        const snapshot = await window.dbGet(contratoRef);
-        console.log('Snapshot:', snapshot.exists(), snapshot.val());
-        alert('Debug: Encontrou dados? ' + snapshot.exists()); // Remover depois
-        
-        // ... resto do código
+            try {
+                const mesBusca = formatarMesBusca(new Date());
+                const contratoRef = window.dbRef(window.db, `obras/${currentObra}/contrato/${mesBusca}`);
+                
+                const snapshot = await window.dbGet(contratoRef);
+                
+                if (snapshot.exists()) {
+                    const dados = snapshot.val();
+                    equipamentosMes = Object.keys(dados).map(key => ({
+                        id: key,
+                        ...dados[key]
+                    }));
                     
                     renderEquipmentList();
                     document.getElementById('syncSection').style.display = 'block';
@@ -1101,7 +1118,7 @@ async function carregarEquipamentos() {
                     document.getElementById('emptyState').innerHTML = `
                         <i class="fas fa-clipboard-list"></i>
                         <p>Nenhum equipamento cadastrado para ${currentMes}</p>
-                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Entre em contato com o administrador</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Verifique o mês no cadastro (formato: MM-AAAA)</p>
                     `;
                     document.getElementById('syncSection').style.display = 'none';
                 }
@@ -1286,11 +1303,9 @@ async function carregarEquipamentos() {
                     timestamp: new Date().toISOString()
                 };
 
-                // Salvar metadados do relatório
                 const relatorioRef = window.dbPush(window.dbRef(window.db, `obras/${currentObra}/relatorios`));
                 await window.dbSet(relatorioRef, dataRelatorio);
 
-                // Salvar cada equipamento
                 for (const eq of pendingSync) {
                     const equipRef = window.dbRef(window.db, `obras/${currentObra}/relatorios/${relatorioRef.key}/equipamentos/${eq.id}`);
                     await window.dbSet(equipRef, eq);
@@ -1314,11 +1329,11 @@ async function carregarEquipamentos() {
         }
 
         // Admin functions
-        async function carregarObrasAdmin() {
+        function carregarObrasAdmin() {
             const obrasRef = window.dbRef(window.db, 'obras');
             window.dbOnValue(obrasRef, (snapshot) => {
-                const select = document.getElementById('adminObraSelect');
-                select.innerHTML = '<option value="">Selecione...</option>';
+                const adminSelect = document.getElementById('adminObraSelect');
+                adminSelect.innerHTML = '<option value="">Selecione...</option>';
                 
                 if (snapshot.exists()) {
                     const obras = snapshot.val();
@@ -1326,16 +1341,7 @@ async function carregarEquipamentos() {
                         const option = document.createElement('option');
                         option.value = key;
                         option.textContent = obras[key].nome || key;
-                        select.appendChild(option);
-                        
-                        // Adicionar ao select fiscal também
-                        const fiscalSelect = document.getElementById('obraSelect');
-                        if (!fiscalSelect.querySelector(`option[value="${key}"]`)) {
-                            const fiscalOption = document.createElement('option');
-                            fiscalOption.value = key;
-                            fiscalOption.textContent = obras[key].nome || key;
-                            fiscalSelect.appendChild(fiscalOption);
-                        }
+                        adminSelect.appendChild(option);
                     });
                 }
             });
@@ -1377,9 +1383,12 @@ async function carregarEquipamentos() {
                 return;
             }
             
+            // CORREÇÃO: Converte MM/AAAA para MM-AAAA
+            const mesFormatado = mes.replace('/', '-');
+            
             try {
                 const equipId = nome.toLowerCase().replace(/\s+/g, '-');
-                const equipRef = window.dbRef(window.db, `obras/${obra}/contrato/${mes}/${equipId}`);
+                const equipRef = window.dbRef(window.db, `obras/${obra}/contrato/${mesFormatado}/${equipId}`);
                 
                 await window.dbSet(equipRef, {
                     nome: nome,
@@ -1439,4 +1448,3 @@ async function carregarEquipamentos() {
     </script>
 </body>
 </html>
-
