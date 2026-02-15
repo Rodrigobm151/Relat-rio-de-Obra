@@ -904,11 +904,11 @@
             return data.toLocaleDateString('pt-BR');
         }
 
-        function formatarMesBusca(data) {
-            const mes = String(data.getMonth() + 1).padStart(2, '0');
-            const ano = data.getFullYear();
-            return `${mes}/${ano}`;
-        }
+       function formatarMesBusca(data) {
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+    return `${mes}/${ano}`;
+}
 
         // Status de conexão
         function checkOnlineStatus() {
@@ -927,63 +927,61 @@
         }
 
         // Carregar dados do contrato
-        async function carregarDados() {
-            if (!navigator.onLine) {
-                showAlert('Sem conexão. Verifique a internet.', 'error');
-                return;
-            }
+       async function carregarDados() {
+    if (!navigator.onLine) {
+        showAlert('Sem conexão. Verifique a internet.', 'error');
+        return;
+    }
 
-            document.getElementById('loadingContainer').classList.remove('hidden');
-            document.getElementById('equipmentList').classList.add('hidden');
-            document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('loadingContainer').classList.remove('hidden');
+    document.getElementById('equipmentList').classList.add('hidden');
+    document.getElementById('emptyState').classList.add('hidden');
 
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const todosEquipamentos = await response.json();
-                
-                // Filtrar pelo mês atual
-                const mesBusca = formatarMesBusca(new Date());
-                equipamentosMes = todosEquipamentos.filter(eq => eq.mes === mesBusca);
+    // DEBUG: Mostra o que está buscando
+    const mesBusca = formatarMesBusca(new Date());
+    console.log('Buscando mês:', mesBusca);
+    alert('Debug: Buscando mês: ' + mesBusca); // Remover depois
 
-                if (equipamentosMes.length === 0) {
-                    document.getElementById('emptyState').classList.remove('hidden');
-                    document.getElementById('syncSection').style.display = 'none';
-                } else {
-                    renderEquipmentList();
-                    document.getElementById('syncSection').style.display = 'block';
-                    updatePendingBadge();
-                }
-
-            } catch (error) {
-                console.error(error);
-                showAlert('Erro ao carregar dados. Tente novamente.', 'error');
-                document.getElementById('emptyState').classList.remove('hidden');
-            } finally {
-                document.getElementById('loadingContainer').classList.add('hidden');
-            }
+    try {
+        const response = await fetch(SCRIPT_URL);
+        const todosEquipamentos = await response.json();
+        
+        // DEBUG: Mostra o que recebeu
+        console.log('Recebido:', todosEquipamentos);
+        alert('Debug: Recebido ' + todosEquipamentos.length + ' equipamentos'); // Remover depois
+        
+        // Mostra primeiro item para ver formato
+        if (todosEquipamentos.length > 0) {
+            alert('Debug: Primeiro item: ' + JSON.stringify(todosEquipamentos[0]));
         }
 
-        function renderEquipmentList() {
-            const list = document.getElementById('equipmentList');
-            list.classList.remove('hidden');
+        // Filtrar pelo mês atual
+        equipamentosMes = todosEquipamentos.filter(eq => {
+            const match = eq.mes === mesBusca;
+            console.log('Comparando:', eq.mes, '===', mesBusca, '?', match);
+            return match;
+        });
 
-            list.innerHTML = equipamentosMes.map((eq, index) => {
-                const id = `eq_${index}`;
-                const apont = apontamentos[id] || {};
-                const isApontado = apont.real !== undefined;
-                const isOpen = openItemId === id;
-                
-                let qtdClass = '';
-                let checkIcon = '';
-                if (isApontado) {
-                    if (apont.real == eq.previsto) {
-                        qtdClass = 'apontado';
-                        checkIcon = '<i class="fas fa-check-circle check-icon"></i>';
-                    } else {
-                        qtdClass = 'parcial';
-                        checkIcon = '<i class="fas fa-exclamation-circle check-icon" style="color: var(--laranja);"></i>';
-                    }
-                }
+        alert('Debug: Filtrados para mês ' + mesBusca + ': ' + equipamentosMes.length); // Remover depois
+
+        if (equipamentosMes.length === 0) {
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('syncSection').style.display = 'none';
+        } else {
+            renderEquipmentList();
+            document.getElementById('syncSection').style.display = 'block';
+            updatePendingBadge();
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert('Debug: Erro: ' + error.message); // Remover depois
+        showAlert('Erro ao carregar dados. Tente novamente.', 'error');
+        document.getElementById('emptyState').classList.remove('hidden');
+    } finally {
+        document.getElementById('loadingContainer').classList.add('hidden');
+    }
+}
 
                 return `
                 <div style="border-bottom: 1px solid var(--cinza-mais-claro);">
@@ -1206,5 +1204,6 @@
     </script>
 </body>
 </html>
+
 
 
