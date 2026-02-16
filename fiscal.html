@@ -527,99 +527,158 @@
             }
         }
 
-        async function carregarHistoricoRDCs() {
-            const container = document.getElementById('rdcList');
-            const statusEl = document.getElementById('statusHoje');
-            const btnCriar = document.getElementById('btnCriarRDC');
-            const statusBox = document.getElementById('statusBoxHoje');
-            
-            container.innerHTML = '<small style="color: #777">Buscando histórico...</small>';
-            
-            const hoje = new Date();
-            const hojeStr = hoje.toLocaleDateString('pt-BR');
-            const hojeKey = formatarDataKey(hoje); // YYYY-MM-DD
-            let rdcHojeEnviado = false;
-            let ultimoNumero = 0;
-            
-            try {
-                const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/relatorios`));
-                let html = '';
+       async function carregarHistoricoRDCs() {
+    const container = document.getElementById('rdcList');
+    const statusEl = document.getElementById('statusHoje');
+    const btnCriar = document.getElementById('btnCriarRDC');
+    const statusBox = document.getElementById('statusBoxHoje');
+    
+    container.innerHTML = '<small style="color: #777">Buscando histórico...</small>';
+    
+    const hoje = new Date();
+    const hojeStr = hoje.toLocaleDateString('pt-BR');
+    const hojeKey = formatarDataKey(hoje);
+    
+    // Calcular data de 7 dias atrás
+    const seteDiasAtras = new Date(hoje);
+    seteDiasAtras.setDate(hoje.getDate() - 7);
+    
+    let rdcHojeEnviado = false;
+    let ultimoNumero = 0;
+    let rdcsRecentes = []; // RDCs dos últimos 7 dias
+    
+    try {
+        const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/relatorios`));
+        let html = '';
+        
+        if (snap && snap.exists()) {
+            snap.forEach(child => {
+                const rdc = child.val();
                 
-                if (snap && snap.exists()) {
-                    const rdcList = [];
-                    snap.forEach(child => {
-                        const rdc = child.val();
-                        rdcList.push(rdc);
-                        if (parseInt(rdc.numero) > ultimoNumero) {
-                            ultimoNumero = parseInt(rdc.numero);
-                        }
-                        // Verifica se há RDC para hoje (pela data ou dataKey)
-                        if (rdc.data === hojeStr || rdc.dataKey === hojeKey) {
-                            rdcHojeEnviado = true;
-                        }
+                if (parseInt(rdc.numero) > ultimoNumero) {
+                    ultimoNumero = parseInt(rdc.numero);
+                }
+                
+                // Verifica se é de hoje
+                if (rdc.data === hojeStr || rdc.dataKey === hojeKey) {
+                    rdcHojeEnviado = true;
+                }
+                
+                // Verifica se está nos últimos 7 dias
+                const dataRDC = rdc.dataKey ? new Date(rdc.dataKey) : null;
+                if (dataRDC && dataRDC >= seteDiasAtras) {
+                    rdcsRecentes.push(rdc);
+                }
+            });
+        }
+        
+        // Calcular RDCs pendentes dos últimos 7 dias
+        const rdcsPendentes = [];
+        if (currentObraData && currentObraData.dataInicio) {
+            const [anoInicio, mesInicio, diaInicio] = currentObraData.dataInicio.split('-');
+            const dataInicio = new Date(anoInicio, mesInicio - 1, diaInicio);
+            
+            // Gerar datas dos últimos 7 dias
+            for (let i = 0; i < 7; i++) {
+                const dataVerificar = new Date(hoje);
+                dataVerificar.setDate(hoje.getDate() - i);
+                
+                // Se a data é anterior ao início da obra, pula
+                if (dataVerificar < dataInicio) continue;
+                
+                const dataVerificarStr = dataVerificar.toLocaleDateString('pt-BR');
+                const dataVerificarKey = formatarDataKey(dataVerificar);
+                
+                // Verifica se já existe RDC para esta data
+                const jaExiste = rdcsRecentes.some(r => 
+                    r.data === dataVerificarStr || r.dataKey === dataVerificarKey
+                );
+                
+                if (!jaExiste && i === 0) {
+                    // Hoje está pendente (já tratado no statusBox)
+                } else if (!jaExiste) {
+                    // Dia anterior pendente
+                    const diffDias = Math.floor((dataVerificar - dataInicio) / (1000 * 60 * 60 * 24));
+                    const numeroRDC = diffDias + 1;
+                    
+                    rdcsPendentes.push({
+                        data: dataVerificarStr,
+                        dataKey: dataVerificarKey,
+                        numero: numeroRDC,
+                        isPendente: true
                     });
-                    
-                    // Ordenar por número decrescente
-                    rdcList.sort((a, b) => parseInt(b.numero) - parseInt(a.numero));
-                    
-                    rdcList.forEach(rdc => {
-                        const isHoje = (rdc.data === hojeStr || rdc.dataKey === hojeKey);
-                        html += `
-                            <div class="card-obra ${isHoje ? 'rdc-pendente-card' : ''}" style="border-left-color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}">
-                                <div style="font-size: 0.9rem">
-                                    <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
-                                    <small style="color: #777">Fiscal: ${rdc.fiscalNome || rdc.fiscal}</small>
-                                </div>
-                                <span style="font-size: 0.75rem; color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}; font-weight: bold;">
-                                    ${isHoje ? 'HOJE' : 'ENVIADO'}
-                                </span>
-                            </div>`;
-                    });
                 }
-                
-                // Determinar próximo número do RDC baseado na dataInicio da obra
-                if (currentObraData && currentObraData.dataInicio && !rdcHojeEnviado) {
-                    // dataInicio está no formato YYYY-MM-DD (do input type="date")
-                    const [anoInicio, mesInicio, diaInicio] = currentObraData.dataInicio.split('-');
-                    const dataInicio = new Date(anoInicio, mesInicio - 1, diaInicio);
-                    
-                    // Calcular diferença em dias
-                    const diffTime = hoje - dataInicio;
-                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                    
-                    // RDC 001 = primeiro dia (dataInicio)
-                    proximoRDCNumero = diffDays + 1;
-                    
-                    // Se for negativo, obra ainda não começou
-                    if (proximoRDCNumero < 1) {
-                        proximoRDCNumero = 1;
-                    }
-                } else if (ultimoNumero > 0) {
-                    proximoRDCNumero = ultimoNumero + 1;
-                } else {
-                    proximoRDCNumero = 1;
-                }
-                
-                // Atualizar status de hoje
-                if (rdcHojeEnviado) {
-                    statusEl.textContent = 'Enviado';
-                    statusEl.className = 'status-enviado';
-                    btnCriar.style.display = 'none';
-                    statusBox.style.background = '#e8f5e9';
-                } else {
-                    statusEl.textContent = 'Pendente';
-                    statusEl.className = 'status-pendente';
-                    btnCriar.style.display = 'inline-block';
-                    statusBox.style.background = 'white';
-                }
-                
-                container.innerHTML = html || '<p style="font-size: 0.8rem; color: #777">Nenhum relatório anterior.</p>';
-                
-            } catch (e) {
-                console.error(e);
-                container.innerHTML = '<div class="erro-box">Erro ao carregar histórico.</div>';
             }
         }
+        
+        // Ordenar: pendentes primeiro (mais recentes), depois enviados
+        rdcsPendentes.sort((a, b) => new Date(b.dataKey) - new Date(a.dataKey));
+        rdcsRecentes.sort((a, b) => new Date(b.dataKey || b.data) - new Date(a.dataKey || a.data));
+        
+        // Renderizar pendentes
+        rdcsPendentes.forEach(rdc => {
+            html += `
+                <div class="card-obra rdc-pendente-card" style="border-left-color: var(--laranja); opacity: 0.8;">
+                    <div style="font-size: 0.9rem">
+                        <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
+                        <small style="color: #777">Aguardando envio</small>
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--laranja); font-weight: bold;">
+                        PENDENTE
+                    </span>
+                </div>`;
+        });
+        
+        // Renderizar enviados recentes
+        rdcsRecentes.forEach(rdc => {
+            const isHoje = (rdc.data === hojeStr || rdc.dataKey === hojeKey);
+            html += `
+                <div class="card-obra ${isHoje ? 'rdc-pendente-card' : ''}" style="border-left-color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}">
+                    <div style="font-size: 0.9rem">
+                        <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
+                        <small style="color: #777">Fiscal: ${rdc.fiscalNome || rdc.fiscal}</small>
+                    </div>
+                    <span style="font-size: 0.75rem; color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}; font-weight: bold;">
+                        ${isHoje ? 'HOJE' : 'ENVIADO'}
+                    </span>
+                </div>`;
+        });
+        
+        // Determinar próximo número do RDC
+        if (currentObraData && currentObraData.dataInicio && !rdcHojeEnviado) {
+            const [anoInicio, mesInicio, diaInicio] = currentObraData.dataInicio.split('-');
+            const dataInicio = new Date(anoInicio, mesInicio - 1, diaInicio);
+            const diffTime = hoje - dataInicio;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            proximoRDCNumero = diffDays + 1;
+            
+            if (proximoRDCNumero < 1) proximoRDCNumero = 1;
+        } else if (ultimoNumero > 0) {
+            proximoRDCNumero = ultimoNumero + 1;
+        } else {
+            proximoRDCNumero = 1;
+        }
+        
+        // Atualizar status de hoje
+        if (rdcHojeEnviado) {
+            statusEl.textContent = 'Enviado';
+            statusEl.className = 'status-enviado';
+            btnCriar.style.display = 'none';
+            statusBox.style.background = '#e8f5e9';
+        } else {
+            statusEl.textContent = 'Pendente';
+            statusEl.className = 'status-pendente';
+            btnCriar.style.display = 'inline-block';
+            statusBox.style.background = 'white';
+        }
+        
+        container.innerHTML = html || '<p style="font-size: 0.8rem; color: #777">Nenhum relatório nos últimos 7 dias.</p>';
+        
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = '<div class="erro-box">Erro ao carregar histórico.</div>';
+    }
+}
 
         // --- LÓGICA DO FORMULÁRIO RDC ---
         async function criarNovoRDC() {
@@ -693,88 +752,95 @@
             if (btnElement) btnElement.classList.add('active');
         }
 
-        async function carregarEquipamentosDoContrato(mesKey) {
-            const container = document.getElementById('equipamentosContainer');
-            container.innerHTML = '<p style="color: #777">Carregando contrato do mês...</p>';
-            
-            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
-            
-            if (!snap || !snap.exists()) {
-                container.innerHTML = `
-                    <div class="erro-box">
-                        <strong>Nenhum contrato encontrado para ${mesKey}</strong><br>
-                        <small>Peça ao administrador para importar o contrato de equipamentos deste mês.</small>
-                    </div>`;
-                return;
-            }
+       async function carregarEquipamentosDoContrato(mesKey) {
+    const container = document.getElementById('equipamentosContainer');
+    container.innerHTML = '<p style="color: #777">Carregando contrato do mês...</p>';
+    
+    const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
+    
+    if (!snap || !snap.exists()) {
+        container.innerHTML = `
+            <div class="erro-box">
+                <strong>Nenhum contrato encontrado para ${mesKey}</strong><br>
+                <small>Peça ao administrador para importar o contrato de equipamentos deste mês.</small>
+            </div>`;
+        return;
+    }
 
-            let html = '';
-            snap.forEach(child => {
-                const eq = child.val();
-                const id = child.key;
-                html += `
-                    <div class="equip-card">
-                        <div class="equip-header" onclick="this.nextElementSibling.classList.toggle('active')">
-                            <span style="color: white">${eq.nome}</span>
-                            <span style="color: white">${String(eq.previsto).padStart(2, '0')} <i class="fas fa-chevron-down"></i></span>
+    let html = '';
+    snap.forEach(child => {
+        const eq = child.val();
+        const id = child.key;
+        html += `
+            <div class="equip-card">
+                <div class="equip-header" onclick="this.nextElementSibling.classList.toggle('active')">
+                    <span style="color: white">${eq.nome}</span>
+                    <span style="color: white">${String(eq.previsto).padStart(2, '0')} <i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="equip-body">
+                    <div class="grid-campos">
+                        <div>
+                            <label class="label-peq">Previsto</label>
+                            <input type="text" class="input-rdc" value="${eq.previsto}" disabled style="background: #f0f0f0;">
                         </div>
-                        <div class="equip-body">
-                            <div class="grid-campos">
-                                <div>
-                                    <label class="label-peq">Previsto</label>
-                                    <input type="text" class="input-rdc" value="${eq.previsto}" disabled style="background: #f0f0f0;">
-                                </div>
-                                <div>
-                                    <label class="label-peq" style="color: var(--azul-vale)">Real</label>
-                                    <input type="number" class="input-rdc in-real" data-id="${id}" data-nome="${eq.nome}" value="${eq.previsto}">
-                                </div>
-                                <div>
-                                    <label class="label-peq" style="color: var(--laranja)">Manut.</label>
-                                    <input type="number" class="input-rdc in-manut" data-id="${id}" value="0">
-                                </div>
-                            </div>
-                            <label class="label-peq">Observações</label>
-                            <textarea class="in-obs" data-id="${id}" placeholder="Notas sobre este equipamento..."></textarea>
+                        <div>
+                            <label class="label-peq" style="color: var(--azul-vale)">Real</label>
+                            <input type="number" class="input-rdc in-real" 
+                                data-id="${id}" 
+                                data-nome="${eq.nome}" 
+                                data-previsto="${eq.previsto}"  <!-- ADICIONADO -->
+                                value="${eq.previsto}">
                         </div>
-                    </div>`;
-            });
-            container.innerHTML = html;
-        }
+                        <div>
+                            <label class="label-peq" style="color: var(--laranja)">Manut.</label>
+                            <input type="number" class="input-rdc in-manut" data-id="${id}" value="0">
+                        </div>
+                    </div>
+                    <label class="label-peq">Observações</label>
+                    <textarea class="in-obs" data-id="${id}" placeholder="Notas sobre este equipamento..."></textarea>
+                </div>
+            </div>`;
+    });
+    container.innerHTML = html;
+}
 
-        async function enviarRDC() {
-            if (!confirm("Confirmar fechamento e envio do RDC?")) return;
+       async function enviarRDC() {
+    if (!confirm("Confirmar fechamento e envio do RDC?")) return;
 
-            // Coleta dados da aba Geral
-            currentRDC.dados.clima = {
-                condicao: document.getElementById('climaCondicao').value,
-                pluviometro: parseFloat(document.getElementById('pluviometro').value) || 0
-            };
-            
-            currentRDC.dados.atividades = {
-                descricao: document.getElementById('descAtividades').value,
-                comentarios: document.getElementById('comentarios').value
-            };
+    // Coleta dados da aba Geral
+    currentRDC.dados.clima = {
+        condicao: document.getElementById('climaCondicao').value,
+        pluviometro: parseFloat(document.getElementById('pluviometro').value) || 0
+    };
+    
+    currentRDC.dados.atividades = {
+        descricao: document.getElementById('descAtividades').value,
+        comentarios: document.getElementById('comentarios').value
+    };
 
-            // Coleta dados de equipamentos
-            document.querySelectorAll('.in-real').forEach(input => {
-                const id = input.dataset.id;
-                currentRDC.dados.equipamentos[id] = {
-                    nome: input.dataset.nome,
-                    real: parseInt(input.value) || 0,
-                    manutencao: parseInt(document.querySelector(`.in-manut[data-id="${id}"]`).value) || 0,
-                    obs: document.querySelector(`.in-obs[data-id="${id}"]`).value
-                };
-            });
+    // Coleta dados de equipamentos - AGORA COM PREVISTO
+    document.querySelectorAll('.in-real').forEach(input => {
+        const id = input.dataset.id;
+        const previstoValor = input.getAttribute('data-previsto') || input.value; // Pega o previsto do atributo ou input disabled
+        
+        currentRDC.dados.equipamentos[id] = {
+            nome: input.dataset.nome,
+            previsto: parseInt(previstoValor) || 0,  // <-- ADICIONADO
+            real: parseInt(input.value) || 0,
+            manutencao: parseInt(document.querySelector(`.in-manut[data-id="${id}"]`).value) || 0,
+            obs: document.querySelector(`.in-obs[data-id="${id}"]`).value
+        };
+    });
 
-            try {
-                const relRef = window.dbRef(window.db, `obras/${currentObraId}/relatorios`);
-                await window.dbPush(relRef, currentRDC);
-                showToast("RDC enviado com sucesso!");
-                voltarParaRDCs();
-            } catch (e) {
-                alert("Erro ao salvar: " + e.message);
-            }
-        }
+    try {
+        const relRef = window.dbRef(window.db, `obras/${currentObraId}/relatorios`);
+        await window.dbPush(relRef, currentRDC);
+        showToast("RDC enviado com sucesso!");
+        voltarParaRDCs();
+    } catch (e) {
+        alert("Erro ao salvar: " + e.message);
+    }
+}
 
         function voltarParaRDCs() {
             document.getElementById('formPanel').style.display = 'none';
