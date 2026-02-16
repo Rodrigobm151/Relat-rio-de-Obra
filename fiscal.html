@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RDC - Área do Fiscal</title>
+    <title>VER 1.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -12,158 +12,187 @@
             --azul-escuro: #0096d2;
             --verde-vale: #007E79;
             --cinza-texto: #555555;
-            --branco: #FFFFFF;
-            --cinza-medio: #747678;
-            --cinza-claro: #BCBEC0;
-            --cinza-mais-claro: #E6E7E8;
-            --laranja: #ff9800;
-            --vermelho: #e74c3c;
             --fundo: #f5f7fa;
+            --laranja: #ff9800;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--fundo); color: var(--cinza-texto); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        body { background-color: var(--fundo); color: var(--cinza-texto); -webkit-font-smoothing: antialiased; padding-bottom: 20px; }
 
-        /* Header */
-        .header { background: var(--azul-vale); color: white; padding: 1rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header-content { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .header-info h1 { font-size: 1.2rem; font-weight: 600; font-style: italic; }
-        .header-info p { font-size: 0.85rem; opacity: 0.9; }
+        /* Headers Estilizados */
+        .header-vale { 
+            background: linear-gradient(135deg, var(--azul-vale), var(--azul-escuro)); 
+            color: white; 
+            padding: 20px; 
+            border-bottom-left-radius: 20px; 
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        .header-vale h1 { font-size: 1.3rem; font-style: italic; font-weight: 700; }
+        .header-vale p { font-size: 0.85rem; opacity: 0.9; }
 
-        .btn-sair { background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
+        .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
 
-        /* Container */
-        .container { max-width: 800px; margin: 0 auto; padding: 1rem; padding-bottom: 100px; }
+        /* Botão Estilo PowerPoint */
+        .btn-criar-pp {
+            background: linear-gradient(to bottom, #4fc3f7, #0199d9);
+            color: white;
+            border: none;
+            padding: 10px 40px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1rem;
+            box-shadow: 0 4px 0 #0077a8, 0 6px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .btn-criar-pp:active { transform: translateY(3px); box-shadow: 0 1px 0 #0077a8; }
 
-        /* Cards & Lists */
-        .card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .card-title { color: var(--azul-vale); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        /* Cards */
+        .card-obra { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 12px; 
+            border-left: 6px solid var(--azul-vale);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
 
-        .obra-item, .rdc-item { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.3s; border-left: 4px solid var(--azul-vale); }
-        .obra-item:hover { transform: translateX(5px); }
+        .status-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
 
-        /* RDC Status Tags */
-        .rdc-status { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; }
-        .enviado { background: #e8f5e9; color: var(--verde-vale); }
-        .rascunho { background: #fff3e0; color: var(--laranja); }
-        .pendente { background: #ffebee; color: var(--vermelho); }
+        /* Tabs do RDC */
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab-btn { 
+            flex: 1; border: none; padding: 12px; border-radius: 8px; 
+            background: #d1d3d4; color: white; font-weight: bold; font-style: italic; 
+            cursor: pointer;
+        }
+        .tab-btn.active { background: var(--azul-vale); }
 
-        /* Tabs */
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 5px; }
-        .tab-btn { background: white; border: 2px solid var(--cinza-mais-claro); color: var(--cinza-texto); padding: 0.8rem 1rem; border-radius: 12px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem; flex: 1; justify-content: center; }
-        .tab-btn.active { background: var(--azul-vale); color: white; border-color: var(--azul-vale); }
-        .tab-content { display: none; animation: fadeIn 0.3s; }
-        .tab-content.active { display: block; }
+        /* Accordion de Equipamentos */
+        .equip-card { margin-bottom: 10px; border-radius: 8px; overflow: hidden; }
+        .equip-header { 
+            background: var(--azul-vale); color: white; padding: 12px 15px; 
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600; cursor: pointer;
+        }
+        .equip-body { 
+            background: white; padding: 15px; border: 1px solid var(--azul-vale); 
+            border-top: none; display: none;
+        }
+        .equip-body.active { display: block; }
 
-        /* Form Elements */
-        .form-group { margin-bottom: 1.2rem; }
-        .form-label { display: block; color: var(--cinza-texto); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .form-select, .form-input, .form-textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--cinza-mais-claro); border-radius: 10px; font-size: 16px; color: var(--cinza-texto); }
-        .form-textarea { min-height: 80px; resize: none; }
+        .grid-campos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .input-rdc { 
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; 
+            text-align: center; font-weight: bold;
+        }
+        .label-peq { font-size: 0.7rem; font-style: italic; display: block; margin-bottom: 4px; }
 
-        /* EQUIPAMENTOS ESTILIZAÇÃO ESPECÍFICA */
-        .equip-list { display: flex; flex-direction: column; gap: 10px; }
-        .equip-item { background: white; border-radius: 12px; padding: 1rem; border-left: 5px solid var(--cinza-claro); cursor: pointer; position: relative; }
-        .equip-item.contestada { border-left-color: var(--laranja); }
-        
-        .equip-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .equip-nome { font-weight: 600; color: var(--cinza-texto); font-size: 1rem; }
-        .equip-nome b { color: var(--azul-vale); font-size: 1.1rem; }
-        .equip-previsto { font-size: 0.75rem; color: var(--cinza-medio); background: var(--cinza-mais-claro); padding: 2px 8px; border-radius: 10px; }
+        textarea { width: 100%; height: 60px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 5px; padding: 8px; }
 
-        .equip-detail { max-height: 0; overflow: hidden; transition: all 0.4s ease-out; background: #fcfcfc; }
-        .equip-detail.open { max-height: 500px; margin-top: 15px; border-top: 1px dashed var(--cinza-claro); padding-top: 15px; }
+        /* Footer */
+        .action-bar { 
+            position: fixed; bottom: 0; left: 0; right: 0; background: white; 
+            padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+            display: flex; gap: 10px; z-index: 100; 
+        }
+        .btn-acao { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
+        .btn-cancelar { background: #eee; color: #666; }
+        .btn-confirmar { background: var(--verde-vale); color: white; }
 
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .detail-box { text-align: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--cinza-mais-claro); }
-        .input-real { width: 100%; border: none; border-bottom: 2px solid var(--azul-vale); text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--azul-vale); outline: none; }
-
-        .btn-salvar-item { background: var(--verde-vale); color: white; border: none; padding: 0.8rem; border-radius: 8px; font-weight: 600; width: 100%; margin-top: 10px; cursor: pointer; }
-
-        /* Footer Action Bar */
-        .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 1rem; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; gap: 1rem; z-index: 100; }
-        .btn-primary { flex: 2; background: var(--azul-vale); color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        .btn-secondary { flex: 1; background: var(--cinza-mais-claro); color: var(--cinza-texto); border: none; padding: 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 30px; z-index: 1000; display: none; font-size: 0.9rem; }
+        .toast { 
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+            background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; 
+            border-radius: 20px; z-index: 1000; display: none; 
+        }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="header-content">
-            <div class="header-info">
-                <h1 id="headerTitle">minhas obras</h1>
-                <p id="headerSubtitle">carregando...</p>
-            </div>
-            <button class="btn-sair" onclick="sair()">sair</button>
-        </div>
-    </header>
+    <div id="toast" class="toast"></div>
 
-    <div class="container">
-        
-        <div id="obrasPanel">
-            <div id="obrasList"></div>
-        </div>
-
-        <div id="rdcPanel" style="display: none;">
-            <div class="card" style="padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: 600;">Relatórios</span>
-                <button class="btn-primary" onclick="criarNovoRDC()" style="padding: 0.5rem 1rem; width: auto;">+ Novo</button>
+    <div id="obrasPanel">
+        <header class="header-vale">
+            <h1>Minhas Obras</h1>
+            <p id="userGreeting">Olá, Fiscal</p>
+        </header>
+        <div class="container" id="obrasList">
             </div>
+    </div>
+
+    <div id="rdcPanel" style="display: none;">
+        <header class="header-vale">
+            <h1 id="headerObraNome">Nome da Obra</h1>
+            <p>Histórico de Relatórios</p>
+        </header>
+        <div class="container">
+            <div class="status-box">
+                <p style="margin-bottom: 15px; font-style: italic;">
+                    Relatório de campo de hoje: <br>
+                    <strong id="dataHojeStr">16/02/2026</strong> – <span style="color: var(--laranja)">Pendente</span>
+                </p>
+                <button class="btn-criar-pp" onclick="criarNovoRDC()">Criar</button>
+            </div>
+            
+            <p style="font-size: 0.8rem; font-style: italic; color: var(--azul-vale); margin-bottom: 10px;">
+                Lista dos relatórios anteriores
+            </p>
             <div id="rdcList"></div>
+            
+            <button class="btn-acao btn-cancelar" style="width: 100%; margin-top: 20px;" onclick="location.reload()">Voltar para Obras</button>
         </div>
+    </div>
 
-        <div id="formPanel" style="display: none;">
-            <div class="card" style="margin-bottom: 10px;">
-                <h2 id="formRdcTitulo" style="color: var(--azul-vale);">RDC #000</h2>
-                <p id="formRdcData" style="font-size: 0.8rem; color: var(--cinza-medio);"></p>
-            </div>
+    <div id="formPanel" style="display: none;">
+        <header class="header-vale">
+            <h1 id="formObraNome">Obra</h1>
+            <p id="formFiscalNome">Fiscal</p>
+        </header>
+        
+        <div class="container">
+            <p style="font-size: 0.85rem; font-style: italic; margin-bottom: 15px; color: var(--azul-vale)">
+                RDC <span id="rdcNum">000</span>: <span id="rdcData">00/00/0000</span> – <span style="color: var(--laranja)">Em elaboração</span>
+            </p>
 
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('clima', this)"><i class="fas fa-sun"></i> Clima</button>
-                <button class="tab-btn" onclick="switchTab('atividades', this)"><i class="fas fa-list"></i> Notas</button>
-                <button class="tab-btn" onclick="switchTab('equipamentos', this)"><i class="fas fa-truck"></i> Equip.</button>
+                <button class="tab-btn active">Clima</button>
+                <button class="tab-btn active">Registro</button>
+                <button class="tab-btn">Histograma</button>
             </div>
 
-            <div id="tab-clima" class="tab-content active">
-                <div class="card">
-                    <div class="form-group">
-                        <label class="form-label">Condição do Tempo</label>
-                        <select class="form-select" id="climaCondicao">
-                            <option value="Bom">Bom / Ensolarado</option>
-                            <option value="Nublado">Nublado</option>
-                            <option value="Chuva Leve">Chuva Leve</option>
-                            <option value="Chuva Forte">Chuva Forte / Paralisado</option>
-                        </select>
-                    </div>
+            <div class="status-box" style="text-align: left; padding: 15px;">
+                <label class="label-peq">Condição do Tempo</label>
+                <select id="climaCondicao" class="input-rdc" style="text-align: left;">
+                    <option value="Bom">Bom / Ensolarado</option>
+                    <option value="Nublado">Nublado</option>
+                    <option value="Chuva Leve">Chuva Leve</option>
+                    <option value="Paralisado">Chuva Forte / Paralisado</option>
+                </select>
+            </div>
+
+            <div id="equipamentosContainer">
                 </div>
-            </div>
+        </div>
 
-            <div id="tab-atividades" class="tab-content">
-                <div class="card">
-                    <div class="form-group">
-                        <label class="form-label">Atividades do Dia</label>
-                        <textarea class="form-textarea" id="atividadesDesc" placeholder="O que foi feito hoje?"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-equipamentos" class="tab-content">
-                <p style="font-size: 0.8rem; margin: 0 0 10px 5px; color: var(--cinza-medio);">Toque no item para ajustar a quantidade real.</p>
-                <div id="equipamentosContainer" class="equip-list"></div>
-            </div>
+        <div class="action-bar">
+            <button class="btn-acao btn-cancelar" onclick="voltarParaRDCs()">CANCELAR</button>
+            <button class="btn-acao btn-confirmar" onclick="enviarRDC()">FINALIZAR E ENVIAR</button>
         </div>
     </div>
-
-    <div class="action-bar" id="actionBar" style="display: none;">
-        <button class="btn-secondary" onclick="voltarParaRDCs()">voltar</button>
-        <button class="btn-primary" onclick="enviarRDC()">ENVIAR RDC</button>
-    </div>
-
-    <div id="toast" class="toast"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
@@ -182,33 +211,29 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Globais para facilitar
+        // Globais para facilitar as chamadas inline do HTML
         window.db = db;
         window.dbRef = ref;
         window.dbGet = get;
         window.dbSet = set;
         window.dbPush = push;
 
-        // Início da aplicação
-        init();
+        // Inicializar aplicação
+        const currentFiscalNome = localStorage.getItem('currentFiscalNome') || 'Fiscal de Campo';
+        document.getElementById('userGreeting').textContent = `Olá, ${currentFiscalNome}`;
+        document.getElementById('dataHojeStr').textContent = new Date().toLocaleDateString('pt-BR');
+        
+        carregarObras();
     </script>
 
     <script>
-        let currentFiscal = localStorage.getItem('currentFiscal') || 'Fiscal_01';
-        let currentFiscalNome = localStorage.getItem('currentFiscalNome') || 'Fiscal';
-        let currentObra = null;
+        let currentObraId = null;
         let currentRDC = null;
-        let equipamentosContrato = [];
 
-        async function init() {
-            document.getElementById('headerSubtitle').textContent = `Olá, ${currentFiscalNome}`;
-            carregarObras();
-        }
-
+        // --- NAVEGAÇÃO E OBRAS ---
         async function carregarObras() {
-            const container = document.getElementById('obrasList');
-            container.innerHTML = 'Carregando obras...';
-            
+            const list = document.getElementById('obrasList');
+            list.innerHTML = '<p>Carregando obras...</p>';
             try {
                 const snap = await window.dbGet(window.dbRef(window.db, 'obras'));
                 if (snap.exists()) {
@@ -216,174 +241,138 @@
                     snap.forEach(child => {
                         const obra = child.val();
                         html += `
-                            <div class="obra-item" onclick="selecionarObra('${child.key}', '${obra.nome}')">
-                                <div class="obra-nome">${obra.nome}</div>
-                                <div style="font-size: 0.8rem; color: #888;">Toque para abrir relatórios</div>
-                            </div>
-                        `;
+                            <div class="card-obra" onclick="abrirObra('${child.key}', '${obra.nome}')">
+                                <div>
+                                    <strong style="color: var(--azul-escuro)">${obra.nome}</strong><br>
+                                    <small style="color: #999">Toque para gerenciar relatórios</small>
+                                </div>
+                                <i class="fas fa-chevron-right" style="color: var(--azul-vale)"></i>
+                            </div>`;
                     });
-                    container.innerHTML = html;
+                    list.innerHTML = html;
                 }
             } catch (e) { console.error(e); }
         }
 
-        function selecionarObra(id, nome) {
-            currentObra = { id, nome };
-            document.getElementById('headerTitle').textContent = nome;
+        function abrirObra(id, nome) {
+            currentObraId = id;
+            document.getElementById('headerObraNome').textContent = nome;
+            document.getElementById('formObraNome').textContent = nome;
             document.getElementById('obrasPanel').style.display = 'none';
             document.getElementById('rdcPanel').style.display = 'block';
-            carregarRDCs();
+            carregarHistoricoRDCs();
         }
 
-        async function carregarRDCs() {
+        async function carregarHistoricoRDCs() {
             const container = document.getElementById('rdcList');
-            container.innerHTML = 'Buscando histórico...';
-            
-            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObra.id}/relatorios`));
+            container.innerHTML = '<small>Buscando histórico...</small>';
+            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/relatorios`));
             let html = '';
             if (snap.exists()) {
                 snap.forEach(child => {
                     const rdc = child.val();
                     html += `
-                        <div class="rdc-item">
-                            <div style="display:flex; justify-content: space-between">
-                                <b>RDC #${rdc.numero}</b>
-                                <span class="rdc-status enviado">Enviado</span>
+                        <div class="card-obra" style="border-left-color: var(--verde-vale)">
+                            <div style="font-size: 0.9rem">
+                                <strong>RDC #${rdc.numero}</strong> - ${rdc.data}<br>
+                                <small>Fiscal: ${rdc.fiscal}</small>
                             </div>
-                            <div style="font-size:0.8rem">${rdc.data}</div>
-                        </div>
-                    `;
+                            <span style="font-size: 0.7rem; color: var(--verde-vale); font-weight: bold;">ENVIADO</span>
+                        </div>`;
                 });
             }
-            container.innerHTML = html || '<p style="text-align:center; padding:20px;">Nenhum relatório enviado.</p>';
+            container.innerHTML = html || '<p style="font-size: 0.8rem; color: #999">Nenhum relatório anterior.</p>';
         }
 
+        // --- LÓGICA DO FORMULÁRIO RDC ---
         async function criarNovoRDC() {
-            const dataAtual = new Date();
-            const dataStr = dataAtual.toLocaleDateString('pt-BR');
-            const dataKey = dataAtual.toISOString().split('T')[0];
-
+            const hoje = new Date();
+            const mesKey = (hoje.getMonth() + 1).toString().padStart(2, '0') + '-' + hoje.getFullYear();
+            
             currentRDC = {
                 numero: Math.floor(Math.random() * 900) + 100,
-                data: dataStr,
-                dataKey: dataKey,
-                dados: { clima: {}, atividades: {}, equipamentos: {} }
+                data: hoje.toLocaleDateString('pt-BR'),
+                mesRef: mesKey,
+                fiscal: localStorage.getItem('currentFiscalNome') || 'Fiscal',
+                dados: { equipamentos: {} }
             };
 
-            document.getElementById('formRdcTitulo').textContent = `RDC #${currentRDC.numero}`;
-            document.getElementById('formRdcData').textContent = dataStr;
+            document.getElementById('rdcNum').textContent = currentRDC.numero;
+            document.getElementById('rdcData').textContent = currentRDC.data;
+            document.getElementById('formFiscalNome').textContent = currentRDC.fiscal;
             
             document.getElementById('rdcPanel').style.display = 'none';
             document.getElementById('formPanel').style.display = 'block';
-            document.getElementById('actionBar').style.display = 'flex';
 
-            await carregarEquipamentosDoContrato();
+            carregarEquipamentosDoContrato(mesKey);
         }
 
-        async function carregarEquipamentosDoContrato() {
+        async function carregarEquipamentosDoContrato(mesKey) {
             const container = document.getElementById('equipamentosContainer');
-            container.innerHTML = 'Carregando lista de contrato...';
-
-            // Nota: No seu banco, ajuste o caminho se necessário (ex: obras/ID/contrato)
-            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObra.id}/contrato`));
+            container.innerHTML = '<p>Carregando contrato do mês...</p>';
             
-            equipamentosContrato = [];
-            if (snap.exists()) {
-                snap.forEach(child => {
-                    equipamentosContrato.push({ id: child.key, ...child.val() });
-                });
+            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
+            
+            if (!snap.exists()) {
+                container.innerHTML = '<div class="status-box">Nenhum contrato de equipamentos encontrado para este mês.</div>';
+                return;
             }
-            renderEquipamentos();
-        }
 
-        function renderEquipamentos() {
-            const container = document.getElementById('equipamentosContainer');
             let html = '';
-
-            equipamentosContrato.forEach((eq, index) => {
-                const editado = currentRDC.dados.equipamentos[eq.id];
-                const valorReal = editado ? editado.real : eq.previsto;
-                const isContestado = editado && editado.real !== eq.previsto;
-
+            snap.forEach(child => {
+                const eq = child.val();
+                const id = child.key;
                 html += `
-                    <div class="equip-item ${isContestado ? 'contestada' : ''}" onclick="toggleEquip(${index})">
-                        <div class="equip-header">
-                            <span class="equip-nome">${eq.nome}: <b>${valorReal}</b></span>
-                            <span class="equip-previsto">Previsto: ${eq.previsto}</span>
+                    <div class="equip-card">
+                        <div class="equip-header" onclick="this.nextElementSibling.classList.toggle('active')">
+                            <span>${eq.nome}</span>
+                            <span>${String(eq.previsto).padStart(2, '0')} <i class="fas fa-chevron-down"></i></span>
                         </div>
-                        <div style="font-size: 0.75rem; color: ${isContestado ? 'var(--laranja)' : '#888'}">
-                            ${isContestado ? 'Quantidade alterada pelo fiscal' : 'Conforme contrato'}
-                        </div>
-
-                        <div class="equip-detail" id="equip-detail-${index}">
-                            <div class="detail-grid">
-                                <div class="detail-box">
-                                    <label class="form-label">Qtd Real</label>
-                                    <input type="number" class="input-real" id="inp-real-${index}" value="${valorReal}" onclick="event.stopPropagation()">
-                                </div>
-                                <div class="detail-box">
-                                    <label class="form-label">Manutenção</label>
-                                    <input type="number" class="input-real" style="color:var(--laranja); border-color:var(--laranja)" id="inp-manut-${index}" value="${editado?.manutencao || 0}" onclick="event.stopPropagation()">
-                                </div>
+                        <div class="equip-body">
+                            <div class="grid-campos">
+                                <div><label class="label-peq">Previsto</label><input type="text" class="input-rdc" value="${eq.previsto}" disabled></div>
+                                <div><label class="label-peq" style="color: var(--azul-vale)">Real</label><input type="number" class="input-rdc in-real" data-id="${id}" data-nome="${eq.nome}" value="${eq.previsto}"></div>
+                                <div><label class="label-peq" style="color: var(--laranja)">Manut.</label><input type="number" class="input-rdc in-manut" data-id="${id}" value="0"></div>
                             </div>
-                            <button class="btn-salvar-item" onclick="confirmarEquipamento('${eq.id}', ${index}); event.stopPropagation();">CONFIRMAR</button>
+                            <label class="label-peq">Observações</label>
+                            <textarea class="in-obs" data-id="${id}" placeholder="Notas sobre este equipamento..."></textarea>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
             container.innerHTML = html;
         }
 
-        function toggleEquip(index) {
-            const el = document.getElementById(`equip-detail-${index}`);
-            const isOpen = el.classList.contains('open');
-            document.querySelectorAll('.equip-detail').forEach(d => d.classList.remove('open'));
-            if (!isOpen) el.classList.add('open');
-        }
-
-        function confirmarEquipamento(id, index) {
-            const real = parseInt(document.getElementById(`inp-real-${index}`).value);
-            const manut = parseInt(document.getElementById(`inp-manut-${index}`).value) || 0;
-
-            currentRDC.dados.equipamentos[id] = {
-                real: real,
-                manutencao: manut,
-                confirmado: true
-            };
-
-            showToast("Quantidade atualizada");
-            renderEquipamentos();
-        }
-
-        function switchTab(tab, btn) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            btn.classList.add('active');
-        }
-
         async function enviarRDC() {
-            try {
-                const relRef = window.dbRef(window.db, `obras/${currentObra.id}/relatorios`);
-                
-                // Coleta dados finais
-                currentRDC.dados.clima = document.getElementById('climaCondicao').value;
-                currentRDC.dados.atividades = document.getElementById('atividadesDesc').value;
-                currentRDC.fiscal = currentFiscalNome;
+            if (!confirm("Confirmar fechamento e envio do RDC?")) return;
 
+            // Coleta dados climáticos
+            currentRDC.dados.clima = document.getElementById('climaCondicao').value;
+
+            // Coleta dados de todos os equipamentos do formulário
+            document.querySelectorAll('.in-real').forEach(input => {
+                const id = input.dataset.id;
+                currentRDC.dados.equipamentos[id] = {
+                    nome: input.dataset.nome,
+                    real: parseInt(input.value) || 0,
+                    manutencao: parseInt(document.querySelector(`.in-manut[data-id="${id}"]`).value) || 0,
+                    obs: document.querySelector(`.in-obs[data-id="${id}"]`).value
+                };
+            });
+
+            try {
+                const relRef = window.dbRef(window.db, `obras/${currentObraId}/relatorios`);
                 await window.dbPush(relRef, currentRDC);
-                showToast("Relatório enviado com sucesso!");
+                showToast("RDC enviado com sucesso!");
                 voltarParaRDCs();
             } catch (e) {
-                showToast("Erro ao enviar");
+                alert("Erro ao salvar: " + e.message);
             }
         }
 
         function voltarParaRDCs() {
             document.getElementById('formPanel').style.display = 'none';
-            document.getElementById('actionBar').style.display = 'none';
             document.getElementById('rdcPanel').style.display = 'block';
-            carregarRDCs();
+            carregarHistoricoRDCs();
         }
 
         function showToast(msg) {
@@ -391,11 +380,6 @@
             t.textContent = msg;
             t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 3000);
-        }
-
-        function sair() {
-            localStorage.clear();
-            window.location.reload();
         }
     </script>
 </body>
