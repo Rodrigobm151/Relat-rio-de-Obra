@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Squad Geotecnia</title>
+    <title>Admin - Squad Geotecnia 1.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Handsontable para tabela estilo Excel -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.0.0/dist/handsontable.full.min.css">
     <script src="https://cdn.jsdelivr.net/npm/handsontable@14.0.0/dist/handsontable.full.min.js"></script>
-    <!-- SheetJS para exportação -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -83,7 +81,6 @@
             padding: 1rem;
         }
 
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 0.5rem;
@@ -129,7 +126,6 @@
             to { opacity: 1; }
         }
 
-        /* Cards */
         .card {
             background: white;
             border-radius: 16px;
@@ -241,28 +237,6 @@
             background: var(--cinza-claro);
         }
 
-        /* Tabela Handsontable customizada */
-        .hot-table-container {
-            margin: 1rem 0;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .handsontable {
-            font-size: 14px !important;
-        }
-
-        .handsontable .htCore th {
-            background-color: var(--azul-vale) !important;
-            color: white !important;
-            font-weight: 600 !important;
-        }
-
-        .handsontable .htCore td {
-            padding: 8px !important;
-        }
-
-        /* Lista de Obras */
         .obra-item {
             background: white;
             border-radius: 12px;
@@ -313,7 +287,6 @@
             transform: scale(1.1);
         }
 
-        /* Lista de Fiscais */
         .fiscal-item {
             background: white;
             border-radius: 12px;
@@ -363,7 +336,6 @@
             color: var(--vermelho);
         }
 
-        /* Equipamentos Section */
         .equip-header {
             display: flex;
             justify-content: space-between;
@@ -390,7 +362,155 @@
             color: var(--cinza-texto);
         }
 
-        /* Toast */
+        .hot-table-container {
+            margin: 1rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .handsontable {
+            font-size: 14px !important;
+        }
+
+        .handsontable .htCore th {
+            background-color: var(--azul-vale) !important;
+            color: white !important;
+            font-weight: 600 !important;
+        }
+
+        .handsontable .htCore td {
+            padding: 8px !important;
+        }
+
+        .dica-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--azul-vale);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--cinza-texto);
+        }
+
+        .dica-box i {
+            color: var(--azul-vale);
+            margin-right: 0.5rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--cinza-mais-claro);
+        }
+
+        th {
+            background: var(--fundo);
+            font-weight: 600;
+            color: var(--cinza-texto);
+        }
+
+        tr:hover {
+            background: rgba(60, 181, 229, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-enviado { background: #e8f5e9; color: var(--verde-vale); }
+        .status-rascunho { background: #fff3e0; color: var(--laranja); }
+        .status-pendente { background: #ffebee; color: var(--vermelho); }
+
+        .export-card {
+            background: linear-gradient(135deg, var(--verde-vale) 0%, #006b66 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .export-card h3 {
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .export-card .form-select {
+            background: white;
+            color: var(--cinza-texto);
+        }
+
+        .rdc-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .rdc-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .rdc-info h3 {
+            font-size: 1.1rem;
+            color: var(--cinza-texto);
+            margin-bottom: 0.3rem;
+        }
+
+        .rdc-info p {
+            font-size: 0.85rem;
+            color: var(--cinza-medio);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--cinza-mais-claro);
+            border-top-color: var(--azul-vale);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--cinza-medio);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--cinza-claro);
+        }
+
         .toast {
             position: fixed;
             top: 80px;
@@ -417,40 +537,6 @@
             background: var(--vermelho);
         }
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--cinza-mais-claro);
-            border-top-color: var(--azul-vale);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: var(--cinza-medio);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--cinza-claro);
-        }
-
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -497,77 +583,31 @@
             justify-content: center;
         }
 
-        /* Dicas */
-        .dica-box {
-            background: #e3f2fd;
-            border-left: 4px solid var(--azul-vale);
-            padding: 1rem;
+        .preview-excel {
+            background: #f8f9fa;
             border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: var(--cinza-texto);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
-        .dica-box i {
-            color: var(--azul-vale);
-            margin-right: 0.5rem;
-        }
-
-        /* Relatórios Table */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
+        .preview-excel table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th, td {
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid var(--cinza-mais-claro);
-        }
-
-        th {
-            background: var(--fundo);
-            font-weight: 600;
-            color: var(--cinza-texto);
-        }
-
-        tr:hover {
-            background: rgba(60, 181, 229, 0.05);
-        }
-
-        .status-badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
             font-size: 0.8rem;
-            font-weight: 600;
         }
 
-        .status-enviado { background: #e8f5e9; color: var(--verde-vale); }
-        .status-rascunho { background: #fff3e0; color: var(--laranja); }
-        .status-pendente { background: #ffebee; color: var(--vermelho); }
-
-        /* Export Section */
-        .export-card {
-            background: linear-gradient(135deg, var(--verde-vale) 0%, #006b66 100%);
+        .preview-excel th {
+            background: var(--azul-vale);
             color: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
+            padding: 0.5rem;
         }
 
-        .export-card h3 {
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .export-card .form-select {
-            background: white;
-            color: var(--cinza-texto);
+        .preview-excel td {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--cinza-mais-claro);
         }
     </style>
 </head>
@@ -591,18 +631,14 @@
             <button class="tab-btn" onclick="switchTab('fiscais', this)">
                 <i class="fas fa-users"></i> Fiscais
             </button>
-            <button class="tab-btn" onclick="switchTab('relatorios', this)">
-                <i class="fas fa-file-alt"></i> Relatórios
-            </button>
-            <button class="tab-btn" onclick="switchTab('exportar', this)">
-                <i class="fas fa-download"></i> Exportar Excel
+            <button class="tab-btn" onclick="switchTab('rdcs', this)">
+                <i class="fas fa-clipboard-list"></i> RDCs
             </button>
         </div>
 
         <!-- ABA OBRAS E EQUIPAMENTOS -->
         <div class="tab-content active" id="tab-obras">
             
-            <!-- Cadastro de Obra -->
             <div class="card">
                 <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nova Obra</h3>
                 <div class="grid-3">
@@ -624,7 +660,6 @@
                 </button>
             </div>
 
-            <!-- Lista de Obras -->
             <div id="obrasList">
                 <div class="loading">
                     <div class="spinner"></div>
@@ -632,7 +667,6 @@
                 </div>
             </div>
 
-            <!-- Editor de Equipamentos (aparece ao selecionar obra) -->
             <div id="equipamentosEditor" style="display: none;">
                 <div class="card">
                     <div class="equip-header">
@@ -640,8 +674,7 @@
                             <h3 class="card-title"><i class="fas fa-tools"></i> Equipamentos da Obra</h3>
                         </div>
                         <div style="display: flex; gap: 0.5rem;">
-                            <select class="form-select" id="mesEquipamento" style="width: 150px;" onchange="carregarEquipamentosTabela()">
-                                <!-- Preenchido dinamicamente -->
+                            <select class="form-select" id="mesEquipamento" style="width: 180px;" onchange="carregarEquipamentosTabela()">
                             </select>
                             <button class="btn btn-success" onclick="salvarEquipamentos()">
                                 <i class="fas fa-save"></i> Salvar no Firebase
@@ -652,7 +685,7 @@
                     <div class="equip-info" id="equipInfo">
                         <p><strong>Obra:</strong> <span id="equipObraNome">-</span></p>
                         <p><strong>Mês:</strong> <span id="equipMesNome">-</span></p>
-                        <p><i class="fas fa-info-circle"></i> Cole dados direto do Excel ou digite na tabela abaixo. Use as setas para navegar.</p>
+                        <p><i class="fas fa-info-circle"></i> Cole dados direto do Excel ou digite na tabela. Use as setas para navegar.</p>
                     </div>
 
                     <div class="dica-box">
@@ -710,93 +743,80 @@
 
         </div>
 
-        <!-- ABA RELATÓRIOS -->
-        <div class="tab-content" id="tab-relatorios">
+        <!-- ABA RDCs -->
+        <div class="tab-content" id="tab-rdcs">
             
             <div class="card">
-                <h3 class="card-title"><i class="fas fa-filter"></i> Filtrar Relatórios</h3>
+                <h3 class="card-title"><i class="fas fa-filter"></i> Filtrar RDCs</h3>
                 <div class="grid-2">
                     <div class="form-group">
                         <label class="form-label">Obra</label>
-                        <select class="form-select" id="filtroObra" onchange="carregarRelatorios()">
-                            <option value="">Todas as obras</option>
+                        <select class="form-select" id="filtroObraRDC" onchange="carregarRDCs()">
+                            <option value="">Selecione uma obra...</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Período</label>
-                        <input type="month" class="form-input" id="filtroMes" onchange="carregarRelatorios()">
-                    </div>
-                </div>
-            </div>
-
-            <div id="relatoriosList">
-                <div class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
-                    <p>Selecione filtros para carregar relatórios</p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ABA EXPORTAR -->
-        <div class="tab-content" id="tab-exportar">
-            
-            <div class="export-card">
-                <h3><i class="fas fa-file-excel"></i> Exportação de Dados</h3>
-                <p>Exporte todos os relatórios RDC para Excel com dados completos.</p>
-                
-                <div class="grid-2" style="margin-top: 1rem;">
-                    <div class="form-group">
-                        <label style="color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; display: block;">Obra</label>
-                        <select class="form-select" id="exportObra">
-                            <option value="">Selecione...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label style="color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; display: block;">Período</label>
-                        <select class="form-select" id="exportPeriodo">
-                            <option value="todos">Todo o período</option>
+                        <select class="form-select" id="filtroPeriodoRDC" onchange="carregarRDCs()">
+                            <option value="todos">Todos os RDCs</option>
                             <option value="mes-atual">Mês atual</option>
                             <option value="ultimos-30">Últimos 30 dias</option>
                             <option value="ultimos-7">Últimos 7 dias</option>
                         </select>
                     </div>
                 </div>
-                
-                <button class="btn" onclick="exportarExcel()" style="margin-top: 1rem; background: white; color: var(--verde-vale);">
-                    <i class="fas fa-download"></i> Baixar Excel
-                </button>
             </div>
 
-            <div class="card">
-                <h3 class="card-title"><i class="fas fa-info-circle"></i> Sobre a Exportação</h3>
-                <p style="margin-bottom: 0.5rem;">O arquivo Excel conterá as seguintes abas:</p>
-                <ul style="margin-left: 1.5rem; color: var(--cinza-medio); line-height: 1.8;">
-                    <li><strong>Resumo</strong> - Visão geral de todos os RDCs</li>
-                    <li><strong>Equipamentos</strong> - Detalhamento de equipamentos por dia</li>
-                    <li><strong>Clima</strong> - Condições climáticas registradas</li>
-                    <li><strong>Atividades</strong> - Descrições e comentários</li>
-                </ul>
+            <div id="rdcListContainer">
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Selecione uma obra para ver os RDCs</p>
+                </div>
             </div>
 
         </div>
 
+    </div>
+
+    <!-- Modal de Exportação -->
+    <div class="modal" id="modalExportar">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-file-excel"></i> Exportar RDCs para Excel</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Obra selecionada</label>
+                <input type="text" class="form-input" id="exportObraNome" readonly>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Período</label>
+                <input type="text" class="form-input" id="exportPeriodoNome" readonly>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">RDCs encontrados</label>
+                <input type="text" class="form-input" id="exportQuantidade" readonly>
+            </div>
+
+            <div class="preview-excel" id="previewExcel">
+                <p>Pré-visualização das abas do Excel:</p>
+                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                    <li><strong>Aba "Geral":</strong> Resumo de todos os RDCs</li>
+                    <li><strong>Aba "Equipamentos":</strong> Detalhamento por equipamento</li>
+                </ul>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModalExportar()">Cancelar</button>
+                <button class="btn btn-success" onclick="confirmarExportacao()">
+                    <i class="fas fa-download"></i> Baixar Excel
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Toast -->
     <div class="toast" id="toast"></div>
-
-    <!-- Modal Confirmação -->
-    <div class="modal" id="modalConfirm">
-        <div class="modal-content">
-            <h3 class="modal-title" id="modalTitle">Confirmação</h3>
-            <p id="modalText">Deseja realmente excluir?</p>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
-                <button class="btn btn-danger" id="modalConfirmBtn">Confirmar</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Firebase -->
     <script type="module">
@@ -828,9 +848,11 @@
         // VARIÁVEIS GLOBAIS
         let obras = {};
         let fiscais = {};
-        let hot = null; // Instância Handsontable
+        let hot = null;
         let obraSelecionada = null;
         let mesSelecionado = null;
+        let rdcsParaExportar = [];
+        let obraExportacao = null;
 
         // INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', () => {
@@ -838,15 +860,13 @@
             carregarFiscais();
             
             const hoje = new Date();
-            document.getElementById('filtroMes').value = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
-            
-            // Preencher select de meses (próximos 12 meses)
             const selectMes = document.getElementById('mesEquipamento');
-            for (let i = 0; i < 12; i++) {
+            
+            for (let i = -3; i < 12; i++) {
                 const d = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
                 const valor = `${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
                 const texto = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-                selectMes.innerHTML += `<option value="${valor}">${texto}</option>`;
+                selectMes.innerHTML += `<option value="${valor}" ${i === 0 ? 'selected' : ''}>${texto}</option>`;
             }
         });
 
@@ -917,12 +937,11 @@
         }
 
         function preencherSelectsObras() {
-            ['filtroObra', 'exportObra'].forEach(id => {
-                const select = document.getElementById(id);
-                select.innerHTML = '<option value="">Selecione...</option>';
-                Object.keys(obras).forEach(key => {
-                    select.innerHTML += `<option value="${key}">${obras[key].nome}</option>`;
-                });
+            const selectRDC = document.getElementById('filtroObraRDC');
+            selectRDC.innerHTML = '<option value="">Selecione uma obra...</option>';
+            
+            Object.keys(obras).forEach(key => {
+                selectRDC.innerHTML += `<option value="${key}">${obras[key].nome}</option>`;
             });
         }
 
@@ -963,7 +982,6 @@
             document.getElementById('equipamentosEditor').style.display = 'block';
             document.getElementById('equipObraNome').textContent = obras[obraId].nome;
             
-            // Scroll para editor
             setTimeout(() => {
                 document.getElementById('equipamentosEditor').scrollIntoView({ behavior: 'smooth' });
             }, 100);
@@ -971,7 +989,7 @@
             carregarEquipamentosTabela();
         }
 
-        // ==================== EQUIPAMENTOS (HANDSONTABLE) ====================
+        // ==================== EQUIPAMENTOS ====================
 
         async function carregarEquipamentosTabela() {
             mesSelecionado = document.getElementById('mesEquipamento').value;
@@ -979,7 +997,7 @@
             
             if (!obraSelecionada || !mesSelecionado) return;
 
-            let dados = [['', '']]; // [Nome, Previsto]
+            let dados = [['', '']];
 
             try {
                 const snapshot = await window.dbGet(
@@ -1018,10 +1036,7 @@
                 manualRowMove: true,
                 stretchH: 'all',
                 licenseKey: 'non-commercial-and-evaluation',
-                language: 'pt-BR',
-                afterChange: function(changes, source) {
-                    // Auto-save opcional pode ir aqui
-                }
+                language: 'pt-BR'
             });
         }
 
@@ -1185,39 +1200,33 @@
         }
 
         function excluirFiscal(fiscalId) {
-            abrirModal(
-                'Excluir Fiscal',
-                `Deseja realmente excluir ${fiscais[fiscalId].nome}?`,
-                async () => {
-                    try {
-                        await window.dbRemove(window.dbRef(window.db, `fiscais/${fiscalId}`));
+            if (confirm(`Deseja realmente excluir ${fiscais[fiscalId].nome}?`)) {
+                window.dbRemove(window.dbRef(window.db, `fiscais/${fiscalId}`))
+                    .then(() => {
                         showToast('Fiscal excluído', 'success');
-                        fecharModal();
                         carregarFiscais();
-                    } catch (error) {
-                        showToast('Erro ao excluir', 'error');
-                    }
-                }
-            );
+                    })
+                    .catch(() => showToast('Erro ao excluir', 'error'));
+            }
         }
 
-        // ==================== RELATÓRIOS E EXPORTAÇÃO ====================
+        // ==================== RDCs E EXPORTAÇÃO ====================
 
-        async function carregarRelatorios() {
-            const obraId = document.getElementById('filtroObra').value;
-            const mesFiltro = document.getElementById('filtroMes').value;
+        async function carregarRDCs() {
+            const obraId = document.getElementById('filtroObraRDC').value;
+            const periodo = document.getElementById('filtroPeriodoRDC').value;
             
             if (!obraId) {
-                document.getElementById('relatoriosList').innerHTML = `
+                document.getElementById('rdcListContainer').innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-filter"></i>
-                        <p>Selecione uma obra para ver os relatórios</p>
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Selecione uma obra para ver os RDCs</p>
                     </div>`;
                 return;
             }
 
-            const container = document.getElementById('relatoriosList');
-            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Carregando...</p></div>';
+            const container = document.getElementById('rdcListContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Carregando RDCs...</p></div>';
 
             try {
                 const snapshot = await window.dbGet(window.dbRef(window.db, `obras/${obraId}/relatorios`));
@@ -1226,105 +1235,16 @@
                     container.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-clipboard-check"></i>
-                            <p>Nenhum relatório encontrado</p>
+                            <p>Nenhum RDC encontrado para esta obra</p>
                         </div>`;
                     return;
                 }
 
-                let relatorios = Object.entries(snapshot.val()).map(([id, r]) => ({ id, ...r }));
+                let rdcs = Object.entries(snapshot.val()).map(([id, r]) => ({ id, ...r }));
                 
-                // Filtrar por mês
-                if (mesFiltro) {
-                    const [ano, mes] = mesFiltro.split('-');
-                    relatorios = relatorios.filter(r => {
-                        const data = r.dataKey || r.data;
-                        return data && data.includes(`${ano}-${mes}`);
-                    });
-                }
-
-                renderRelatoriosTable(relatorios);
-
-            } catch (error) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar</p></div>';
-            }
-        }
-
-        function renderRelatoriosTable(relatorios) {
-            const container = document.getElementById('relatoriosList');
-            
-            if (relatorios.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum relatório no período</p></div>';
-                return;
-            }
-
-            let html = `
-                <div class="card table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>RDC</th>
-                                <th>Data</th>
-                                <th>Fiscal</th>
-                                <th>Status</th>
-                                <th>Equipamentos</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            relatorios.forEach(rel => {
-                const qtdEquip = rel.dados?.equipamentos ? Object.keys(rel.dados.equipamentos).length : 0;
-                
-                html += `
-                    <tr>
-                        <td>${rel.numero || '---'}</td>
-                        <td>${rel.data || rel.dataKey}</td>
-                        <td>${rel.fiscalNome || rel.fiscal}</td>
-                        <td><span class="status-badge status-${rel.status || 'enviado'}">${rel.status || 'enviado'}</span></td>
-                        <td>${qtdEquip} apontados</td>
-                        <td>
-                            <button class="btn-icon btn-success" onclick="verRelatorio('${rel.id}')" title="Ver detalhes">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
-
-        async function exportarExcel() {
-            const obraId = document.getElementById('exportObra').value;
-            const periodo = document.getElementById('exportPeriodo').value;
-
-            if (!obraId) {
-                showToast('Selecione uma obra', 'error');
-                return;
-            }
-
-            const btn = event.target.closest('.btn');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
-            btn.disabled = true;
-
-            try {
-                const snapshot = await window.dbGet(window.dbRef(window.db, `obras/${obraId}/relatorios`));
-                
-                if (!snapshot.exists()) {
-                    showToast('Nenhum dado para exportar', 'error');
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                    return;
-                }
-
-                let relatorios = Object.values(snapshot.val());
-                const hoje = new Date();
-
                 // Filtrar por período
-                relatorios = relatorios.filter(r => {
+                const hoje = new Date();
+                rdcs = rdcs.filter(r => {
                     const dataRDC = new Date(r.dataKey || r.data);
                     switch(periodo) {
                         case 'mes-atual':
@@ -1338,54 +1258,174 @@
                     }
                 });
 
-                if (relatorios.length === 0) {
-                    showToast('Nenhum dado no período selecionado', 'error');
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                    return;
-                }
+                // Ordenar por data (mais recente primeiro)
+                rdcs.sort((a, b) => new Date(b.dataKey || b.data) - new Date(a.dataKey || a.data));
 
-                // Criar workbook
+                renderRDCList(rdcs, obraId, periodo);
+
+            } catch (error) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar RDCs</p></div>';
+            }
+        }
+
+        function renderRDCList(rdcs, obraId, periodo) {
+            const container = document.getElementById('rdcListContainer');
+            
+            if (rdcs.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum RDC no período selecionado</p></div>';
+                return;
+            }
+
+            // Salvar para exportação
+            rdcsParaExportar = rdcs;
+            obraExportacao = obraId;
+
+            const periodoNomes = {
+                'todos': 'Todos os RDCs',
+                'mes-atual': 'Mês atual',
+                'ultimos-30': 'Últimos 30 dias',
+                'ultimos-7': 'Últimos 7 dias'
+            };
+
+            let html = `
+                <div class="card" style="background: linear-gradient(135deg, var(--azul-vale) 0%, var(--azul-escuro) 100%); color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h3 style="font-style: italic; margin-bottom: 0.5rem;"><i class="fas fa-chart-bar"></i> Resumo</h3>
+                            <p>${rdcs.length} RDC(s) encontrado(s) | Período: ${periodoNomes[periodo]}</p>
+                        </div>
+                        <button class="btn" onclick="abrirModalExportar()" style="background: white; color: var(--azul-vale);">
+                            <i class="fas fa-file-excel"></i> Exportar Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem; font-weight: 600; color: var(--cinza-medio);">Lista de RDCs:</div>
+            `;
+
+            rdcs.forEach(rdc => {
+                const qtdEquip = rdc.dados?.equipamentos ? Object.keys(rdc.dados.equipamentos).length : 0;
+                const dataFormatada = formatarDataBR(rdc.dataKey || rdc.data);
+                
+                html += `
+                    <div class="rdc-item">
+                        <div class="rdc-info">
+                            <h3><i class="fas fa-file-alt" style="color: var(--azul-vale); margin-right: 0.5rem;"></i>RDC ${rdc.numero || '---'}</h3>
+                            <p>
+                                <i class="fas fa-calendar"></i> ${dataFormatada} | 
+                                <i class="fas fa-user"></i> ${rdc.fiscalNome || rdc.fiscal} | 
+                                <i class="fas fa-tools"></i> ${qtdEquip} equipamento(s)
+                            </p>
+                            ${rdc.dados?.clima?.condicao ? `
+                                <p style="margin-top: 0.3rem;">
+                                    <i class="fas fa-cloud-sun"></i> ${rdc.dados.clima.condicao} | 
+                                    <i class="fas fa-tint"></i> ${rdc.dados.clima.pluviometro || 0}mm
+                                </p>
+                            ` : ''}
+                        </div>
+                        <div class="obra-actions">
+                            <span class="status-badge status-${rdc.status || 'enviado'}" style="margin-right: 0.5rem;">
+                                ${rdc.status || 'enviado'}
+                            </span>
+                            <button class="btn-icon btn-success" onclick="verDetalhesRDC('${rdc.id}')" title="Ver detalhes">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function abrirModalExportar() {
+            const obra = obras[obraExportacao];
+            const periodo = document.getElementById('filtroPeriodoRDC').value;
+            const periodoNomes = {
+                'todos': 'Todos os RDCs',
+                'mes-atual': 'Mês atual',
+                'ultimos-30': 'Últimos 30 dias',
+                'ultimos-7': 'Últimos 7 dias'
+            };
+
+            document.getElementById('exportObraNome').value = obra.nome;
+            document.getElementById('exportPeriodoNome').value = periodoNomes[periodo];
+            document.getElementById('exportQuantidade').value = `${rdcsParaExportar.length} RDC(s)`;
+            
+            document.getElementById('modalExportar').classList.add('active');
+        }
+
+        function fecharModalExportar() {
+            document.getElementById('modalExportar').classList.remove('active');
+        }
+
+        async function confirmarExportacao() {
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+            btn.disabled = true;
+
+            try {
                 const wb = XLSX.utils.book_new();
                 
-                // Aba Resumo
-                const resumoData = relatorios.map(r => ({
-                    'RDC': r.numero,
-                    'Data': r.data || r.dataKey,
-                    'Fiscal': r.fiscalNome || r.fiscal,
-                    'Status': r.status || 'enviado',
-                    'Condição Climática': r.dados?.clima?.condicao || '',
-                    'Pluviômetro (mm)': r.dados?.clima?.pluviometro || 0,
-                    'Qtd Equipamentos': r.dados?.equipamentos ? Object.keys(r.dados.equipamentos).length : 0
+                // ===== ABA 1: GERAL (Resumo dos RDCs) =====
+                const geralData = rdcsParaExportar.map(rdc => ({
+                    'RDC': rdc.numero || '-',
+                    'Data': formatarDataBR(rdc.dataKey || rdc.data),
+                    'Fiscal': rdc.fiscalNome || rdc.fiscal,
+                    'Status': rdc.status || 'enviado',
+                    'Condição Climática': rdc.dados?.clima?.condicao || '-',
+                    'Pluviômetro (mm)': rdc.dados?.clima?.pluviometro || 0,
+                    'Qtd Equipamentos Apontados': rdc.dados?.equipamentos ? Object.keys(rdc.dados.equipamentos).length : 0,
+                    'Descrição Atividades': rdc.dados?.atividades?.descricao || '-',
+                    'Comentários': rdc.dados?.atividades?.comentarios || '-'
                 }));
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumoData), "Resumo");
+                
+                const wsGeral = XLSX.utils.json_to_sheet(geralData);
+                
+                // Ajustar larguras das colunas
+                wsGeral['!cols'] = [
+                    {wch: 10}, {wch: 12}, {wch: 20}, {wch: 12}, 
+                    {wch: 18}, {wch: 15}, {wch: 22}, {wch: 40}, {wch: 40}
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, wsGeral, "Geral");
 
-                // Aba Equipamentos
-                const equipData = [];
-                relatorios.forEach(r => {
-                    if (r.dados?.equipamentos) {
-                        Object.entries(r.dados.equipamentos).forEach(([id, eq]) => {
-                            equipData.push({
-                                'RDC': r.numero,
-                                'Data': r.data || r.dataKey,
-                                'Equipamento': eq.nome || id,
-                                'Previsto': eq.previsto || '-',
-                                'Real': eq.real || '-',
-                                'Manutenção': eq.manutencao || 0,
-                                'Observações': eq.obs || ''
+                // ===== ABA 2: EQUIPAMENTOS (Detalhamento) =====
+                const equipamentosData = [];
+                
+                rdcsParaExportar.forEach(rdc => {
+                    if (rdc.dados?.equipamentos) {
+                        Object.entries(rdc.dados.equipamentos).forEach(([equipId, eq]) => {
+                            equipamentosData.push({
+                                'RDC': rdc.numero || '-',
+                                'Data': formatarDataBR(rdc.dataKey || rdc.data),
+                                'Fiscal': rdc.fiscalNome || rdc.fiscal,
+                                'Equipamento': eq.nome || equipId,
+                                'Quantidade Prevista': eq.previsto || '-',
+                                'Quantidade Real': eq.real !== undefined ? eq.real : '-',
+                                'Em Manutenção': eq.manutencao || 0,
+                                'Observações': eq.obs || '-'
                             });
                         });
                     }
                 });
-                if (equipData.length > 0) {
-                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(equipData), "Equipamentos");
+                
+                if (equipamentosData.length > 0) {
+                    const wsEquip = XLSX.utils.json_to_sheet(equipamentosData);
+                    wsEquip['!cols'] = [
+                        {wch: 10}, {wch: 12}, {wch: 20}, {wch: 25}, 
+                        {wch: 18}, {wch: 15}, {wch: 15}, {wch: 30}
+                    ];
+                    XLSX.utils.book_append_sheet(wb, wsEquip, "Equipamentos");
                 }
 
                 // Download
-                const nomeArquivo = `RDC_${obras[obraId].nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                const nomeArquivo = `RDCs_${obras[obraExportacao].nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, nomeArquivo);
 
                 showToast('Excel gerado com sucesso!', 'success');
+                fecharModalExportar();
 
             } catch (error) {
                 console.error(error);
@@ -1396,19 +1436,46 @@
             }
         }
 
-        // ==================== UTILITÁRIOS ====================
+        function verDetalhesRDC(rdcId) {
+            const rdc = rdcsParaExportar.find(r => r.id === rdcId);
+            if (!rdc) return;
 
-        function abrirModal(titulo, texto, onConfirm) {
-            document.getElementById('modalTitle').textContent = titulo;
-            document.getElementById('modalText').textContent = texto;
-            document.getElementById('modalConfirm').classList.add('active');
+            let detalhes = `RDC ${rdc.numero || '-'}\n`;
+            detalhes += `Data: ${formatarDataBR(rdc.dataKey || rdc.data)}\n`;
+            detalhes += `Fiscal: ${rdc.fiscalNome || rdc.fiscal}\n\n`;
             
-            const btn = document.getElementById('modalConfirmBtn');
-            btn.onclick = onConfirm;
+            if (rdc.dados?.clima) {
+                detalhes += `CLIMA:\n`;
+                detalhes += `Condição: ${rdc.dados.clima.condicao || '-'}\n`;
+                detalhes += `Pluviômetro: ${rdc.dados.clima.pluviometro || 0}mm\n\n`;
+            }
+            
+            if (rdc.dados?.equipamentos) {
+                detalhes += `EQUIPAMENTOS:\n`;
+                Object.entries(rdc.dados.equipamentos).forEach(([id, eq]) => {
+                    detalhes += `- ${eq.nome || id}: Real ${eq.real || '-'}, Manut ${eq.manutencao || 0}\n`;
+                });
+            }
+
+            alert(detalhes);
         }
 
-        function fecharModal() {
-            document.getElementById('modalConfirm').classList.remove('active');
+        // ==================== UTILITÁRIOS ====================
+
+        function editarObra(id) {
+            showToast('Função em desenvolvimento', 'error');
+        }
+
+        function excluirObra(id) {
+            if (confirm(`Deseja realmente excluir ${obras[id].nome}?`)) {
+                window.dbRemove(window.dbRef(window.db, `obras/${id}`))
+                    .then(() => {
+                        showToast('Obra excluída', 'success');
+                        carregarObras();
+                        document.getElementById('equipamentosEditor').style.display = 'none';
+                    })
+                    .catch(() => showToast('Erro ao excluir', 'error'));
+            }
         }
 
         function showToast(msg, type = 'success') {
@@ -1426,35 +1493,9 @@
             return `${dia}/${mes}/${ano}`;
         }
 
-        function editarObra(id) {
-            showToast('Função em desenvolvimento', 'error');
-        }
-
-        function excluirObra(id) {
-            abrirModal(
-                'Excluir Obra',
-                `Deseja realmente excluir ${obras[id].nome}? Todos os dados serão perdidos.`,
-                async () => {
-                    try {
-                        await window.dbRemove(window.dbRef(window.db, `obras/${id}`));
-                        showToast('Obra excluída', 'success');
-                        fecharModal();
-                        carregarObras();
-                        document.getElementById('equipamentosEditor').style.display = 'none';
-                    } catch (error) {
-                        showToast('Erro ao excluir', 'error');
-                    }
-                }
-            );
-        }
-
-        function verRelatorio(id) {
-            showToast('Visualização detalhada em desenvolvimento', 'error');
-        }
-
         // Fechar modal ao clicar fora
-        document.getElementById('modalConfirm').addEventListener('click', (e) => {
-            if (e.target.id === 'modalConfirm') fecharModal();
+        document.getElementById('modalExportar').addEventListener('click', (e) => {
+            if (e.target.id === 'modalExportar') fecharModalExportar();
         });
     </script>
 </body>
