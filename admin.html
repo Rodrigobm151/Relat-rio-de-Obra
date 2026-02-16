@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VER 1.9</title>
+    <title>VER 2.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -520,28 +520,39 @@
         }
 
 function converterMesParaKey(mesStr) {
-    // Se for objeto Date do Excel, converter para string primeiro
+    // Se for número (serial do Excel), converter para data
+    if (typeof mesStr === 'number') {
+        // Excel conta dias desde 01/01/1900 (ou 1904 em Mac)
+        const excelEpoch = new Date(1900, 0, 1);
+        // Ajuste: Excel tem bug do ano bissexto 1900, então subtrair 2 dias
+        const data = new Date(excelEpoch.getTime() + (mesStr - 2) * 24 * 60 * 60 * 1000);
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const ano = data.getFullYear();
+        return `${mes}-${ano}`;
+    }
+    
+    // Se for objeto Date do JavaScript
     if (mesStr instanceof Date) {
         const mes = String(mesStr.getMonth() + 1).padStart(2, '0');
         const ano = mesStr.getFullYear();
         return `${mes}-${ano}`;
     }
     
-    // Converter para string se não for
+    // Converter para string
     const str = String(mesStr).trim();
     
-    // Se já vier como data completa (01/01/2026 ou 2026-01-01)
+    // Se já vier como data completa (01/01/2026)
     const formatoDataBR = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     if (formatoDataBR) {
-        return `${formatoDataBR[2]}-${formatoDataBR[3]}`; // MM-AAAA
+        return `${formatoDataBR[2]}-${formatoDataBR[3]}`;
     }
     
     const formatoDataISO = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (formatoDataISO) {
-        return `${formatoDataISO[2]}-${formatoDataISO[1]}`; // MM-AAAA
+        return `${formatoDataISO[2]}-${formatoDataISO[1]}`;
     }
     
-    // Mapeamento de meses em português
+    // Mapeamento de meses
     const mesesMap = { 
         'jan': '01', 'janeiro': '01', 'jan.': '01',
         'fev': '02', 'fevereiro': '02', 'fev.': '02',
@@ -557,50 +568,68 @@ function converterMesParaKey(mesStr) {
         'dez': '12', 'dezembro': '12', 'dez.': '12'
     };
     
-    // Tenta formato MM/AAAA (01/2026)
+    // Formato MM/AAAA
     const formatoNumerico = str.match(/^(\d{2})\/(\d{4})$/);
     if (formatoNumerico) {
         return `${formatoNumerico[1]}-${formatoNumerico[2]}`;
     }
     
-    // Tenta formato texto (Jan/2026, Janeiro/2026, etc)
+    // Formato texto
     const partes = str.toLowerCase().split(/[\/\s\-]+/);
     const mesEncontrado = partes.find(p => mesesMap[p.replace(/[^a-z.]/g, '')]);
     const anoEncontrado = partes.find(p => /^\d{4}$/.test(p));
     
     if (mesEncontrado && anoEncontrado) {
-        const mesNum = mesesMap[mesEncontrado.replace(/[^a-z.]/g, '')];
-        return `${mesNum}-${anoEncontrado}`;
+        return `${mesesMap[mesEncontrado.replace(/[^a-z.]/g, '')]}-${anoEncontrado}`;
     }
     
-    // Se não conseguiu converter, loga para debug
-    console.warn('Não conseguiu converter:', str);
+    console.warn('Não conseguiu converter:', mesStr, 'Tipo:', typeof mesStr);
     return null;
 }
 
-        function mostrarPreview(colunasMeses, linhas) {
-            const thead = document.getElementById('previewThead');
-            const tbody = document.getElementById('previewTbody');
-            
-            let htmlHead = '<tr><th>Equipamento</th>';
-            colunasMeses.forEach(mes => { if (mes) htmlHead += `<th style="text-align:center">${mes}</th>`; });
-            htmlHead += '</tr>';
-            thead.innerHTML = htmlHead;
-            
-            let htmlBody = '';
-            linhas.slice(0, 10).forEach(linha => {
-                if (!linha[0]) return;
-                htmlBody += `<tr><td>${linha[0]}</td>`;
-                for (let i = 1; i <= colunasMeses.length; i++) {
-                    htmlBody += `<td style="text-align:center">${linha[i] !== undefined ? linha[i] : '-'}</td>`;
-                }
-                htmlBody += '</tr>';
-            });
-            if (linhas.length > 10) htmlBody += `<tr><td colspan="${colunasMeses.length + 1}" style="text-align:center;color:var(--cinza-medio)">... e mais ${linhas.length - 10} equipamentos</td></tr>`;
-            tbody.innerHTML = htmlBody;
-            
-            document.getElementById('previewContainer').style.display = 'block';
+       function mostrarPreview(colunasMeses, linhas) {
+    const thead = document.getElementById('previewThead');
+    const tbody = document.getElementById('previewTbody');
+    
+    // Formatar cabeçalho dos meses
+    let htmlHead = '<tr><th>Equipamento</th>';
+    colunasMeses.forEach(mes => {
+        let displayMes = mes;
+        
+        // Se for número (serial Excel), converter para formato legível
+        if (typeof mes === 'number') {
+            const excelEpoch = new Date(1900, 0, 1);
+            const data = new Date(excelEpoch.getTime() + (mes - 2) * 24 * 60 * 60 * 1000);
+            displayMes = data.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
         }
+        // Se for Date
+        else if (mes instanceof Date) {
+            displayMes = mes.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+        }
+        
+        htmlHead += `<th style="text-align:center; min-width: 80px;">${displayMes}</th>`;
+    });
+    htmlHead += '</tr>';
+    thead.innerHTML = htmlHead;
+    
+    // Corpo da tabela
+    let htmlBody = '';
+    linhas.slice(0, 10).forEach(linha => {
+        if (!linha[0]) return;
+        htmlBody += `<tr><td>${linha[0]}</td>`;
+        for (let i = 1; i <= colunasMeses.length; i++) {
+            htmlBody += `<td style="text-align:center">${linha[i] !== undefined ? linha[i] : '-'}</td>`;
+        }
+        htmlBody += '</tr>';
+    });
+    
+    if (linhas.length > 10) {
+        htmlBody += `<tr><td colspan="${colunasMeses.length + 1}" style="text-align:center;color:var(--cinza-medio)">... e mais ${linhas.length - 10} equipamentos</td></tr>`;
+    }
+    
+    tbody.innerHTML = htmlBody;
+    document.getElementById('previewContainer').style.display = 'block';
+}
 
         async function salvarEquipamentosExcel() {
             if (!obraSelecionada || Object.keys(dadosExcel).length === 0) { showToast('Nenhum dado para salvar', 'error'); return; }
