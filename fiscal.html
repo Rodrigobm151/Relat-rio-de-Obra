@@ -15,6 +15,9 @@
             font-display: swap;
         }
     </style>
+
+    let rdcPendenteHoje = null; // Para armazenar dados se quisermos editar
+    let rdcsPendentesAnteriores = []; // Lista de pendentes para edição
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -527,7 +530,7 @@
             }
         }
 
-       async function carregarHistoricoRDCs() {
+      async function carregarHistoricoRDCs() {
     const container = document.getElementById('rdcList');
     const statusEl = document.getElementById('statusHoje');
     const btnCriar = document.getElementById('btnCriarRDC');
@@ -545,15 +548,16 @@
     
     let rdcHojeEnviado = false;
     let ultimoNumero = 0;
-    let rdcsRecentes = []; // RDCs dos últimos 7 dias
+    let rdcsEnviados = [];
+    rdcsPendentesAnteriores = []; // Resetar
     
     try {
         const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/relatorios`));
-        let html = '';
         
         if (snap && snap.exists()) {
             snap.forEach(child => {
                 const rdc = child.val();
+                rdc.id = child.key; // Guardar ID para possível edição
                 
                 if (parseInt(rdc.numero) > ultimoNumero) {
                     ultimoNumero = parseInt(rdc.numero);
@@ -562,23 +566,19 @@
                 // Verifica se é de hoje
                 if (rdc.data === hojeStr || rdc.dataKey === hojeKey) {
                     rdcHojeEnviado = true;
+                    rdc.isHoje = true;
                 }
                 
-                // Verifica se está nos últimos 7 dias
-                const dataRDC = rdc.dataKey ? new Date(rdc.dataKey) : null;
-                if (dataRDC && dataRDC >= seteDiasAtras) {
-                    rdcsRecentes.push(rdc);
-                }
+                rdcsEnviados.push(rdc);
             });
         }
         
-        // Calcular RDCs pendentes dos últimos 7 dias
-        const rdcsPendentes = [];
+        // Calcular RDCs pendentes dos últimos 7 dias (incluindo hoje se não enviado)
         if (currentObraData && currentObraData.dataInicio) {
             const [anoInicio, mesInicio, diaInicio] = currentObraData.dataInicio.split('-');
             const dataInicio = new Date(anoInicio, mesInicio - 1, diaInicio);
             
-            // Gerar datas dos últimos 7 dias
+            // Gerar datas dos últimos 7 dias (hoje até 6 dias atrás)
             for (let i = 0; i < 7; i++) {
                 const dataVerificar = new Date(hoje);
                 dataVerificar.setDate(hoje.getDate() - i);
@@ -590,59 +590,170 @@
                 const dataVerificarKey = formatarDataKey(dataVerificar);
                 
                 // Verifica se já existe RDC para esta data
-                const jaExiste = rdcsRecentes.some(r => 
+                const rdcExistente = rdcsEnviados.find(r => 
                     r.data === dataVerificarStr || r.dataKey === dataVerificarKey
                 );
                 
-                if (!jaExiste && i === 0) {
-                    // Hoje está pendente (já tratado no statusBox)
-                } else if (!jaExiste) {
-                    // Dia anterior pendente
+                if (!rdcExistente) {
+                    // Calcular número do RDC
                     const diffDias = Math.floor((dataVerificar - dataInicio) / (1000 * 60 * 60 * 24));
                     const numeroRDC = diffDias + 1;
                     
-                    rdcsPendentes.push({
+                    const rdcPendente = {
                         data: dataVerificarStr,
                         dataKey: dataVerificarKey,
                         numero: numeroRDC,
-                        isPendente: true
-                    });
+                        isPendente: true,
+                        isHoje: i === 0
+                    };
+                    
+                    if (i === 0) {
+                        rdcPendenteHoje = rdcPendente;
+                    } else {
+                        rdcsPendentesAnteriores.push(rdcPendente);
+                    }
                 }
             }
         }
         
-        // Ordenar: pendentes primeiro (mais recentes), depois enviados
-        rdcsPendentes.sort((a, b) => new Date(b.dataKey) - new Date(a.dataKey));
-        rdcsRecentes.sort((a, b) => new Date(b.dataKey || b.data) - new Date(a.dataKey || a.data));
-        
-        // Renderizar pendentes
-        rdcsPendentes.forEach(rdc => {
-            html += `
-                <div class="card-obra rdc-pendente-card" style="border-left-color: var(--laranja); opacity: 0.8;">
-                    <div style="font-size: 0.9rem">
-                        <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
-                        <small style="color: #777">Aguardando envio</small>
-                    </div>
-                    <span style="font-size: 0.75rem; color: var(--laranja); font-weight: bold;">
-                        PENDENTE
-                    </span>
-                </div>`;
+        // Ordenar enviados por data (mais recente primeiro)
+        rdcsEnviados.sort((a, b) => {
+            const dataA = a.dataKey ? new Date(a.dataKey) : new Date(a.data.split('/').reverse().join('-'));
+            const dataB = b.dataKey ? new Date(b.dataKey) : new Date(b.data.split('/').reverse().join('-'));
+            return dataB - dataA;
         });
         
-        // Renderizar enviados recentes
-        rdcsRecentes.forEach(rdc => {
-            const isHoje = (rdc.data === hojeStr || rdc.dataKey === hojeKey);
-            html += `
-                <div class="card-obra ${isHoje ? 'rdc-pendente-card' : ''}" style="border-left-color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}">
-                    <div style="font-size: 0.9rem">
-                        <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
-                        <small style="color: #777">Fiscal: ${rdc.fiscalNome || rdc.fiscal}</small>
-                    </div>
-                    <span style="font-size: 0.75rem; color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}; font-weight: bold;">
-                        ${isHoje ? 'HOJE' : 'ENVIADO'}
-                    </span>
-                </div>`;
+        // Ordenar pendentes anteriores (mais recente primeiro)
+        rdcsPendentesAnteriores.sort((a, b) => new Date(b.dataKey) - new Date(a.dataKey));
+        
+        // SEPARAR ENVIADOS: Recentes (7 dias) vs Antigos
+        const rdcsRecentes = rdcsEnviados.filter(r => {
+            const dataRDC = r.dataKey ? new Date(r.dataKey) : new Date(r.data.split('/').reverse().join('-'));
+            return dataRDC >= seteDiasAtras;
         });
+        
+        const rdcsAntigos = rdcsEnviados.filter(r => {
+            const dataRDC = r.dataKey ? new Date(r.dataKey) : new Date(r.data.split('/').reverse().join('-'));
+            return dataRDC < seteDiasAtras;
+        });
+        
+        // MONTAR HTML
+        let html = '';
+        
+        // SEÇÃO 1: RDC DE HOJE (DESTAQUE)
+        if (rdcHojeEnviado) {
+            const rdcHoje = rdcsEnviados.find(r => r.isHoje);
+            html += `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 0.75rem; color: var(--verde-vale); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                        <i class="fas fa-calendar-day"></i> Hoje - Enviado
+                    </div>
+                    <div class="card-obra" style="border-left-color: var(--verde-vale); background: #e8f5e9; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <div style="font-size: 1rem">
+                            <strong style="color: var(--azul-escuro); font-size: 1.1rem">RDC #${String(rdcHoje.numero).padStart(3, '0')}</strong><br>
+                            <small style="color: #555">Fiscal: ${rdcHoje.fiscalNome || rdcHoje.fiscal}</small><br>
+                            <small style="color: #777; font-size: 0.75rem;">
+                                <i class="fas fa-cloud-sun"></i> ${rdcHoje.dados?.clima?.condicao || '-'} | 
+                                <i class="fas fa-tint"></i> ${rdcHoje.dados?.clima?.pluviometro || 0}mm
+                            </small>
+                        </div>
+                        <span style="font-size: 0.9rem; color: var(--verde-vale); font-weight: bold;">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                    </div>
+                </div>`;
+        } else if (rdcPendenteHoje) {
+            html += `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 0.75rem; color: var(--laranja); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                        <i class="fas fa-calendar-day"></i> Hoje - Pendente
+                    </div>
+                    <div class="card-obra rdc-pendente-card" style="border-left-color: var(--laranja); border: 2px solid var(--laranja); box-shadow: 0 4px 12px rgba(255,152,0,0.2); cursor: pointer;" onclick="editarRDC('${rdcPendenteHoje.dataKey}')">
+                        <div style="font-size: 1rem">
+                            <strong style="color: var(--azul-escuro); font-size: 1.1rem">RDC #${String(rdcPendenteHoje.numero).padStart(3, '0')}</strong><br>
+                            <small style="color: #777">Clique para preencher</small>
+                        </div>
+                        <span style="font-size: 0.9rem; color: var(--laranja); font-weight: bold;">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                    </div>
+                </div>`;
+        }
+        
+        // SEÇÃO 2: PENDENTES ANTERIORES (Últimos 7 dias)
+        if (rdcsPendentesAnteriores.length > 0) {
+            html += `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 0.75rem; color: var(--laranja); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-exclamation-circle"></i> Pendentes (${rdcsPendentesAnteriores.length})
+                    </div>`;
+            
+            rdcsPendentesAnteriores.forEach(rdc => {
+                html += `
+                    <div class="card-obra rdc-pendente-card" style="border-left-color: var(--laranja); cursor: pointer; margin-bottom: 8px;" onclick="editarRDC('${rdc.dataKey}')">
+                        <div style="font-size: 0.9rem">
+                            <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
+                            <small style="color: #777"><i class="fas fa-edit"></i> Clique para preencher</small>
+                        </div>
+                        <span style="font-size: 0.75rem; color: var(--laranja); font-weight: bold;">
+                            PENDENTE
+                        </span>
+                    </div>`;
+            });
+            
+            html += `</div>`;
+        }
+        
+        // SEÇÃO 3: ENVIADOS RECENTES (Últimos 7 dias, exceto hoje)
+        const recentesSemHoje = rdcsRecentes.filter(r => !r.isHoje);
+        if (recentesSemHoje.length > 0) {
+            html += `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 0.75rem; color: var(--verde-vale); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-check"></i> Enviados Recentes
+                    </div>`;
+            
+            recentesSemHoje.forEach(rdc => {
+                html += `
+                    <div class="card-obra" style="border-left-color: var(--verde-vale); margin-bottom: 8px; opacity: 0.9;">
+                        <div style="font-size: 0.9rem">
+                            <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
+                            <small style="color: #777">Fiscal: ${rdc.fiscalNome || rdc.fiscal}</small>
+                        </div>
+                        <span style="font-size: 0.75rem; color: var(--verde-vale); font-weight: bold;">
+                            ENVIADO
+                        </span>
+                    </div>`;
+            });
+            
+            html += `</div>`;
+        }
+        
+        // SEÇÃO 4: HISTÓRICO ANTIGO (Agrupado)
+        if (rdcsAntigos.length > 0) {
+            html += `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 0.75rem; color: #999; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;" onclick="toggleHistoricoAntigo()">
+                        <i class="fas fa-archive"></i> Histórico Anterior (${rdcsAntigos.length}) 
+                        <i class="fas fa-chevron-down" id="icon-historico" style="transition: transform 0.3s;"></i>
+                    </div>
+                    <div id="historico-antigo" style="display: none;">`;
+            
+            rdcsAntigos.forEach(rdc => {
+                html += `
+                    <div class="card-obra" style="border-left-color: #bbb; margin-bottom: 8px; opacity: 0.7;">
+                        <div style="font-size: 0.85rem">
+                            <strong style="color: #666">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
+                            <small style="color: #999">Fiscal: ${rdc.fiscalNome || rdc.fiscal}</small>
+                        </div>
+                        <span style="font-size: 0.7rem; color: #999; font-weight: bold;">
+                            ENVIADO
+                        </span>
+                    </div>`;
+            });
+            
+            html += `</div></div>`;
+        }
         
         // Determinar próximo número do RDC
         if (currentObraData && currentObraData.dataInicio && !rdcHojeEnviado) {
@@ -659,7 +770,7 @@
             proximoRDCNumero = 1;
         }
         
-        // Atualizar status de hoje
+        // Atualizar status de hoje no box superior
         if (rdcHojeEnviado) {
             statusEl.textContent = 'Enviado';
             statusEl.className = 'status-enviado';
@@ -672,12 +783,78 @@
             statusBox.style.background = 'white';
         }
         
-        container.innerHTML = html || '<p style="font-size: 0.8rem; color: #777">Nenhum relatório nos últimos 7 dias.</p>';
+        container.innerHTML = html || '<p style="font-size: 0.8rem; color: #777">Nenhum relatório encontrado.</p>';
         
     } catch (e) {
         console.error(e);
         container.innerHTML = '<div class="erro-box">Erro ao carregar histórico.</div>';
     }
+}
+
+// ADICIONE esta nova função para expandir/colapsar histórico
+function toggleHistoricoAntigo() {
+    const div = document.getElementById('historico-antigo');
+    const icon = document.getElementById('icon-historico');
+    
+    if (div.style.display === 'none') {
+        div.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+    } else {
+        div.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+    }
+}
+
+// ADICIONE esta nova função para editar RDC pendente
+function editarRDC(dataKey) {
+    // Encontrar o RDC pendente
+    let rdcParaEditar = null;
+    
+    if (rdcPendenteHoje && rdcPendenteHoje.dataKey === dataKey) {
+        rdcParaEditar = rdcPendenteHoje;
+    } else {
+        rdcParaEditar = rdcsPendentesAnteriores.find(r => r.dataKey === dataKey);
+    }
+    
+    if (!rdcParaEditar) {
+        showToast('RDC não encontrado', 'error');
+        return;
+    }
+    
+    // Preencher dados do RDC
+    currentRDC = {
+        numero: rdcParaEditar.numero,
+        data: rdcParaEditar.data,
+        dataKey: rdcParaEditar.dataKey,
+        mesRef: formatarMesKey(new Date(rdcParaEditar.dataKey)),
+        fiscalNome: localStorage.getItem('currentFiscalNome') || 'Fiscal',
+        status: 'enviado',
+        dados: { 
+            clima: {},
+            atividades: {},
+            equipamentos: {} 
+        }
+    };
+    
+    document.getElementById('rdcNum').textContent = String(currentRDC.numero).padStart(3, '0');
+    document.getElementById('rdcData').textContent = currentRDC.data;
+    document.getElementById('formFiscalNome').textContent = currentRDC.fiscalNome;
+    
+    // Resetar campos
+    document.getElementById('climaCondicao').value = 'Bom';
+    document.getElementById('pluviometro').value = '';
+    document.getElementById('descAtividades').value = '';
+    document.getElementById('comentarios').value = '';
+    
+    // Ativar aba geral
+    ativarAbaGeral();
+    
+    // Mostrar formulário
+    document.getElementById('rdcPanel').style.display = 'none';
+    document.getElementById('formPanel').style.display = 'block';
+    
+    // Carregar equipamentos
+    carregarEquipamentosDoContrato(currentRDC.mesRef);
 }
 
         // --- LÓGICA DO FORMULÁRIO RDC ---
