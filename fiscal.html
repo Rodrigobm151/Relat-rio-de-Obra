@@ -1,501 +1,402 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RDC - Área do Fiscal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --azul-vale: #3CB5E5;
+            --azul-escuro: #0096d2;
+            --verde-vale: #007E79;
+            --cinza-texto: #555555;
+            --branco: #FFFFFF;
+            --cinza-medio: #747678;
+            --cinza-claro: #BCBEC0;
+            --cinza-mais-claro: #E6E7E8;
+            --laranja: #ff9800;
+            --vermelho: #e74c3c;
+            --fundo: #f5f7fa;
+        }
 
-<title>RDC - Área do Fiscal</title>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--fundo); color: var(--cinza-texto); line-height: 1.6; -webkit-font-smoothing: antialiased; }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        /* Header */
+        .header { background: var(--azul-vale); color: white; padding: 1rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-content { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .header-info h1 { font-size: 1.2rem; font-weight: 600; font-style: italic; }
+        .header-info p { font-size: 0.85rem; opacity: 0.9; }
 
-<style>
+        .btn-sair { background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
 
-/* ================= VARIÁVEIS ================= */
+        /* Container */
+        .container { max-width: 800px; margin: 0 auto; padding: 1rem; padding-bottom: 100px; }
 
-:root {
+        /* Cards & Lists */
+        .card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card-title { color: var(--azul-vale); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
 
---azul-vale: #3CB5E5;
---verde-vale: #007E79;
---cinza-texto: #555;
---cinza-medio: #747678;
---cinza-claro: #BCBEC0;
---cinza-mais-claro: #E6E7E8;
---laranja: #ff9800;
---vermelho: #e74c3c;
---fundo: #f5f7fa;
---branco: #fff;
+        .obra-item, .rdc-item { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.3s; border-left: 4px solid var(--azul-vale); }
+        .obra-item:hover { transform: translateX(5px); }
 
-}
+        /* RDC Status Tags */
+        .rdc-status { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; }
+        .enviado { background: #e8f5e9; color: var(--verde-vale); }
+        .rascunho { background: #fff3e0; color: var(--laranja); }
+        .pendente { background: #ffebee; color: var(--vermelho); }
 
-/* ================= RESET ================= */
+        /* Tabs */
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: white; border: 2px solid var(--cinza-mais-claro); color: var(--cinza-texto); padding: 0.8rem 1rem; border-radius: 12px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem; flex: 1; justify-content: center; }
+        .tab-btn.active { background: var(--azul-vale); color: white; border-color: var(--azul-vale); }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter',sans-serif;
-}
+        /* Form Elements */
+        .form-group { margin-bottom: 1.2rem; }
+        .form-label { display: block; color: var(--cinza-texto); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .form-select, .form-input, .form-textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--cinza-mais-claro); border-radius: 10px; font-size: 16px; color: var(--cinza-texto); }
+        .form-textarea { min-height: 80px; resize: none; }
 
-body{
-background:var(--fundo);
-color:var(--cinza-texto);
-}
+        /* EQUIPAMENTOS ESTILIZAÇÃO ESPECÍFICA */
+        .equip-list { display: flex; flex-direction: column; gap: 10px; }
+        .equip-item { background: white; border-radius: 12px; padding: 1rem; border-left: 5px solid var(--cinza-claro); cursor: pointer; position: relative; }
+        .equip-item.contestada { border-left-color: var(--laranja); }
+        
+        .equip-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .equip-nome { font-weight: 600; color: var(--cinza-texto); font-size: 1rem; }
+        .equip-nome b { color: var(--azul-vale); font-size: 1.1rem; }
+        .equip-previsto { font-size: 0.75rem; color: var(--cinza-medio); background: var(--cinza-mais-claro); padding: 2px 8px; border-radius: 10px; }
 
-/* ================= HEADER ================= */
+        .equip-detail { max-height: 0; overflow: hidden; transition: all 0.4s ease-out; background: #fcfcfc; }
+        .equip-detail.open { max-height: 500px; margin-top: 15px; border-top: 1px dashed var(--cinza-claro); padding-top: 15px; }
 
-.header{
-background:var(--azul-vale);
-color:white;
-padding:1rem;
-position:sticky;
-top:0;
-z-index:100;
-}
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .detail-box { text-align: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--cinza-mais-claro); }
+        .input-real { width: 100%; border: none; border-bottom: 2px solid var(--azul-vale); text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--azul-vale); outline: none; }
 
-.header-content{
-max-width:800px;
-margin:auto;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
+        .btn-salvar-item { background: var(--verde-vale); color: white; border: none; padding: 0.8rem; border-radius: 8px; font-weight: 600; width: 100%; margin-top: 10px; cursor: pointer; }
 
-.btn-sair{
-background:rgba(255,255,255,.2);
-border:none;
-color:white;
-padding:.5rem 1rem;
-border-radius:20px;
-cursor:pointer;
-}
+        /* Footer Action Bar */
+        .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 1rem; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; gap: 1rem; z-index: 100; }
+        .btn-primary { flex: 2; background: var(--azul-vale); color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .btn-secondary { flex: 1; background: var(--cinza-mais-claro); color: var(--cinza-texto); border: none; padding: 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; }
 
-/* ================= CONTAINER ================= */
-
-.container{
-max-width:800px;
-margin:auto;
-padding:1rem;
-padding-bottom:120px;
-}
-
-/* ================= CARD ================= */
-
-.card{
-background:white;
-border-radius:16px;
-padding:1.5rem;
-margin-bottom:1rem;
-box-shadow:0 2px 8px rgba(0,0,0,.05);
-}
-
-.card-title{
-color:var(--azul-vale);
-margin-bottom:1rem;
-}
-
-/* ================= EQUIPAMENTOS ================= */
-
-.equip-list{
-background:white;
-border-radius:12px;
-overflow:hidden;
-box-shadow:0 2px 8px rgba(0,0,0,.05);
-}
-
-.equip-item{
-padding:1rem;
-border-bottom:1px solid var(--cinza-mais-claro);
-}
-
-.equip-item:last-child{
-border-bottom:none;
-}
-
-.equip-detail{
-background:#f9f9f9;
-padding:0;
-max-height:0;
-overflow:hidden;
-transition:.3s;
-}
-
-.equip-detail.open{
-padding:1rem;
-max-height:600px;
-}
-
-/* ================= FORM ================= */
-
-.form-group{
-margin-bottom:1rem;
-}
-
-.form-label{
-font-size:.9rem;
-display:block;
-margin-bottom:.3rem;
-}
-
-.form-input,
-.form-textarea{
-width:100%;
-padding:.7rem;
-border:2px solid var(--cinza-mais-claro);
-border-radius:8px;
-}
-
-.btn-salvar-item{
-background:var(--verde-vale);
-color:white;
-border:none;
-padding:.8rem;
-border-radius:8px;
-width:100%;
-cursor:pointer;
-font-weight:600;
-}
-
-/* ================= TOAST ================= */
-
-.toast{
-position:fixed;
-top:90px;
-left:50%;
-transform:translateX(-50%) translateY(-100px);
-background:#333;
-color:white;
-padding:1rem 2rem;
-border-radius:30px;
-opacity:0;
-transition:.3s;
-z-index:999;
-}
-
-.toast.show{
-opacity:1;
-transform:translateX(-50%) translateY(0);
-}
-
-</style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 30px; z-index: 1000; display: none; font-size: 0.9rem; }
+    </style>
 </head>
-
 <body>
 
-<!-- ================= HEADER ================= -->
-
-<header class="header">
-
-<div class="header-content">
-
-<div>
-<h3 id="headerTitle">Minhas Obras</h3>
-<small id="headerSubtitle">Selecione uma obra</small>
-</div>
-
-<button class="btn-sair" onclick="sair()">
-<i class="fas fa-sign-out-alt"></i> Sair
-</button>
-
-</div>
-
-</header>
-
-
-<!-- ================= CONTAINER ================= -->
-
-<div class="container">
-
-
-<!-- ================= PAINEL EQUIP ================= -->
-
-<div id="formPanel">
-
-<div class="card">
-
-<h3 class="card-title">
-<i class="fas fa-truck"></i> Equipamentos
-</h3>
-
-<p style="font-size:.85rem;color:var(--cinza-medio)">
-Clique para informar quantidade real
-</p>
-
-</div>
-
-
-<div id="equipamentosContainer">
-
-<div style="text-align:center;padding:2rem">
-Carregando...
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ================= TOAST ================= -->
-
-<div class="toast" id="toast"></div>
-
-
-<!-- ================= FIREBASE ================= -->
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
-
-const firebaseConfig = {
-
-apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
-authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
-databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
-projectId: "relatorio-obra-geotecnia"
-
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-window.db = db;
-window.dbRef = ref;
-window.dbGet = get;
-window.dbSet = set;
-
-</script>
-
-
-<!-- ================= SCRIPT ================= -->
-
-<script>
-
-/* ================= ESTADO ================= */
-
-let equipamentosContrato = [];
-let currentRDC = { dados:{ equipamentos:{} } };
-
-
-/* ================= INIT ================= */
-
-document.addEventListener('DOMContentLoaded',()=>{
-
-carregarEquipamentos("2026-02-16");
-
-});
-
-
-/* ================= CARREGAR ================= */
-
-async function carregarEquipamentos(dataKey){
-
-const container = document.getElementById('equipamentosContainer');
-
-try{
-
-// Simulação — troque pelo seu Firebase
-equipamentosContrato = [
-
-{id:"1",nome:"Escavadeira",previsto:5},
-{id:"2",nome:"Trator",previsto:3},
-{id:"3",nome:"Caminhão",previsto:4}
-
-];
-
-renderEquipamentos();
-
-}
-catch(e){
-
-container.innerHTML="Erro ao carregar";
-
-}
-
-}
-
-
-/* ================= RENDER ================= */
-
-function renderEquipamentos(){
-
-const container = document.getElementById('equipamentosContainer');
-
-let html = '<div class="equip-list">';
-
-equipamentosContrato.forEach((eq,index)=>{
-
-const dados = currentRDC.dados.equipamentos[eq.id] || {};
-
-const real = dados.real!==undefined ? dados.real : '-';
-const manut = dados.manutencao || 0;
-
-let status = '⏳';
-
-if(dados.real!==undefined){
-
-if(manut>0) status='⚠️';
-else if(real==eq.previsto) status='✅';
-else status='✏️';
-
-}
-
-html+=`
-
-<div class="equip-item">
-
-<div onclick="toggleEquip(${index})"
-style="display:flex;justify-content:space-between;align-items:center">
-
-<div>
-
-<strong>${eq.nome}</strong><br>
-
-<small style="color:var(--cinza-medio)">
-Prev: ${eq.previsto} | Real: ${real}
-${manut>0?` | Manut: ${manut}`:''}
-</small>
-
-</div>
-
-<div style="font-size:20px">${status}</div>
-
-</div>
-
-
-<div class="equip-detail" id="equip-detail-${index}">
-
-
-<div class="form-group">
-
-<label class="form-label">Quantidade real</label>
-
-<input type="number"
-id="equip-real-${index}"
-value="${dados.real!==undefined?dados.real:eq.previsto}"
-class="form-input">
-
-</div>
-
-
-<div class="form-group">
-
-<label class="form-label">Em manutenção</label>
-
-<input type="number"
-id="equip-manut-${index}"
-value="${manut}"
-class="form-input">
-
-</div>
-
-
-<div class="form-group">
-
-<label class="form-label">Observações</label>
-
-<textarea id="equip-obs-${index}"
-class="form-textarea">${dados.obs||''}</textarea>
-
-</div>
-
-
-<button class="btn-salvar-item"
-onclick="salvarEquipamento('${eq.id}',${index});event.stopPropagation()">
-
-<i class="fas fa-check"></i> Confirmar
-
-</button>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-html+='</div>';
-
-container.innerHTML = html;
-
-}
-
-
-/* ================= TOGGLE ================= */
-
-function toggleEquip(index){
-
-const detail = document.getElementById(`equip-detail-${index}`);
-
-detail.classList.toggle('open');
-
-}
-
-
-/* ================= SALVAR ================= */
-
-function salvarEquipamento(id,index){
-
-const real = parseInt(document.getElementById(`equip-real-${index}`).value)||0;
-
-const manut = parseInt(document.getElementById(`equip-manut-${index}`).value)||0;
-
-const obs = document.getElementById(`equip-obs-${index}`).value;
-
-
-if(manut>real){
-
-showToast("Manutenção maior que real");
-
-return;
-
-}
-
-
-currentRDC.dados.equipamentos[id]={
-
-real,
-manutencao:manut,
-obs,
-data:new Date().toISOString()
-
-};
-
-
-renderEquipamentos();
-
-showToast("Atualizado!");
-
-}
-
-
-/* ================= TOAST ================= */
-
-function showToast(msg){
-
-const t = document.getElementById('toast');
-
-t.textContent = msg;
-
-t.classList.add('show');
-
-setTimeout(()=>t.classList.remove('show'),2500);
-
-}
-
-
-/* ================= SAIR ================= */
-
-function sair(){
-
-alert("Logout aqui");
-
-}
-
-</script>
-
+    <header class="header">
+        <div class="header-content">
+            <div class="header-info">
+                <h1 id="headerTitle">minhas obras</h1>
+                <p id="headerSubtitle">carregando...</p>
+            </div>
+            <button class="btn-sair" onclick="sair()">sair</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="obrasPanel">
+            <div id="obrasList"></div>
+        </div>
+
+        <div id="rdcPanel" style="display: none;">
+            <div class="card" style="padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 600;">Relatórios</span>
+                <button class="btn-primary" onclick="criarNovoRDC()" style="padding: 0.5rem 1rem; width: auto;">+ Novo</button>
+            </div>
+            <div id="rdcList"></div>
+        </div>
+
+        <div id="formPanel" style="display: none;">
+            <div class="card" style="margin-bottom: 10px;">
+                <h2 id="formRdcTitulo" style="color: var(--azul-vale);">RDC #000</h2>
+                <p id="formRdcData" style="font-size: 0.8rem; color: var(--cinza-medio);"></p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('clima', this)"><i class="fas fa-sun"></i> Clima</button>
+                <button class="tab-btn" onclick="switchTab('atividades', this)"><i class="fas fa-list"></i> Notas</button>
+                <button class="tab-btn" onclick="switchTab('equipamentos', this)"><i class="fas fa-truck"></i> Equip.</button>
+            </div>
+
+            <div id="tab-clima" class="tab-content active">
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">Condição do Tempo</label>
+                        <select class="form-select" id="climaCondicao">
+                            <option value="Bom">Bom / Ensolarado</option>
+                            <option value="Nublado">Nublado</option>
+                            <option value="Chuva Leve">Chuva Leve</option>
+                            <option value="Chuva Forte">Chuva Forte / Paralisado</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-atividades" class="tab-content">
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">Atividades do Dia</label>
+                        <textarea class="form-textarea" id="atividadesDesc" placeholder="O que foi feito hoje?"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-equipamentos" class="tab-content">
+                <p style="font-size: 0.8rem; margin: 0 0 10px 5px; color: var(--cinza-medio);">Toque no item para ajustar a quantidade real.</p>
+                <div id="equipamentosContainer" class="equip-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-bar" id="actionBar" style="display: none;">
+        <button class="btn-secondary" onclick="voltarParaRDCs()">voltar</button>
+        <button class="btn-primary" onclick="enviarRDC()">ENVIAR RDC</button>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
+            authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
+            databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
+            projectId: "relatorio-obra-geotecnia",
+            storageBucket: "relatorio-obra-geotecnia.firebasestorage.app",
+            messagingSenderId: "765646735604",
+            appId: "1:765646735604:web:59424d5353813939e976a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Globais para facilitar
+        window.db = db;
+        window.dbRef = ref;
+        window.dbGet = get;
+        window.dbSet = set;
+        window.dbPush = push;
+
+        // Início da aplicação
+        init();
+    </script>
+
+    <script>
+        let currentFiscal = localStorage.getItem('currentFiscal') || 'Fiscal_01';
+        let currentFiscalNome = localStorage.getItem('currentFiscalNome') || 'Fiscal';
+        let currentObra = null;
+        let currentRDC = null;
+        let equipamentosContrato = [];
+
+        async function init() {
+            document.getElementById('headerSubtitle').textContent = `Olá, ${currentFiscalNome}`;
+            carregarObras();
+        }
+
+        async function carregarObras() {
+            const container = document.getElementById('obrasList');
+            container.innerHTML = 'Carregando obras...';
+            
+            try {
+                const snap = await window.dbGet(window.dbRef(window.db, 'obras'));
+                if (snap.exists()) {
+                    let html = '';
+                    snap.forEach(child => {
+                        const obra = child.val();
+                        html += `
+                            <div class="obra-item" onclick="selecionarObra('${child.key}', '${obra.nome}')">
+                                <div class="obra-nome">${obra.nome}</div>
+                                <div style="font-size: 0.8rem; color: #888;">Toque para abrir relatórios</div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function selecionarObra(id, nome) {
+            currentObra = { id, nome };
+            document.getElementById('headerTitle').textContent = nome;
+            document.getElementById('obrasPanel').style.display = 'none';
+            document.getElementById('rdcPanel').style.display = 'block';
+            carregarRDCs();
+        }
+
+        async function carregarRDCs() {
+            const container = document.getElementById('rdcList');
+            container.innerHTML = 'Buscando histórico...';
+            
+            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObra.id}/relatorios`));
+            let html = '';
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const rdc = child.val();
+                    html += `
+                        <div class="rdc-item">
+                            <div style="display:flex; justify-content: space-between">
+                                <b>RDC #${rdc.numero}</b>
+                                <span class="rdc-status enviado">Enviado</span>
+                            </div>
+                            <div style="font-size:0.8rem">${rdc.data}</div>
+                        </div>
+                    `;
+                });
+            }
+            container.innerHTML = html || '<p style="text-align:center; padding:20px;">Nenhum relatório enviado.</p>';
+        }
+
+        async function criarNovoRDC() {
+            const dataAtual = new Date();
+            const dataStr = dataAtual.toLocaleDateString('pt-BR');
+            const dataKey = dataAtual.toISOString().split('T')[0];
+
+            currentRDC = {
+                numero: Math.floor(Math.random() * 900) + 100,
+                data: dataStr,
+                dataKey: dataKey,
+                dados: { clima: {}, atividades: {}, equipamentos: {} }
+            };
+
+            document.getElementById('formRdcTitulo').textContent = `RDC #${currentRDC.numero}`;
+            document.getElementById('formRdcData').textContent = dataStr;
+            
+            document.getElementById('rdcPanel').style.display = 'none';
+            document.getElementById('formPanel').style.display = 'block';
+            document.getElementById('actionBar').style.display = 'flex';
+
+            await carregarEquipamentosDoContrato();
+        }
+
+        async function carregarEquipamentosDoContrato() {
+            const container = document.getElementById('equipamentosContainer');
+            container.innerHTML = 'Carregando lista de contrato...';
+
+            // Nota: No seu banco, ajuste o caminho se necessário (ex: obras/ID/contrato)
+            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObra.id}/contrato`));
+            
+            equipamentosContrato = [];
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    equipamentosContrato.push({ id: child.key, ...child.val() });
+                });
+            }
+            renderEquipamentos();
+        }
+
+        function renderEquipamentos() {
+            const container = document.getElementById('equipamentosContainer');
+            let html = '';
+
+            equipamentosContrato.forEach((eq, index) => {
+                const editado = currentRDC.dados.equipamentos[eq.id];
+                const valorReal = editado ? editado.real : eq.previsto;
+                const isContestado = editado && editado.real !== eq.previsto;
+
+                html += `
+                    <div class="equip-item ${isContestado ? 'contestada' : ''}" onclick="toggleEquip(${index})">
+                        <div class="equip-header">
+                            <span class="equip-nome">${eq.nome}: <b>${valorReal}</b></span>
+                            <span class="equip-previsto">Previsto: ${eq.previsto}</span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: ${isContestado ? 'var(--laranja)' : '#888'}">
+                            ${isContestado ? 'Quantidade alterada pelo fiscal' : 'Conforme contrato'}
+                        </div>
+
+                        <div class="equip-detail" id="equip-detail-${index}">
+                            <div class="detail-grid">
+                                <div class="detail-box">
+                                    <label class="form-label">Qtd Real</label>
+                                    <input type="number" class="input-real" id="inp-real-${index}" value="${valorReal}" onclick="event.stopPropagation()">
+                                </div>
+                                <div class="detail-box">
+                                    <label class="form-label">Manutenção</label>
+                                    <input type="number" class="input-real" style="color:var(--laranja); border-color:var(--laranja)" id="inp-manut-${index}" value="${editado?.manutencao || 0}" onclick="event.stopPropagation()">
+                                </div>
+                            </div>
+                            <button class="btn-salvar-item" onclick="confirmarEquipamento('${eq.id}', ${index}); event.stopPropagation();">CONFIRMAR</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleEquip(index) {
+            const el = document.getElementById(`equip-detail-${index}`);
+            const isOpen = el.classList.contains('open');
+            document.querySelectorAll('.equip-detail').forEach(d => d.classList.remove('open'));
+            if (!isOpen) el.classList.add('open');
+        }
+
+        function confirmarEquipamento(id, index) {
+            const real = parseInt(document.getElementById(`inp-real-${index}`).value);
+            const manut = parseInt(document.getElementById(`inp-manut-${index}`).value) || 0;
+
+            currentRDC.dados.equipamentos[id] = {
+                real: real,
+                manutencao: manut,
+                confirmado: true
+            };
+
+            showToast("Quantidade atualizada");
+            renderEquipamentos();
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        async function enviarRDC() {
+            try {
+                const relRef = window.dbRef(window.db, `obras/${currentObra.id}/relatorios`);
+                
+                // Coleta dados finais
+                currentRDC.dados.clima = document.getElementById('climaCondicao').value;
+                currentRDC.dados.atividades = document.getElementById('atividadesDesc').value;
+                currentRDC.fiscal = currentFiscalNome;
+
+                await window.dbPush(relRef, currentRDC);
+                showToast("Relatório enviado com sucesso!");
+                voltarParaRDCs();
+            } catch (e) {
+                showToast("Erro ao enviar");
+            }
+        }
+
+        function voltarParaRDCs() {
+            document.getElementById('formPanel').style.display = 'none';
+            document.getElementById('actionBar').style.display = 'none';
+            document.getElementById('rdcPanel').style.display = 'block';
+            carregarRDCs();
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function sair() {
+            localStorage.clear();
+            window.location.reload();
+        }
+    </script>
 </body>
 </html>
