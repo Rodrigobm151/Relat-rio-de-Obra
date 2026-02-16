@@ -667,49 +667,124 @@
                 </div>
             </div>
 
-            <div id="equipamentosEditor" style="display: none;">
-                <div class="card">
-                    <div class="equip-header">
-                        <div>
-                            <h3 class="card-title"><i class="fas fa-tools"></i> Equipamentos da Obra</h3>
-                        </div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <select class="form-select" id="mesEquipamento" style="width: 180px;" onchange="carregarEquipamentosTabela()">
-                            </select>
-                            <button class="btn btn-success" onclick="salvarEquipamentos()">
-                                <i class="fas fa-save"></i> Salvar no Firebase
-                            </button>
-                        </div>
-                    </div>
+<div id="equipamentosEditor" style="display: none;">
+    <div class="card">
 
-                    <div class="equip-info" id="equipInfo">
-                        <p><strong>Obra:</strong> <span id="equipObraNome">-</span></p>
-                        <p><strong>Mês:</strong> <span id="equipMesNome">-</span></p>
-                        <p><i class="fas fa-info-circle"></i> Cole dados direto do Excel ou digite na tabela. Use as setas para navegar.</p>
-                    </div>
+        <div class="equip-header">
+            <h3 class="card-title">
+                <i class="fas fa-file-excel"></i> Importar Equipamentos
+            </h3>
+        </div>
 
-                    <div class="dica-box">
-                        <i class="fas fa-lightbulb"></i>
-                        <strong>Dica:</strong> Selecione as células no Excel, copie (Ctrl+C), clique na primeira célula da tabela abaixo e cole (Ctrl+V).
-                    </div>
+        <div class="equip-info">
+            <p><strong>Obra:</strong> <span id="equipObraNome">-</span></p>
 
-                    <div class="hot-table-container" id="tabelaEquipamentos"></div>
+            <p><strong>Mês:</strong>
+						<select id="mesEquipamento"
+					        class="form-select"
+					        style="width:200px"
+					        onchange="mesSelecionado=this.value; carregarEquipamentosExistentes();">
+						</select>
 
-                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                        <button class="btn btn-secondary" onclick="adicionarLinha()">
-                            <i class="fas fa-plus"></i> Adicionar Linha
-                        </button>
-                        <button class="btn btn-danger" onclick="limparTabela()">
-                            <i class="fas fa-trash"></i> Limpar Tabela
-                        </button>
-                        <button class="btn" onclick="exportarModelo()">
-                            <i class="fas fa-file-excel"></i> Baixar Modelo
-                        </button>
-                    </div>
-                </div>
+            </p>
+        </div>
+
+        <div class="dica-box">
+            <i class="fas fa-lightbulb"></i>
+            Baixe o modelo, preencha no Excel e envie.
+        </div>
+
+        <!-- PASSO 1 -->
+        <div class="card" style="background:var(--fundo)">
+            <h4><i class="fas fa-download"></i> Baixar modelo</h4>
+
+            <button class="btn btn-secondary" onclick="baixarModelo()">
+                <i class="fas fa-file-excel"></i> Baixar Excel
+            </button>
+        </div>
+
+        <!-- PASSO 2 -->
+        <div class="card" style="background:var(--fundo)">
+
+            <h4><i class="fas fa-upload"></i> Enviar arquivo</h4>
+
+            <div id="dropZone"
+                 style="border:2px dashed var(--cinza-claro);
+                 padding:2rem;
+                 border-radius:12px;
+                 text-align:center">
+
+                <p>Arraste ou clique</p>
+
+                <input type="file"
+                       id="fileInput"
+                       accept=".xlsx,.xls"
+                       hidden
+                       onchange="processarArquivo(this.files[0])">
+
+                <button class="btn"
+                        onclick="document.getElementById('fileInput').click()">
+                    Selecionar
+                </button>
+            </div>
+        </div>
+
+        <!-- PASSO 3 -->
+        <div id="previewContainer" style="display:none">
+
+            <h4><i class="fas fa-eye"></i> Revisar</h4>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Previsto</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="previewTbody"></tbody>
+                </table>
             </div>
 
+            <div style="margin-top:1rem;display:flex;gap:10px">
+
+                <button class="btn btn-success"
+                        onclick="salvarEquipamentosExcel()">
+                    Salvar
+                </button>
+
+                <button class="btn btn-danger"
+                        onclick="limparUpload()">
+                    Limpar
+                </button>
+
+            </div>
         </div>
+
+        <!-- EXISTENTES -->
+        <div id="listaExistente"
+             style="display:none;margin-top:2rem">
+
+            <h4>Já cadastrados</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Previsto</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tbodyExistente"></tbody>
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
 
         <!-- ABA FISCAIS -->
         <div class="tab-content" id="tab-fiscais">
@@ -851,6 +926,7 @@
         let hot = null;
         let obraSelecionada = null;
         let mesSelecionado = null;
+				let dadosExcel = [];
         let rdcsParaExportar = [];
         let obraExportacao = null;
 
@@ -859,15 +935,7 @@
             carregarObras();
             carregarFiscais();
             
-            const hoje = new Date();
-            const selectMes = document.getElementById('mesEquipamento');
-            
-            for (let i = -3; i < 12; i++) {
-                const d = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
-                const valor = `${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
-                const texto = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-                selectMes.innerHTML += `<option value="${valor}" ${i === 0 ? 'selected' : ''}>${texto}</option>`;
-            }
+         
         });
 
         function sair() {
@@ -977,123 +1045,332 @@
             }
         }
 
-        function selecionarObra(obraId) {
-            obraSelecionada = obraId;
-            document.getElementById('equipamentosEditor').style.display = 'block';
-            document.getElementById('equipObraNome').textContent = obras[obraId].nome;
-            
-            setTimeout(() => {
-                document.getElementById('equipamentosEditor').scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-            
-            carregarEquipamentosTabela();
-        }
 
-        // ==================== EQUIPAMENTOS ====================
 
-        async function carregarEquipamentosTabela() {
-            mesSelecionado = document.getElementById('mesEquipamento').value;
-            document.getElementById('equipMesNome').textContent = mesSelecionado || '-';
-            
-            if (!obraSelecionada || !mesSelecionado) return;
+     
+     // ==================== EQUIPAMENTOS ====================
 
-            let dados = [['', '']];
+function selecionarObra(obraId) {
 
-            try {
-                const snapshot = await window.dbGet(
-                    window.dbRef(window.db, `obras/${obraSelecionada}/contrato/${mesSelecionado}`)
-                );
-                
-                if (snapshot.exists()) {
-                    const equipamentos = snapshot.val();
-                    dados = Object.values(equipamentos).map(eq => [eq.nome, eq.previsto]);
+    obraSelecionada = obraId;
+
+    document.getElementById('equipamentosEditor').style.display = 'block';
+
+    document.getElementById('equipObraNome').textContent =
+        obras[obraId].nome;
+
+    preencherMeses();
+
+    carregarEquipamentosExistentes();
+
+    setTimeout(() => {
+        document.getElementById('equipamentosEditor')
+            .scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+}
+
+
+// Preenche meses (único lugar)
+function preencherMeses() {
+
+    const select = document.getElementById('mesEquipamento');
+
+    select.innerHTML = '';
+
+    const hoje = new Date();
+
+    for (let i = -3; i < 12; i++) {
+
+        const d = new Date(
+            hoje.getFullYear(),
+            hoje.getMonth() + i,
+            1
+        );
+
+        const valor =
+            `${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+
+        const texto =
+            d.toLocaleDateString('pt-BR',
+            { month: 'long', year: 'numeric' });
+
+        select.innerHTML +=
+            `<option value="${valor}"
+            ${i===0?'selected':''}>
+            ${texto}</option>`;
+    }
+
+    mesSelecionado = select.value;
+}
+
+
+// Baixar modelo
+function baixarModelo() {
+
+    const wb = XLSX.utils.book_new();
+
+    const ws = XLSX.utils.aoa_to_sheet([
+        ['Nome do Equipamento','Quantidade Prevista'],
+        ['Escavadeira',5],
+        ['Caminhão',10],
+        ['Trator',3],
+        ['Retroescavadeira',2],
+        ['Rolo Compactador',4]
+    ]);
+
+    XLSX.utils.book_append_sheet(wb,ws,'Equipamentos');
+
+    XLSX.writeFile(wb,'modelo_equipamentos.xlsx');
+}
+
+
+// Ler Excel
+function processarArquivo(file) {
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = e => {
+
+        try {
+
+            const data = new Uint8Array(e.target.result);
+
+            const wb = XLSX.read(data,{type:'array'});
+
+            const ws = wb.Sheets[wb.SheetNames[0]];
+
+            const json =
+                XLSX.utils.sheet_to_json(ws,{header:1});
+
+            dadosExcel = [];
+
+            for(let i=1;i<json.length;i++){
+
+                const l = json[i];
+
+                if(l[0] && l[1]){
+
+                    dadosExcel.push({
+                        nome: String(l[0]).trim(),
+                        previsto: parseInt(l[1])||0
+                    });
                 }
-            } catch (error) {
-                console.error('Erro ao carregar equipamentos:', error);
             }
 
-            inicializarTabela(dados);
-        }
-
-        function inicializarTabela(dados) {
-            const container = document.getElementById('tabelaEquipamentos');
-            
-            if (hot) {
-                hot.destroy();
-            }
-
-            hot = new Handsontable(container, {
-                data: dados,
-                colHeaders: ['Nome do Equipamento', 'Quantidade Prevista'],
-                columns: [
-                    { type: 'text', width: 300 },
-                    { type: 'numeric', width: 150 }
-                ],
-                rowHeaders: true,
-                minRows: 5,
-                minCols: 2,
-                contextMenu: ['row_above', 'row_below', 'remove_row'],
-                manualRowMove: true,
-                stretchH: 'all',
-                licenseKey: 'non-commercial-and-evaluation',
-                //language: 'pt-BR'
-            });
-        }
-
-        async function salvarEquipamentos() {
-            if (!hot || !obraSelecionada || !mesSelecionado) {
-                showToast('Selecione obra e mês', 'error');
+            if(dadosExcel.length===0){
+                showToast('Arquivo sem dados','error');
                 return;
             }
 
-            const dados = hot.getData();
-            const equipamentos = {};
-            
-            dados.forEach((linha, index) => {
-                const [nome, previsto] = linha;
-                if (nome && previsto) {
-                    const equipId = nome.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                    equipamentos[equipId] = {
-                        nome: nome.trim(),
-                        previsto: parseInt(previsto) || 0
-                    };
-                }
-            });
+            mostrarPreview();
 
-            try {
-                await window.dbSet(
-                    window.dbRef(window.db, `obras/${obraSelecionada}/contrato/${mesSelecionado}`),
-                    equipamentos
-                );
-                showToast('Equipamentos salvos com sucesso!', 'success');
-            } catch (error) {
-                showToast('Erro ao salvar equipamentos', 'error');
-            }
+            showToast(
+                `${dadosExcel.length} equipamentos carregados`,
+                'success'
+            );
+
+        } catch(err){
+
+            console.error(err);
+
+            showToast('Erro ao ler Excel','error');
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+
+// Mostrar preview
+function mostrarPreview(){
+
+    const tbody =
+        document.getElementById('previewTbody');
+
+    tbody.innerHTML = dadosExcel.map(e=>`
+        <tr>
+            <td>${e.nome}</td>
+            <td>${e.previsto}</td>
+        </tr>
+    `).join('');
+
+    document.getElementById('previewContainer')
+        .style.display='block';
+}
+
+
+// Salvar Firebase
+async function salvarEquipamentosExcel(){
+
+    if(!obraSelecionada || !mesSelecionado || dadosExcel.length===0){
+
+        showToast('Selecione obra, mês e arquivo','error');
+
+        return;
+    }
+
+    try {
+
+        const equipamentos = {};
+
+        dadosExcel.forEach(e=>{
+
+            const id =
+                e.nome.toLowerCase()
+                .replace(/\s+/g,'-')
+                .replace(/[^a-z0-9-]/g,'');
+
+            equipamentos[id]={
+                nome:e.nome,
+                previsto:e.previsto
+            };
+        });
+
+        await window.dbSet(
+            window.dbRef(window.db,
+            `obras/${obraSelecionada}/contrato/${mesSelecionado}`),
+            equipamentos
+        );
+
+        showToast('Equipamentos salvos','success');
+
+        limparUpload();
+
+        carregarEquipamentosExistentes();
+
+    } catch(err){
+
+        console.error(err);
+
+        showToast('Erro ao salvar','error');
+    }
+}
+
+
+// Limpar
+function limparUpload(){
+
+    dadosExcel=[];
+
+    document.getElementById('fileInput').value='';
+
+    document.getElementById('previewContainer')
+        .style.display='none';
+
+    document.getElementById('previewTbody').innerHTML='';
+}
+
+
+// Carregar existentes
+async function carregarEquipamentosExistentes(){
+
+    if(!obraSelecionada || !mesSelecionado) return;
+
+    try {
+
+        const snap = await window.dbGet(
+            window.dbRef(window.db,
+            `obras/${obraSelecionada}/contrato/${mesSelecionado}`)
+        );
+
+        const cont =
+            document.getElementById('listaExistente');
+
+        const tbody =
+            document.getElementById('tbodyExistente');
+
+        if(!snap.exists()){
+
+            cont.style.display='none';
+
+            return;
         }
 
-        function adicionarLinha() {
-            if (hot) {
-                hot.alter('insert_row_below', hot.countRows() - 1);
-            }
-        }
+        const lista = Object.entries(snap.val());
 
-        function limparTabela() {
-            if (confirm('Tem certeza que deseja limpar a tabela?')) {
-                inicializarTabela([['', '']]);
-            }
-        }
+        tbody.innerHTML = lista.map(([id,e])=>`
+            <tr>
+                <td>${e.nome}</td>
+                <td>${e.previsto}</td>
+                <td>
+                    <button class="btn-icon btn-danger"
+                    onclick="excluirEquipamento('${id}')">
+                    <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
 
-        function exportarModelo() {
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet([
-                ['Nome do Equipamento', 'Quantidade Prevista'],
-                ['Escavadeira 35T', '5'],
-                ['Caminhão Basculante', '10'],
-                ['Trator de Esteira', '3']
-            ]);
-            XLSX.utils.book_append_sheet(wb, ws, 'Modelo');
-            XLSX.writeFile(wb, 'modelo_equipamentos.xlsx');
+        cont.style.display='block';
+
+    } catch(err){
+
+        console.error(err);
+    }
+}
+
+
+// Excluir
+async function excluirEquipamento(id){
+
+    if(!confirm('Deseja excluir?')) return;
+
+    try {
+
+        await window.dbRemove(
+            window.dbRef(window.db,
+            `obras/${obraSelecionada}/contrato/${mesSelecionado}/${id}`)
+        );
+
+        showToast('Equipamento excluído','success');
+
+        carregarEquipamentosExistentes();
+
+    } catch(err){
+
+        console.error(err);
+
+        showToast('Erro ao excluir','error');
+    }
+}
+
+
+// Drag and drop
+document.addEventListener('DOMContentLoaded',()=>{
+
+    const dz = document.getElementById('dropZone');
+
+    if(!dz) return;
+
+    dz.addEventListener('dragover',e=>{
+        e.preventDefault();
+        dz.style.borderColor='var(--azul-vale)';
+        dz.style.background='#e3f2fd';
+    });
+
+    dz.addEventListener('dragleave',e=>{
+        e.preventDefault();
+        dz.style.borderColor='var(--cinza-claro)';
+        dz.style.background='white';
+    });
+
+    dz.addEventListener('drop',e=>{
+        e.preventDefault();
+
+        dz.style.borderColor='var(--cinza-claro)';
+        dz.style.background='white';
+
+        if(e.dataTransfer.files.length){
+
+            processarArquivo(e.dataTransfer.files[0]);
         }
+    });
+
+});
+
+
 
         // ==================== FISCAIS ====================
 
