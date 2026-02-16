@@ -3,37 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Squad Geotecnia - Login</title>
+    <title>Squad Geotecnia</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* VARIÁVEIS DO SISTEMA - CORES VALE */
         :root {
-            --azul-vale: #3CB5E5;
-            --azul-escuro: #0096d2;
-            --azul-mais-escuro: #0077b3;
-            --verde-vale: #007E79;
+            --azul-fundo: #3CB5E5;
             --branco: #FFFFFF;
-            --cinza-claro: #BCBEC0;
         }
 
-        /* FONTE VALE - ITALIC NATURAL (não forçar no CSS) */
         @font-face {
             font-family: 'ValeSans';
             src: url('./assets/fonts/ValeSans-Italic.woff2') format('woff2');
-            font-weight: 400;
-            font-style: normal; /* Fonte já é itálica fisicamente */
+            font-weight: normal;
+            font-style: normal;
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'ValeSans', 'Inter', sans-serif; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'ValeSans', sans-serif; }
         
         body, html { 
             height: 100%; 
-            background: linear-gradient(135deg, #3CB5E5 0%, #0096d2 50%, #0077b3 100%);
+            background-color: var(--azul-fundo);
             color: white;
             overflow: hidden;
         }
@@ -43,299 +32,130 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            text-align: center;
         }
 
-        /* VÍDEO NO TOPO (BANNER) */
-        .video-header {
+        /* VÍDEO NO TOPO COM CROP */
+        .video-container {
             position: relative;
             width: 100%;
-            height: 35vh;
+            height: 40vh;
             overflow: hidden;
         }
 
         .header-video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0.6;
+            object-fit: cover; /* Faz o crop automático */
         }
 
-        /* GRADIENTE DO VÍDEO PARA O FUNDO AZUL */
-        .video-header::after {
+        /* EFEITO DE FADE PARA O AZUL */
+        .video-container::after {
             content: '';
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80%;
-            background: linear-gradient(to bottom, transparent, #3CB5E5);
+            bottom: 0; left: 0; width: 100%; height: 60%;
+            background: linear-gradient(to bottom, transparent, var(--azul-fundo));
         }
 
-        /* CONTEÚDO CENTRALIZADO - LOGO ACIMA DO TÍTULO */
-        .brand-section {
-            display: flex;
-            flex-direction: column; /* LOGO ACIMA DO TÍTULO */
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            padding: 0 20px;
-            z-index: 10;
-        }
-
-        .icon-main { 
-            width: 80px; /* Logo maior */
-            height: auto;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
-        }
-
-        .title-wrapper {
+        /* CONTEÚDO CENTRAL */
+        .content {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centralizado */
-            text-align: center;
-        }
-
-        .title { 
-            font-size: 1.8rem; 
-            color: white; 
-            line-height: 1.2;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            font-weight: 600;
-        }
-
-        .glitch { 
-            font-size: 1rem; 
-            color: rgba(255,255,255,0.9);
-            margin-top: 8px;
-            letter-spacing: 1px;
-        }
-
-        /* ÁREA DE LOGIN */
-        .form-area { 
-            width: 100%; 
-            max-width: 320px; 
-            margin-top: 50px; 
-            flex-grow: 1;
+            align-items: center;
+            width: 100%;
+            padding: 0 30px;
             z-index: 10;
-            padding: 0 20px;
+            margin-top: -40px; /* Sobe o logo para cima do fade */
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .squad-logo { width: 120px; height: auto; margin-bottom: 10px; }
 
-        .form-label {
-            display: block;
-            color: rgba(255,255,255,0.95);
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            padding-left: 5px;
-        }
-        
-        select { 
-            width: 100%; 
-            height: 52px; 
-            background: rgba(255, 255, 255, 0.15); 
-            border: 2px solid rgba(255, 255, 255, 0.3); 
-            border-radius: 12px; 
-            color: white; 
-            padding: 0 15px; 
-            font-size: 16px; 
-            outline: none; 
-            -webkit-appearance: none;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+        .app-title { font-size: 2.2rem; font-weight: normal; margin-bottom: 5px; }
 
-        select:hover, select:focus {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
-
-        select option {
-            background: #0096d2;
-            color: white;
-            padding: 10px;
-        }
-        
-        .btn-entrar { 
-            width: 100%; 
-            height: 52px; 
-            background: white; 
-            color: #3CB5E5; 
-            border: none; 
-            border-radius: 12px; 
+        .glitch-text { 
             font-size: 1.1rem; 
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
+            min-height: 1.5rem;
+            margin-bottom: 25px;
+            opacity: 0.9;
         }
 
-        .btn-entrar:hover:not(:disabled) {
-            background: rgba(255,255,255,0.95);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
+        .vale-logo { width: 100px; margin-bottom: 40px; }
 
-        .btn-entrar:disabled {
-            background: rgba(255,255,255,0.4);
-            color: rgba(60, 181, 229, 0.6);
-            cursor: not-allowed;
-        }
-
-        /* LINK ADMIN */
-        .admin-link {
+        /* INPUTS ESTILO POWERPOINT */
+        #fiscalSelect {
+            width: 100%;
+            max-width: 280px;
+            height: 35px;
+            border: none;
+            border-radius: 2px;
+            padding: 0 10px;
+            font-size: 0.9rem;
             text-align: center;
-            margin-top: 25px;
-            opacity: 0.6;
-            transition: opacity 0.3s;
-        }
-
-        .admin-link a {
-            color: white;
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-
-        .admin-link:hover {
-            opacity: 1;
-        }
-
-        /* RODAPÉ CENTRALIZADO */
-        .footer-logos { 
-            display: flex; 
-            gap: 40px; 
-            align-items: center; 
-            justify-content: center;
-            padding-bottom: 40px;
-            width: 100%;
-            z-index: 10;
-        }
-
-        .footer-logos img { 
-            height: 50px; 
-            width: auto; 
-            filter: brightness(0) invert(1);
-            opacity: 0.95;
-        }
-
-        /* LOADING */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(60, 181, 229, 0.98);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
             margin-bottom: 20px;
+            color: #555;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* TOAST */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: white;
-            color: #e74c3c;
-            padding: 12px 24px;
+        .btn-entrar {
+            width: 100%;
+            max-width: 180px;
+            height: 45px;
+            background: #3498db; /* Azul um pouco mais escuro para o botão */
+            color: white;
+            border: 1px solid #2980b9;
             border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 2000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-style: italic;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+            transition: transform 0.1s;
         }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
+        .btn-entrar:active { transform: scale(0.98); }
+        .btn-entrar:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* FOOTER */
+        footer {
+            padding-bottom: 20px;
+            font-size: 0.8rem;
         }
 
-        .toast.success {
-            color: #007E79;
-        }
+        .reta-logo { width: 120px; margin-top: 5px; filter: brightness(0) invert(1); }
+
     </style>
 </head>
 <body>
 
     <main class="main-container">
-        <section class="video-header">
-            <video class="header-video" autoplay muted loop playsinline preload="auto">
+        <section class="video-container">
+            <video class="header-video" autoplay muted loop playsinline>
                 <source src="./assets/video/background.mp4" type="video/mp4">
             </video>
         </section>
 
-        <section class="brand-section">
-            <!-- LOGO ACIMA DO TÍTULO -->
-            <img src="./assets/imagens/squad-logo.png" class="icon-main" alt="Squad Geotecnia">
-            <div class="title-wrapper">
-                <h1 class="title">Squad Geotecnia</h1>
-                <div class="glitch" id="glitch-text">Geotechnical Works</div>
-            </div>
-        </section>
+        <section class="content">
+            <img src="./assets/imagens/squad-logo.png" class="squad-logo" alt="Logo Squad">
+            <h1 class="app-title">Squad Geotecnia</h1>
+            <div id="glitch-target" class="glitch-text">Obras geotecnicas</div>
 
-        <section class="form-area">
-            <div class="form-group">
-                <label class="form-label">Selecione o fiscal</label>
-                <select id="fiscalSelect">
-                    <option value="">Selecione usuário</option>
-                </select>
-            </div>
+            <img src="./assets/imagens/vale-logo.png" class="vale-logo" alt="Vale">
+
+            <select id="fiscalSelect">
+                <option value="">Carregando usuários...</option>
+            </select>
+
             <button class="btn-entrar" id="btnEntrar" onclick="entrarSistema()" disabled>
                 Entrar
             </button>
-
-            <div class="admin-link">
-                <a href="#" onclick="mostrarAcessoAdmin(event)">
-                    <i class="fas fa-lock" style="margin-right: 5px;"></i>
-                    Acesso Administrativo
-                </a>
-            </div>
         </section>
 
-        <footer class="footer-logos">
-            <img src="./assets/imagens/vale-logo.png" alt="Vale">
-            <img src="./assets/imagens/reta-logo.png" alt="Reta Engenharia">
+        <footer>
+            <p>developed by</p>
+            <img src="./assets/imagens/reta-logo.png" class="reta-logo" alt="Reta Engenharia">
         </footer>
     </main>
 
-    <!-- Loading -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <p>Carregando...</p>
-    </div>
-
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
-
-    <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
@@ -353,90 +173,58 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        window.db = db;
-        window.dbRef = ref;
-        window.dbGet = get;
+        // Busca usuários do Firebase
+        async function carregarUsuarios() {
+            const select = document.getElementById('fiscalSelect');
+            try {
+                // Ajuste o caminho 'usuarios' para o nó correto do seu banco
+                const snapshot = await get(ref(db, 'usuarios')); 
+                select.innerHTML = '<option value="">Selecione usuário</option>';
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const user = child.val();
+                        const option = document.createElement('option');
+                        option.value = child.key;
+                        option.textContent = user.nome || child.key;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error("Erro ao carregar:", error);
+                select.innerHTML = '<option value="">Erro ao carregar</option>';
+            }
+        }
+
+        carregarUsuarios();
+        
+        // Habilita botão ao selecionar
+        document.getElementById('fiscalSelect').addEventListener('change', (e) => {
+            document.getElementById('btnEntrar').disabled = !e.target.value;
+        });
+
+        window.entrarSistema = () => {
+            const select = document.getElementById('fiscalSelect');
+            localStorage.setItem('currentFiscal', select.value);
+            localStorage.setItem('currentFiscalNome', select.options[select.selectedIndex].text);
+            window.location.href = 'fiscal.html';
+        };
     </script>
 
     <script>
-        const FISCAIS = [
-            { id: 'joao-silva', nome: 'João Silva' },
-            { id: 'maria-santos', nome: 'Maria Santos' },
-            { id: 'pedro-oliveira', nome: 'Pedro Oliveira' },
-            { id: 'ana-costa', nome: 'Ana Costa' },
-            { id: 'carlos-lima', nome: 'Carlos Lima' }
-        ];
+        // Lógica do Efeito de Texto Rotativo (Glitch)
+        const phrases = ["Obras geotecnicas", "Somons bons", "Precisão digital"];
+        let i = 0;
+        const target = document.getElementById("glitch-target");
 
-        function carregarFiscais() {
-            const select = document.getElementById('fiscalSelect');
-            FISCAIS.forEach(f => {
-                const option = document.createElement('option');
-                option.value = f.id;
-                option.textContent = f.nome;
-                select.appendChild(option);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarFiscais();
-            
-            const fiscalSalvo = localStorage.getItem('currentFiscal');
-            if (fiscalSalvo) {
-                document.getElementById('fiscalSelect').value = fiscalSalvo;
-                document.getElementById('btnEntrar').disabled = false;
-            }
-
-            document.getElementById('fiscalSelect').addEventListener('change', (e) => {
-                document.getElementById('btnEntrar').disabled = !e.target.value;
-            });
-        });
-
-        function entrarSistema() {
-            const fiscal = document.getElementById('fiscalSelect').value;
-            if (!fiscal) {
-                showToast('Selecione um fiscal');
-                return;
-            }
-
-            const fiscalNome = FISCAIS.find(f => f.id === fiscal)?.nome || fiscal;
-            
-            localStorage.setItem('currentFiscal', fiscal);
-            localStorage.setItem('currentFiscalNome', fiscalNome);
-
-            document.getElementById('loadingOverlay').classList.add('active');
-
-            setTimeout(() => {
-                window.location.href = 'fiscal.html';
-            }, 500);
-        }
-
-        function mostrarAcessoAdmin(e) {
-            e.preventDefault();
-            const senha = prompt('Digite a senha de administrador:');
-            if (senha === 'admin123') {
-                window.location.href = 'admin.html';
-            } else if (senha) {
-                showToast('Senha incorreta');
-            }
-        }
-
-        // Glitch effect
-        const phrases = ["Geotechnical Works", "Geotecnia Digital", "Squad Vale", "Relatórios RDC"];
-        let count = 0;
-        const textElement = document.getElementById("glitch-text");
-        
         setInterval(() => {
-            count = (count + 1) % phrases.length;
-            textElement.textContent = phrases[count];
-        }, 4000);
-
-        function showToast(msg, type = 'error') {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = 'toast ' + type;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
+            i = (i + 1) % phrases.length;
+            target.style.opacity = 0;
+            setTimeout(() => {
+                target.textContent = phrases[i];
+                target.style.opacity = 1;
+            }, 500);
+        }, 3500);
     </script>
 </body>
 </html>
