@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XXX</title>
+    <title>RDC - Área do Fiscal</title>
     
     <!-- Font ValeSans local com fallback -->
     <style>
@@ -500,6 +500,7 @@
             container.innerHTML = '<small style="color: #777">Buscando histórico...</small>';
             
             const hoje = new Date().toLocaleDateString('pt-BR');
+            const hojeKey = formatarDataKey(new Date()); // YYYY-MM-DD
             let rdcHojeEnviado = false;
             let ultimoNumero = 0;
             
@@ -514,7 +515,8 @@
                     if (parseInt(rdc.numero) > ultimoNumero) {
                         ultimoNumero = parseInt(rdc.numero);
                     }
-                    if (rdc.data === hoje) {
+                    // Verifica se há RDC para hoje (pela data ou dataKey)
+                    if (rdc.data === hoje || rdc.dataKey === hojeKey) {
                         rdcHojeEnviado = true;
                     }
                 });
@@ -523,12 +525,12 @@
                 rdcList.sort((a, b) => parseInt(b.numero) - parseInt(a.numero));
                 
                 rdcList.forEach(rdc => {
-                    const isHoje = rdc.data === hoje;
+                    const isHoje = (rdc.data === hoje || rdc.dataKey === hojeKey);
                     html += `
                         <div class="card-obra ${isHoje ? 'rdc-pendente-card' : ''}" style="border-left-color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}">
                             <div style="font-size: 0.9rem">
                                 <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
-                                <small style="color: #777">Fiscal: ${rdc.fiscal}</small>
+                                <small style="color: #777">Fiscal: ${rdc.fiscalNome || rdc.fiscal}</small>
                             </div>
                             <span style="font-size: 0.75rem; color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}; font-weight: bold;">
                                 ${isHoje ? 'HOJE' : 'ENVIADO'}
@@ -537,14 +539,19 @@
                 });
             }
             
-            // Determinar próximo número do RDC
-            // Se obra tem dataInicio, calcular quantos dias se passaram
+            // Determinar próximo número do RDC baseado na dataInicio da obra
             if (currentObraData.dataInicio && !rdcHojeEnviado) {
-                const dataInicio = new Date(currentObraData.dataInicio.split('/').reverse().join('-'));
+                // dataInicio está no formato YYYY-MM-DD (do input type="date")
+                const [anoInicio, mesInicio, diaInicio] = currentObraData.dataInicio.split('-');
+                const dataInicio = new Date(anoInicio, mesInicio - 1, diaInicio);
                 const hojeDate = new Date();
-                const diffTime = Math.abs(hojeDate - dataInicio);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                proximoRDCNumero = diffDays + 1; // RDC 001 = primeiro dia
+                
+                // Calcular diferença em dias
+                const diffTime = hojeDate - dataInicio;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                // RDC 001 = primeiro dia (dataInicio)
+                proximoRDCNumero = diffDays + 1;
             } else if (ultimoNumero > 0) {
                 proximoRDCNumero = ultimoNumero + 1;
             }
@@ -568,22 +575,25 @@
         // --- LÓGICA DO FORMULÁRIO RDC ---
         async function criarNovoRDC() {
             const hoje = new Date();
-            const mesKey = (hoje.getMonth() + 1).toString().padStart(2, '0') + '-' + hoje.getFullYear();
+            const mesKey = formatarMesKey(hoje); // MM-YYYY para o contrato
             
             currentRDC = {
                 numero: proximoRDCNumero,
                 data: hoje.toLocaleDateString('pt-BR'),
+                dataKey: formatarDataKey(hoje), // YYYY-MM-DD
                 mesRef: mesKey,
-                fiscal: localStorage.getItem('currentFiscalNome') || 'Fiscal',
+                fiscalNome: localStorage.getItem('currentFiscalNome') || 'Fiscal',
+                status: 'enviado',
                 dados: { 
-                    geral: {},
+                    clima: {},
+                    atividades: {},
                     equipamentos: {} 
                 }
             };
 
             document.getElementById('rdcNum').textContent = String(currentRDC.numero).padStart(3, '0');
             document.getElementById('rdcData').textContent = currentRDC.data;
-            document.getElementById('formFiscalNome').textContent = currentRDC.fiscal;
+            document.getElementById('formFiscalNome').textContent = currentRDC.fiscalNome;
             
             // Resetar campos
             document.getElementById('climaCondicao').value = 'Bom';
@@ -617,7 +627,7 @@
             const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
             
             if (!snap.exists()) {
-                container.innerHTML = '<div class="status-box" style="color: #777">Nenhum contrato de equipamentos encontrado para este mês.</div>';
+                container.innerHTML = '<div class="status-box" style="color: #777">Nenhum contrato de equipamentos encontrado para este mês (' + mesKey + ').</div>';
                 return;
             }
 
@@ -658,10 +668,13 @@
             if (!confirm("Confirmar fechamento e envio do RDC?")) return;
 
             // Coleta dados da aba Geral
-            currentRDC.dados.geral = {
-                clima: document.getElementById('climaCondicao').value,
-                pluviometro: parseFloat(document.getElementById('pluviometro').value) || 0,
-                descricaoAtividades: document.getElementById('descAtividades').value,
+            currentRDC.dados.clima = {
+                condicao: document.getElementById('climaCondicao').value,
+                pluviometro: parseFloat(document.getElementById('pluviometro').value) || 0
+            };
+            
+            currentRDC.dados.atividades = {
+                descricao: document.getElementById('descAtividades').value,
                 comentarios: document.getElementById('comentarios').value
             };
 
@@ -697,6 +710,19 @@
             t.textContent = msg;
             t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        // Funções auxiliares de formatação de data
+        function formatarDataKey(date) {
+            // Retorna YYYY-MM-DD
+            return date.toISOString().split('T')[0];
+        }
+        
+        function formatarMesKey(date) {
+            // Retorna MM-YYYY para o contrato
+            const mes = String(date.getMonth() + 1).padStart(2, '0');
+            const ano = date.getFullYear();
+            return `${mes}-${ano}`;
         }
     </script>
 </body>
