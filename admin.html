@@ -6,7 +6,10 @@
     <title>Admin - Squad Geotecnia</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS para exportação Excel -->
+    <!-- Handsontable para tabela estilo Excel -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.0.0/dist/handsontable.full.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.0.0/dist/handsontable.full.min.js"></script>
+    <!-- SheetJS para exportação -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -47,7 +50,7 @@
         }
 
         .header-content {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -67,24 +70,66 @@
             padding: 0.5rem 1rem;
             border-radius: 20px;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-sair:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 1rem;
         }
 
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--cinza-mais-claro);
+            overflow-x: auto;
         }
 
-        @media (max-width: 768px) {
-            .grid-2 { grid-template-columns: 1fr; }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--cinza-medio);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+            white-space: nowrap;
         }
 
+        .tab-btn.active {
+            color: var(--azul-vale);
+            border-bottom-color: var(--azul-vale);
+            font-weight: 600;
+        }
+
+        .tab-btn:hover {
+            color: var(--azul-vale);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Cards */
         .card {
             background: white;
             border-radius: 16px;
@@ -102,6 +147,22 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
         }
 
         .form-group {
@@ -123,6 +184,12 @@
             border: 2px solid var(--cinza-mais-claro);
             border-radius: 8px;
             font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--azul-vale);
         }
 
         .btn {
@@ -140,12 +207,62 @@
             gap: 0.5rem;
         }
 
-        .btn:hover { background: var(--azul-escuro); }
-        .btn-success { background: var(--verde-vale); }
-        .btn-success:hover { background: #006b66; }
-        .btn-warning { background: var(--laranja); }
-        .btn-danger { background: var(--vermelho); }
+        .btn:hover {
+            background: var(--azul-escuro);
+            transform: translateY(-1px);
+        }
 
+        .btn-success {
+            background: var(--verde-vale);
+        }
+
+        .btn-success:hover {
+            background: #006b66;
+        }
+
+        .btn-danger {
+            background: var(--vermelho);
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: var(--laranja);
+        }
+
+        .btn-secondary {
+            background: var(--cinza-mais-claro);
+            color: var(--cinza-texto);
+        }
+
+        .btn-secondary:hover {
+            background: var(--cinza-claro);
+        }
+
+        /* Tabela Handsontable customizada */
+        .hot-table-container {
+            margin: 1rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .handsontable {
+            font-size: 14px !important;
+        }
+
+        .handsontable .htCore th {
+            background-color: var(--azul-vale) !important;
+            color: white !important;
+            font-weight: 600 !important;
+        }
+
+        .handsontable .htCore td {
+            padding: 8px !important;
+        }
+
+        /* Lista de Obras */
         .obra-item {
             background: white;
             border-radius: 12px;
@@ -155,6 +272,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.3s;
+        }
+
+        .obra-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .obra-info h3 {
@@ -183,8 +306,214 @@
             align-items: center;
             justify-content: center;
             color: white;
+            transition: all 0.3s;
         }
 
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Lista de Fiscais */
+        .fiscal-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fiscal-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .fiscal-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--azul-vale);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .fiscal-status {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.2rem;
+        }
+
+        .fiscal-status.ativo {
+            background: #e8f5e9;
+            color: var(--verde-vale);
+        }
+
+        .fiscal-status.inativo {
+            background: #ffebee;
+            color: var(--vermelho);
+        }
+
+        /* Equipamentos Section */
+        .equip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .equip-info {
+            background: var(--fundo);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .equip-info p {
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
+            color: var(--cinza-medio);
+        }
+
+        .equip-info strong {
+            color: var(--cinza-texto);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--cinza-texto);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--verde-vale);
+        }
+
+        .toast.error {
+            background: var(--vermelho);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--cinza-mais-claro);
+            border-top-color: var(--azul-vale);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--cinza-medio);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--cinza-claro);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            color: var(--azul-vale);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* Dicas */
+        .dica-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--azul-vale);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--cinza-texto);
+        }
+
+        .dica-box i {
+            color: var(--azul-vale);
+            margin-right: 0.5rem;
+        }
+
+        /* Relatórios Table */
         .table-container {
             overflow-x: auto;
         }
@@ -222,34 +551,8 @@
         .status-rascunho { background: #fff3e0; color: var(--laranja); }
         .status-pendente { background: #ffebee; color: var(--vermelho); }
 
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--cinza-mais-claro);
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 1rem 1.5rem;
-            cursor: pointer;
-            font-size: 0.95rem;
-            color: var(--cinza-medio);
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-        }
-
-        .tab-btn.active {
-            color: var(--azul-vale);
-            border-bottom-color: var(--azul-vale);
-            font-weight: 600;
-        }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .export-section {
+        /* Export Section */
+        .export-card {
             background: linear-gradient(135deg, var(--verde-vale) 0%, #006b66 100%);
             color: white;
             border-radius: 16px;
@@ -257,60 +560,24 @@
             margin-bottom: 1rem;
         }
 
-        .export-section h3 {
+        .export-card h3 {
             margin-bottom: 1rem;
             font-style: italic;
         }
 
-        .export-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+        .export-card .form-select {
+            background: white;
+            color: var(--cinza-texto);
         }
-
-        .loading {
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--cinza-mais-claro);
-            border-top-color: var(--azul-vale);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .toast {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: var(--cinza-texto);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        .toast.show { opacity: 1; }
-        .toast.success { background: var(--verde-vale); }
-        .toast.error { background: var(--vermelho); }
     </style>
 </head>
 <body>
 
     <header class="header">
         <div class="header-content">
-            <h1><i class="fas fa-cog"></i> painel administrativo</h1>
+            <h1><i class="fas fa-cog"></i> Painel Administrativo</h1>
             <button class="btn-sair" onclick="sair()">
-                <i class="fas fa-sign-out-alt"></i> sair
+                <i class="fas fa-sign-out-alt"></i> Sair
             </button>
         </div>
     </header>
@@ -319,44 +586,125 @@
         
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('obras', this)">
-                <i class="fas fa-building"></i> obras
+                <i class="fas fa-building"></i> Obras e Equipamentos
+            </button>
+            <button class="tab-btn" onclick="switchTab('fiscais', this)">
+                <i class="fas fa-users"></i> Fiscais
             </button>
             <button class="tab-btn" onclick="switchTab('relatorios', this)">
-                <i class="fas fa-file-alt"></i> relatórios
+                <i class="fas fa-file-alt"></i> Relatórios
             </button>
             <button class="tab-btn" onclick="switchTab('exportar', this)">
-                <i class="fas fa-download"></i> exportar excel
+                <i class="fas fa-download"></i> Exportar Excel
             </button>
         </div>
 
-        <!-- ABA OBRAS -->
+        <!-- ABA OBRAS E EQUIPAMENTOS -->
         <div class="tab-content active" id="tab-obras">
             
+            <!-- Cadastro de Obra -->
             <div class="card">
-                <h3 class="card-title"><i class="fas fa-plus-circle"></i> nova obra</h3>
-                <div class="grid-2">
+                <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nova Obra</h3>
+                <div class="grid-3">
                     <div class="form-group">
-                        <label class="form-label">nome da obra</label>
-                        <input type="text" class="form-input" id="novaObraNome" placeholder="ex: mineração sul">
+                        <label class="form-label">Nome da obra</label>
+                        <input type="text" class="form-input" id="novaObraNome" placeholder="Ex: Mineração Sul">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">data de início</label>
+                        <label class="form-label">Data de início</label>
                         <input type="date" class="form-input" id="novaObraData">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">localização (opcional)</label>
-                    <input type="text" class="form-input" id="novaObraLocal" placeholder="ex: carajás - pa">
+                    <div class="form-group">
+                        <label class="form-label">Localização</label>
+                        <input type="text" class="form-input" id="novaObraLocal" placeholder="Ex: Carajás - PA">
+                    </div>
                 </div>
                 <button class="btn btn-success" onclick="criarObra()">
-                    <i class="fas fa-save"></i> criar obra
+                    <i class="fas fa-save"></i> Criar Obra
                 </button>
             </div>
 
+            <!-- Lista de Obras -->
             <div id="obrasList">
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>carregando obras...</p>
+                    <p>Carregando obras...</p>
+                </div>
+            </div>
+
+            <!-- Editor de Equipamentos (aparece ao selecionar obra) -->
+            <div id="equipamentosEditor" style="display: none;">
+                <div class="card">
+                    <div class="equip-header">
+                        <div>
+                            <h3 class="card-title"><i class="fas fa-tools"></i> Equipamentos da Obra</h3>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select class="form-select" id="mesEquipamento" style="width: 150px;" onchange="carregarEquipamentosTabela()">
+                                <!-- Preenchido dinamicamente -->
+                            </select>
+                            <button class="btn btn-success" onclick="salvarEquipamentos()">
+                                <i class="fas fa-save"></i> Salvar no Firebase
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="equip-info" id="equipInfo">
+                        <p><strong>Obra:</strong> <span id="equipObraNome">-</span></p>
+                        <p><strong>Mês:</strong> <span id="equipMesNome">-</span></p>
+                        <p><i class="fas fa-info-circle"></i> Cole dados direto do Excel ou digite na tabela abaixo. Use as setas para navegar.</p>
+                    </div>
+
+                    <div class="dica-box">
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Dica:</strong> Selecione as células no Excel, copie (Ctrl+C), clique na primeira célula da tabela abaixo e cole (Ctrl+V).
+                    </div>
+
+                    <div class="hot-table-container" id="tabelaEquipamentos"></div>
+
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="adicionarLinha()">
+                            <i class="fas fa-plus"></i> Adicionar Linha
+                        </button>
+                        <button class="btn btn-danger" onclick="limparTabela()">
+                            <i class="fas fa-trash"></i> Limpar Tabela
+                        </button>
+                        <button class="btn" onclick="exportarModelo()">
+                            <i class="fas fa-file-excel"></i> Baixar Modelo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ABA FISCAIS -->
+        <div class="tab-content" id="tab-fiscais">
+            
+            <div class="card">
+                <h3 class="card-title"><i class="fas fa-user-plus"></i> Novo Fiscal</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Nome completo</label>
+                        <input type="text" class="form-input" id="novoFiscalNome" placeholder="Ex: João Silva">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">E-mail (opcional)</label>
+                        <input type="email" class="form-input" id="novoFiscalEmail" placeholder="Ex: joao@email.com">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="criarFiscal()">
+                    <i class="fas fa-save"></i> Cadastrar Fiscal
+                </button>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title"><i class="fas fa-users"></i> Fiscais Cadastrados</h3>
+                <div id="fiscaisList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Carregando fiscais...</p>
+                    </div>
                 </div>
             </div>
 
@@ -366,25 +714,25 @@
         <div class="tab-content" id="tab-relatorios">
             
             <div class="card">
-                <h3 class="card-title"><i class="fas fa-filter"></i> filtrar relatórios</h3>
+                <h3 class="card-title"><i class="fas fa-filter"></i> Filtrar Relatórios</h3>
                 <div class="grid-2">
                     <div class="form-group">
-                        <label class="form-label">obra</label>
+                        <label class="form-label">Obra</label>
                         <select class="form-select" id="filtroObra" onchange="carregarRelatorios()">
-                            <option value="">todas as obras</option>
+                            <option value="">Todas as obras</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">mês</label>
+                        <label class="form-label">Período</label>
                         <input type="month" class="form-input" id="filtroMes" onchange="carregarRelatorios()">
                     </div>
                 </div>
             </div>
 
             <div id="relatoriosList">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>selecione filtros para carregar relatórios...</p>
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Selecione filtros para carregar relatórios</p>
                 </div>
             </div>
 
@@ -393,41 +741,41 @@
         <!-- ABA EXPORTAR -->
         <div class="tab-content" id="tab-exportar">
             
-            <div class="export-section">
-                <h3><i class="fas fa-file-excel"></i> exportação de dados</h3>
-                <p>exporte os relatórios para excel com todos os dados detalhados.</p>
+            <div class="export-card">
+                <h3><i class="fas fa-file-excel"></i> Exportação de Dados</h3>
+                <p>Exporte todos os relatórios RDC para Excel com dados completos.</p>
                 
-                <div class="export-grid">
+                <div class="grid-2" style="margin-top: 1rem;">
                     <div class="form-group">
-                        <label style="color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; display: block;">obra</label>
-                        <select class="form-select" id="exportObra" style="background: white; color: var(--cinza-texto);">
-                            <option value="">selecione...</option>
+                        <label style="color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; display: block;">Obra</label>
+                        <select class="form-select" id="exportObra">
+                            <option value="">Selecione...</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label style="color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; display: block;">período</label>
-                        <select class="form-select" id="exportPeriodo" style="background: white; color: var(--cinza-texto);">
-                            <option value="todos">todo o período</option>
-                            <option value="mes-atual">mês atual</option>
-                            <option value="ultimos-30">últimos 30 dias</option>
-                            <option value="ultimos-7">últimos 7 dias</option>
+                        <label style="color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; display: block;">Período</label>
+                        <select class="form-select" id="exportPeriodo">
+                            <option value="todos">Todo o período</option>
+                            <option value="mes-atual">Mês atual</option>
+                            <option value="ultimos-30">Últimos 30 dias</option>
+                            <option value="ultimos-7">Últimos 7 dias</option>
                         </select>
                     </div>
                 </div>
                 
                 <button class="btn" onclick="exportarExcel()" style="margin-top: 1rem; background: white; color: var(--verde-vale);">
-                    <i class="fas fa-download"></i> baixar excel
+                    <i class="fas fa-download"></i> Baixar Excel
                 </button>
             </div>
 
             <div class="card">
-                <h3 class="card-title"><i class="fas fa-info-circle"></i> sobre a exportação</h3>
-                <p style="margin-bottom: 0.5rem;">o arquivo excel conterá as seguintes abas:</p>
-                <ul style="margin-left: 1.5rem; color: var(--cinza-medio);">
-                    <li><strong>resumo</strong> - visão geral de todos os rdcs</li>
-                    <li><strong>equipamentos</strong> - detalhamento de equipamentos por dia</li>
-                    <li><strong>clima</strong> - condições climáticas registradas</li>
-                    <li><strong>atividades</strong> - descrição das atividades executadas</li>
+                <h3 class="card-title"><i class="fas fa-info-circle"></i> Sobre a Exportação</h3>
+                <p style="margin-bottom: 0.5rem;">O arquivo Excel conterá as seguintes abas:</p>
+                <ul style="margin-left: 1.5rem; color: var(--cinza-medio); line-height: 1.8;">
+                    <li><strong>Resumo</strong> - Visão geral de todos os RDCs</li>
+                    <li><strong>Equipamentos</strong> - Detalhamento de equipamentos por dia</li>
+                    <li><strong>Clima</strong> - Condições climáticas registradas</li>
+                    <li><strong>Atividades</strong> - Descrições e comentários</li>
                 </ul>
             </div>
 
@@ -435,12 +783,25 @@
 
     </div>
 
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
+
+    <!-- Modal Confirmação -->
+    <div class="modal" id="modalConfirm">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Confirmação</h3>
+            <p id="modalText">Deseja realmente excluir?</p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-danger" id="modalConfirmBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
@@ -460,18 +821,33 @@
         window.dbGet = get;
         window.dbSet = set;
         window.dbPush = push;
+        window.dbRemove = remove;
     </script>
 
     <script>
+        // VARIÁVEIS GLOBAIS
         let obras = {};
-        let relatorios = [];
+        let fiscais = {};
+        let hot = null; // Instância Handsontable
+        let obraSelecionada = null;
+        let mesSelecionado = null;
 
+        // INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', () => {
             carregarObras();
+            carregarFiscais();
             
-            // Set mês atual no filtro
             const hoje = new Date();
             document.getElementById('filtroMes').value = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
+            
+            // Preencher select de meses (próximos 12 meses)
+            const selectMes = document.getElementById('mesEquipamento');
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
+                const valor = `${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+                const texto = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                selectMes.innerHTML += `<option value="${valor}">${texto}</option>`;
+            }
         });
 
         function sair() {
@@ -485,7 +861,8 @@
             document.getElementById(`tab-${tab}`).classList.add('active');
         }
 
-        // CARREGAR OBRAS
+        // ==================== OBRAS ====================
+
         async function carregarObras() {
             try {
                 const snapshot = await window.dbGet(window.dbRef(window.db, 'obras'));
@@ -493,38 +870,42 @@
                 if (snapshot.exists()) {
                     obras = snapshot.val();
                     renderObrasList();
-                    preencherSelectObras();
+                    preencherSelectsObras();
                 } else {
-                    document.getElementById('obrasList').innerHTML = '<div class="card"><p>nenhuma obra cadastrada</p></div>';
+                    document.getElementById('obrasList').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-folder-open"></i>
+                            <p>Nenhuma obra cadastrada</p>
+                        </div>`;
                 }
             } catch (error) {
-                showToast('erro ao carregar obras', 'error');
+                showToast('Erro ao carregar obras', 'error');
             }
         }
 
         function renderObrasList() {
             const container = document.getElementById('obrasList');
             
-            let html = '';
+            let html = '<div style="margin-bottom: 1rem; font-weight: 600; color: var(--cinza-medio);">Clique em uma obra para gerenciar equipamentos:</div>';
+            
             Object.keys(obras).forEach(key => {
                 const obra = obras[key];
+                const dataInicio = obra.dataInicio ? formatarDataBR(obra.dataInicio) : 'Não definido';
+                
                 html += `
-                    <div class="obra-item">
+                    <div class="obra-item" onclick="selecionarObra('${key}')" style="cursor: pointer;">
                         <div class="obra-info">
                             <h3>${obra.nome}</h3>
                             <p>
-                                <i class="fas fa-calendar"></i> início: ${obra.dataInicio || 'não definido'} 
+                                <i class="fas fa-calendar-alt"></i> Início: ${dataInicio}
                                 ${obra.local ? `| <i class="fas fa-map-marker-alt"></i> ${obra.local}` : ''}
                             </p>
                         </div>
-                        <div class="obra-actions">
-                            <button class="btn-icon btn-success" onclick="gerenciarEquipamentos('${key}')" title="equipamentos">
-                                <i class="fas fa-tools"></i>
-                            </button>
-                            <button class="btn-icon btn-warning" onclick="editarObra('${key}')" title="editar">
+                        <div class="obra-actions" onclick="event.stopPropagation();">
+                            <button class="btn-icon btn-success" onclick="editarObra('${key}')" title="Editar">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn-icon btn-danger" onclick="excluirObra('${key}')" title="excluir">
+                            <button class="btn-icon btn-danger" onclick="excluirObra('${key}')" title="Excluir">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -535,30 +916,29 @@
             container.innerHTML = html;
         }
 
-        function preencherSelectObras() {
-            const selects = ['filtroObra', 'exportObra'];
-            selects.forEach(id => {
+        function preencherSelectsObras() {
+            ['filtroObra', 'exportObra'].forEach(id => {
                 const select = document.getElementById(id);
-                select.innerHTML = '<option value="">selecione...</option>';
+                select.innerHTML = '<option value="">Selecione...</option>';
                 Object.keys(obras).forEach(key => {
                     select.innerHTML += `<option value="${key}">${obras[key].nome}</option>`;
                 });
             });
         }
 
-        // CRIAR OBRA
         async function criarObra() {
             const nome = document.getElementById('novaObraNome').value.trim();
             const dataInicio = document.getElementById('novaObraData').value;
             const local = document.getElementById('novaObraLocal').value.trim();
 
             if (!nome || !dataInicio) {
-                showToast('preencha nome e data de início', 'error');
+                showToast('Preencha nome e data de início', 'error');
                 return;
             }
 
             try {
-                const obraId = nome.toLowerCase().replace(/\s+/g, '-');
+                const obraId = nome.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                
                 await window.dbSet(window.dbRef(window.db, `obras/${obraId}`), {
                     nome,
                     dataInicio,
@@ -566,7 +946,7 @@
                     criadaEm: new Date().toISOString()
                 });
 
-                showToast('obra criada com sucesso!', 'success');
+                showToast('Obra criada com sucesso!', 'success');
                 document.getElementById('novaObraNome').value = '';
                 document.getElementById('novaObraData').value = '';
                 document.getElementById('novaObraLocal').value = '';
@@ -574,86 +954,306 @@
                 carregarObras();
 
             } catch (error) {
-                showToast('erro ao criar obra', 'error');
+                showToast('Erro ao criar obra', 'error');
             }
         }
 
-        // GERENCIAR EQUIPAMENTOS
-        function gerenciarEquipamentos(obraId) {
-            const obra = obras[obraId];
-            const mes = prompt(`cadastrar equipamentos para qual mês? (formato: MM-AAAA)\nexemplo: 02-2026`);
+        function selecionarObra(obraId) {
+            obraSelecionada = obraId;
+            document.getElementById('equipamentosEditor').style.display = 'block';
+            document.getElementById('equipObraNome').textContent = obras[obraId].nome;
             
-            if (!mes || !/^\d{2}-\d{4}$/.test(mes)) {
-                showToast('formato inválido. use MM-AAAA', 'error');
-                return;
+            // Scroll para editor
+            setTimeout(() => {
+                document.getElementById('equipamentosEditor').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+            
+            carregarEquipamentosTabela();
+        }
+
+        // ==================== EQUIPAMENTOS (HANDSONTABLE) ====================
+
+        async function carregarEquipamentosTabela() {
+            mesSelecionado = document.getElementById('mesEquipamento').value;
+            document.getElementById('equipMesNome').textContent = mesSelecionado || '-';
+            
+            if (!obraSelecionada || !mesSelecionado) return;
+
+            let dados = [['', '']]; // [Nome, Previsto]
+
+            try {
+                const snapshot = await window.dbGet(
+                    window.dbRef(window.db, `obras/${obraSelecionada}/contrato/${mesSelecionado}`)
+                );
+                
+                if (snapshot.exists()) {
+                    const equipamentos = snapshot.val();
+                    dados = Object.values(equipamentos).map(eq => [eq.nome, eq.previsto]);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar equipamentos:', error);
             }
 
-            const nome = prompt('nome do equipamento:');
-            if (!nome) return;
+            inicializarTabela(dados);
+        }
 
-            const previsto = parseInt(prompt('quantidade prevista:'));
-            if (isNaN(previsto)) {
-                showToast('quantidade inválida', 'error');
-                return;
+        function inicializarTabela(dados) {
+            const container = document.getElementById('tabelaEquipamentos');
+            
+            if (hot) {
+                hot.destroy();
             }
 
-            const equipId = nome.toLowerCase().replace(/\s+/g, '-');
-            
-            window.dbSet(window.dbRef(window.db, `obras/${obraId}/contrato/${mes}/${equipId}`), {
-                nome,
-                previsto
-            }).then(() => {
-                showToast('equipamento cadastrado!', 'success');
-            }).catch(() => {
-                showToast('erro ao cadastrar', 'error');
+            hot = new Handsontable(container, {
+                data: dados,
+                colHeaders: ['Nome do Equipamento', 'Quantidade Prevista'],
+                columns: [
+                    { type: 'text', width: 300 },
+                    { type: 'numeric', width: 150 }
+                ],
+                rowHeaders: true,
+                minRows: 5,
+                minCols: 2,
+                contextMenu: ['row_above', 'row_below', 'remove_row'],
+                manualRowMove: true,
+                stretchH: 'all',
+                licenseKey: 'non-commercial-and-evaluation',
+                language: 'pt-BR',
+                afterChange: function(changes, source) {
+                    // Auto-save opcional pode ir aqui
+                }
             });
         }
 
-        // CARREGAR RELATÓRIOS
+        async function salvarEquipamentos() {
+            if (!hot || !obraSelecionada || !mesSelecionado) {
+                showToast('Selecione obra e mês', 'error');
+                return;
+            }
+
+            const dados = hot.getData();
+            const equipamentos = {};
+            
+            dados.forEach((linha, index) => {
+                const [nome, previsto] = linha;
+                if (nome && previsto) {
+                    const equipId = nome.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                    equipamentos[equipId] = {
+                        nome: nome.trim(),
+                        previsto: parseInt(previsto) || 0
+                    };
+                }
+            });
+
+            try {
+                await window.dbSet(
+                    window.dbRef(window.db, `obras/${obraSelecionada}/contrato/${mesSelecionado}`),
+                    equipamentos
+                );
+                showToast('Equipamentos salvos com sucesso!', 'success');
+            } catch (error) {
+                showToast('Erro ao salvar equipamentos', 'error');
+            }
+        }
+
+        function adicionarLinha() {
+            if (hot) {
+                hot.alter('insert_row_below', hot.countRows() - 1);
+            }
+        }
+
+        function limparTabela() {
+            if (confirm('Tem certeza que deseja limpar a tabela?')) {
+                inicializarTabela([['', '']]);
+            }
+        }
+
+        function exportarModelo() {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([
+                ['Nome do Equipamento', 'Quantidade Prevista'],
+                ['Escavadeira 35T', '5'],
+                ['Caminhão Basculante', '10'],
+                ['Trator de Esteira', '3']
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws, 'Modelo');
+            XLSX.writeFile(wb, 'modelo_equipamentos.xlsx');
+        }
+
+        // ==================== FISCAIS ====================
+
+        async function carregarFiscais() {
+            try {
+                const snapshot = await window.dbGet(window.dbRef(window.db, 'fiscais'));
+                
+                if (snapshot.exists()) {
+                    fiscais = snapshot.val();
+                    renderFiscaisList();
+                } else {
+                    document.getElementById('fiscaisList').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users-slash"></i>
+                            <p>Nenhum fiscal cadastrado</p>
+                        </div>`;
+                }
+            } catch (error) {
+                showToast('Erro ao carregar fiscais', 'error');
+            }
+        }
+
+        function renderFiscaisList() {
+            const container = document.getElementById('fiscaisList');
+            
+            let html = '';
+            Object.keys(fiscais).forEach(key => {
+                const fiscal = fiscais[key];
+                const iniciais = fiscal.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                
+                html += `
+                    <div class="fiscal-item">
+                        <div class="fiscal-info">
+                            <div class="fiscal-avatar">${iniciais}</div>
+                            <div>
+                                <div style="font-weight: 600;">${fiscal.nome}</div>
+                                <div style="font-size: 0.85rem; color: var(--cinza-medio);">
+                                    ${fiscal.email || 'Sem e-mail'}
+                                </div>
+                                <span class="fiscal-status ${fiscal.ativo !== false ? 'ativo' : 'inativo'}">
+                                    ${fiscal.ativo !== false ? 'Ativo' : 'Inativo'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="obra-actions">
+                            <button class="btn-icon btn-warning" onclick="toggleFiscal('${key}')" title="${fiscal.ativo !== false ? 'Desativar' : 'Ativar'}">
+                                <i class="fas ${fiscal.ativo !== false ? 'fa-pause' : 'fa-play'}"></i>
+                            </button>
+                            <button class="btn-icon btn-danger" onclick="excluirFiscal('${key}')" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function criarFiscal() {
+            const nome = document.getElementById('novoFiscalNome').value.trim();
+            const email = document.getElementById('novoFiscalEmail').value.trim();
+
+            if (!nome) {
+                showToast('Digite o nome do fiscal', 'error');
+                return;
+            }
+
+            try {
+                const fiscalId = nome.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                
+                await window.dbSet(window.dbRef(window.db, `fiscais/${fiscalId}`), {
+                    nome,
+                    email,
+                    ativo: true,
+                    criadoEm: new Date().toISOString()
+                });
+
+                showToast('Fiscal cadastrado com sucesso!', 'success');
+                document.getElementById('novoFiscalNome').value = '';
+                document.getElementById('novoFiscalEmail').value = '';
+                
+                carregarFiscais();
+
+            } catch (error) {
+                showToast('Erro ao cadastrar fiscal', 'error');
+            }
+        }
+
+        async function toggleFiscal(fiscalId) {
+            const fiscal = fiscais[fiscalId];
+            const novoStatus = fiscal.ativo === false ? true : false;
+            
+            try {
+                await window.dbSet(
+                    window.dbRef(window.db, `fiscais/${fiscalId}/ativo`),
+                    novoStatus
+                );
+                showToast(`Fiscal ${novoStatus ? 'ativado' : 'desativado'}`, 'success');
+                carregarFiscais();
+            } catch (error) {
+                showToast('Erro ao alterar status', 'error');
+            }
+        }
+
+        function excluirFiscal(fiscalId) {
+            abrirModal(
+                'Excluir Fiscal',
+                `Deseja realmente excluir ${fiscais[fiscalId].nome}?`,
+                async () => {
+                    try {
+                        await window.dbRemove(window.dbRef(window.db, `fiscais/${fiscalId}`));
+                        showToast('Fiscal excluído', 'success');
+                        fecharModal();
+                        carregarFiscais();
+                    } catch (error) {
+                        showToast('Erro ao excluir', 'error');
+                    }
+                }
+            );
+        }
+
+        // ==================== RELATÓRIOS E EXPORTAÇÃO ====================
+
         async function carregarRelatorios() {
             const obraId = document.getElementById('filtroObra').value;
-            const mesFiltro = document.getElementById('filtroMes').value; // YYYY-MM
+            const mesFiltro = document.getElementById('filtroMes').value;
             
             if (!obraId) {
-                document.getElementById('relatoriosList').innerHTML = '<div class="card"><p>selecione uma obra</p></div>';
+                document.getElementById('relatoriosList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-filter"></i>
+                        <p>Selecione uma obra para ver os relatórios</p>
+                    </div>`;
                 return;
             }
 
             const container = document.getElementById('relatoriosList');
-            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>carregando...</p></div>';
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Carregando...</p></div>';
 
             try {
                 const snapshot = await window.dbGet(window.dbRef(window.db, `obras/${obraId}/relatorios`));
                 
                 if (!snapshot.exists()) {
-                    container.innerHTML = '<div class="card"><p>nenhum relatório encontrado</p></div>';
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-check"></i>
+                            <p>Nenhum relatório encontrado</p>
+                        </div>`;
                     return;
                 }
 
-                const dados = snapshot.val();
-                relatorios = Object.keys(dados).map(key => ({ id: key, ...dados[key] }));
-
-                // Filtrar por mês se selecionado
+                let relatorios = Object.entries(snapshot.val()).map(([id, r]) => ({ id, ...r }));
+                
+                // Filtrar por mês
                 if (mesFiltro) {
                     const [ano, mes] = mesFiltro.split('-');
                     relatorios = relatorios.filter(r => {
-                        const dataRDC = r.dataKey || r.data;
-                        return dataRDC.includes(`${ano}-${mes}`);
+                        const data = r.dataKey || r.data;
+                        return data && data.includes(`${ano}-${mes}`);
                     });
                 }
 
-                renderRelatoriosTable();
+                renderRelatoriosTable(relatorios);
 
             } catch (error) {
-                container.innerHTML = '<div class="card"><p>erro ao carregar</p></div>';
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar</p></div>';
             }
         }
 
-        function renderRelatoriosTable() {
+        function renderRelatoriosTable(relatorios) {
             const container = document.getElementById('relatoriosList');
             
             if (relatorios.length === 0) {
-                container.innerHTML = '<div class="card"><p>nenhum relatório encontrado para o período</p></div>';
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum relatório no período</p></div>';
                 return;
             }
 
@@ -662,12 +1262,12 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>rdc</th>
-                                <th>data</th>
-                                <th>fiscal</th>
-                                <th>status</th>
-                                <th>equipamentos</th>
-                                <th>ações</th>
+                                <th>RDC</th>
+                                <th>Data</th>
+                                <th>Fiscal</th>
+                                <th>Status</th>
+                                <th>Equipamentos</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -684,7 +1284,7 @@
                         <td><span class="status-badge status-${rel.status || 'enviado'}">${rel.status || 'enviado'}</span></td>
                         <td>${qtdEquip} apontados</td>
                         <td>
-                            <button class="btn-icon btn-success" onclick="verDetalhes('${rel.id}')" title="ver">
+                            <button class="btn-icon btn-success" onclick="verRelatorio('${rel.id}')" title="Ver detalhes">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </td>
@@ -696,56 +1296,50 @@
             container.innerHTML = html;
         }
 
-        // EXPORTAR EXCEL
         async function exportarExcel() {
             const obraId = document.getElementById('exportObra').value;
             const periodo = document.getElementById('exportPeriodo').value;
 
             if (!obraId) {
-                showToast('selecione uma obra', 'error');
+                showToast('Selecione uma obra', 'error');
                 return;
             }
 
-            const btn = event.target;
+            const btn = event.target.closest('.btn');
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> gerando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
             btn.disabled = true;
 
             try {
-                // Buscar dados
                 const snapshot = await window.dbGet(window.dbRef(window.db, `obras/${obraId}/relatorios`));
                 
                 if (!snapshot.exists()) {
-                    showToast('nenhum dado para exportar', 'error');
+                    showToast('Nenhum dado para exportar', 'error');
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                     return;
                 }
 
-                const dados = snapshot.val();
-                let relatorios = Object.keys(dados).map(key => ({ id: key, ...dados[key] }));
+                let relatorios = Object.values(snapshot.val());
+                const hoje = new Date();
 
                 // Filtrar por período
-                const hoje = new Date();
                 relatorios = relatorios.filter(r => {
                     const dataRDC = new Date(r.dataKey || r.data);
-                    
                     switch(periodo) {
                         case 'mes-atual':
                             return dataRDC.getMonth() === hoje.getMonth() && dataRDC.getFullYear() === hoje.getFullYear();
                         case 'ultimos-30':
-                            const trintaDiasAtras = new Date(hoje.getTime() - (30 * 24 * 60 * 60 * 1000));
-                            return dataRDC >= trintaDiasAtras;
+                            return dataRDC >= new Date(hoje.getTime() - (30 * 24 * 60 * 60 * 1000));
                         case 'ultimos-7':
-                            const seteDiasAtras = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
-                            return dataRDC >= seteDiasAtras;
+                            return dataRDC >= new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
                         default:
                             return true;
                     }
                 });
 
                 if (relatorios.length === 0) {
-                    showToast('nenhum dado no período selecionado', 'error');
+                    showToast('Nenhum dado no período selecionado', 'error');
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                     return;
@@ -753,14 +1347,8 @@
 
                 // Criar workbook
                 const wb = XLSX.utils.book_new();
-                wb.Props = {
-                    Title: `Relatórios ${obras[obraId].nome}`,
-                    Subject: "RDC - Relatório Diário de Campo",
-                    Author: "Squad Geotecnia",
-                    CreatedDate: new Date()
-                };
-
-                // ABA 1: Resumo
+                
+                // Aba Resumo
                 const resumoData = relatorios.map(r => ({
                     'RDC': r.numero,
                     'Data': r.data || r.dataKey,
@@ -770,56 +1358,57 @@
                     'Pluviômetro (mm)': r.dados?.clima?.pluviometro || 0,
                     'Qtd Equipamentos': r.dados?.equipamentos ? Object.keys(r.dados.equipamentos).length : 0
                 }));
-                
-                const wsResumo = XLSX.utils.json_to_sheet(resumoData);
-                XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo");
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumoData), "Resumo");
 
-                // ABA 2: Equipamentos Detalhado
-                const equipamentosData = [];
+                // Aba Equipamentos
+                const equipData = [];
                 relatorios.forEach(r => {
                     if (r.dados?.equipamentos) {
-                        Object.entries(r.dados.equipamentos).forEach(([equipId, dados]) => {
-                            equipamentosData.push({
+                        Object.entries(r.dados.equipamentos).forEach(([id, eq]) => {
+                            equipData.push({
                                 'RDC': r.numero,
                                 'Data': r.data || r.dataKey,
-                                'Equipamento': equipId,
-                                'Real': dados.real,
-                                'Manutenção': dados.manutencao || 0,
-                                'Observações': dados.obs || ''
+                                'Equipamento': eq.nome || id,
+                                'Previsto': eq.previsto || '-',
+                                'Real': eq.real || '-',
+                                'Manutenção': eq.manutencao || 0,
+                                'Observações': eq.obs || ''
                             });
                         });
                     }
                 });
-                
-                if (equipamentosData.length > 0) {
-                    const wsEquip = XLSX.utils.json_to_sheet(equipamentosData);
-                    XLSX.utils.book_append_sheet(wb, wsEquip, "Equipamentos");
+                if (equipData.length > 0) {
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(equipData), "Equipamentos");
                 }
-
-                // ABA 3: Atividades
-                const atividadesData = relatorios.map(r => ({
-                    'RDC': r.numero,
-                    'Data': r.data || r.dataKey,
-                    'Atividades': r.dados?.atividades?.descricao || '',
-                    'Comentários': r.dados?.atividades?.comentarios || ''
-                }));
-                
-                const wsAtiv = XLSX.utils.json_to_sheet(atividadesData);
-                XLSX.utils.book_append_sheet(wb, wsAtiv, "Atividades");
 
                 // Download
                 const nomeArquivo = `RDC_${obras[obraId].nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, nomeArquivo);
 
-                showToast('excel gerado com sucesso!', 'success');
+                showToast('Excel gerado com sucesso!', 'success');
 
             } catch (error) {
                 console.error(error);
-                showToast('erro ao gerar excel', 'error');
+                showToast('Erro ao gerar Excel', 'error');
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
             }
+        }
+
+        // ==================== UTILITÁRIOS ====================
+
+        function abrirModal(titulo, texto, onConfirm) {
+            document.getElementById('modalTitle').textContent = titulo;
+            document.getElementById('modalText').textContent = texto;
+            document.getElementById('modalConfirm').classList.add('active');
+            
+            const btn = document.getElementById('modalConfirmBtn');
+            btn.onclick = onConfirm;
+        }
+
+        function fecharModal() {
+            document.getElementById('modalConfirm').classList.remove('active');
         }
 
         function showToast(msg, type = 'success') {
@@ -830,19 +1419,43 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        function formatarDataBR(dataStr) {
+            if (!dataStr) return '-';
+            if (dataStr.includes('/')) return dataStr;
+            const [ano, mes, dia] = dataStr.split('-');
+            return `${dia}/${mes}/${ano}`;
+        }
+
         function editarObra(id) {
-            showToast('função em desenvolvimento', 'error');
+            showToast('Função em desenvolvimento', 'error');
         }
 
         function excluirObra(id) {
-            if (confirm('tem certeza que deseja excluir esta obra?')) {
-                showToast('função em desenvolvimento', 'error');
-            }
+            abrirModal(
+                'Excluir Obra',
+                `Deseja realmente excluir ${obras[id].nome}? Todos os dados serão perdidos.`,
+                async () => {
+                    try {
+                        await window.dbRemove(window.dbRef(window.db, `obras/${id}`));
+                        showToast('Obra excluída', 'success');
+                        fecharModal();
+                        carregarObras();
+                        document.getElementById('equipamentosEditor').style.display = 'none';
+                    } catch (error) {
+                        showToast('Erro ao excluir', 'error');
+                    }
+                }
+            );
         }
 
-        function verDetalhes(id) {
-            showToast('função em desenvolvimento', 'error');
+        function verRelatorio(id) {
+            showToast('Visualização detalhada em desenvolvimento', 'error');
         }
+
+        // Fechar modal ao clicar fora
+        document.getElementById('modalConfirm').addEventListener('click', (e) => {
+            if (e.target.id === 'modalConfirm') fecharModal();
+        });
     </script>
 </body>
 </html>
