@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VER 2.1</title>
+    <title>Squad Geotecnia</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -1178,4 +1178,100 @@ function converterMesParaKey(mesStr) {
 
         function abrirModalExportar() {
             const obra = obras[obraExportacao];
-            const periodo = document.getElementById('filtroPeriodoRDC
+            const periodo = document.getElementById('filtroPeriodoRDC').value;
+            const periodoNomes = { 'todos': 'Todos os RDCs', 'mes-atual': 'Mês atual', 'ultimos-30': 'Últimos 30 dias', 'ultimos-7': 'Últimos 7 dias' };
+
+            document.getElementById('exportObraNome').value = obra.nome;
+            document.getElementById('exportPeriodoNome').value = periodoNomes[periodo];
+            document.getElementById('exportQuantidade').value = `${rdcsParaExportar.length} RDC(s)`;
+            document.getElementById('modalExportar').classList.add('active');
+        }
+
+        function fecharModalExportar() { document.getElementById('modalExportar').classList.remove('active'); }
+
+        async function confirmarExportacao() {
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+            btn.disabled = true;
+
+            try {
+                const wb = XLSX.utils.book_new();
+                
+                // ABA GERAL
+                const geralData = rdcsParaExportar.map(rdc => ({
+                    'RDC': rdc.numero || '-',
+                    'Data': formatarDataBR(rdc.dataKey || rdc.data),
+                    'Fiscal': rdc.fiscalNome || rdc.fiscal,
+                    'Status': rdc.status || 'enviado',
+                    'Condição Climática': rdc.dados?.clima?.condicao || '-',
+                    'Pluviômetro (mm)': rdc.dados?.clima?.pluviometro || 0,
+                    'Qtd Equipamentos': rdc.dados?.equipamentos ? Object.keys(rdc.dados.equipamentos).length : 0,
+                    'Atividades': rdc.dados?.atividades?.descricao || '-',
+                    'Comentários': rdc.dados?.atividades?.comentarios || '-'
+                }));
+                
+                const wsGeral = XLSX.utils.json_to_sheet(geralData);
+                wsGeral['!cols'] = [{wch:10}, {wch:12}, {wch:20}, {wch:12}, {wch:18}, {wch:15}, {wch:18}, {wch:40}, {wch:40}];
+                XLSX.utils.book_append_sheet(wb, wsGeral, "Geral");
+
+                // ABA EQUIPAMENTOS
+                const equipData = [];
+                rdcsParaExportar.forEach(rdc => {
+                    if (rdc.dados?.equipamentos) {
+                        Object.entries(rdc.dados.equipamentos).forEach(([id, eq]) => {
+                            equipData.push({
+                                'RDC': rdc.numero || '-',
+                                'Data': formatarDataBR(rdc.dataKey || rdc.data),
+                                'Fiscal': rdc.fiscalNome || rdc.fiscal,
+                                'Equipamento': eq.nome || id,
+                                'Previsto': eq.previsto || '-',
+                                'Real': eq.real !== undefined ? eq.real : '-',
+                                'Manutenção': eq.manutencao || 0,
+                                'Observações': eq.obs || '-'
+                            });
+                        });
+                    }
+                });
+                
+                if (equipData.length > 0) {
+                    const wsEquip = XLSX.utils.json_to_sheet(equipData);
+                    wsEquip['!cols'] = [{wch:10}, {wch:12}, {wch:20}, {wch:25}, {wch:12}, {wch:10}, {wch:12}, {wch:30}];
+                    XLSX.utils.book_append_sheet(wb, wsEquip, "Equipamentos");
+                }
+
+                XLSX.writeFile(wb, `RDCs_${obras[obraExportacao].nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
+                showToast('Excel gerado com sucesso!', 'success');
+                fecharModalExportar();
+            } catch (error) {
+                showToast('Erro ao gerar Excel', 'error');
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        function verDetalhesRDC(rdcId) {
+            const rdc = rdcsParaExportar.find(r => r.id === rdcId);
+            if (!rdc) return;
+            let detalhes = `RDC ${rdc.numero || '-'}\nData: ${formatarDataBR(rdc.dataKey || rdc.data)}\nFiscal: ${rdc.fiscalNome || rdc.fiscal}\n\n`;
+            if (rdc.dados?.clima) detalhes += `CLIMA:\nCondição: ${rdc.dados.clima.condicao || '-'}\nPluviômetro: ${rdc.dados.clima.pluviometro || 0}mm\n\n`;
+            if (rdc.dados?.equipamentos) {
+                detalhes += `EQUIPAMENTOS:\n`;
+                Object.entries(rdc.dados.equipamentos).forEach(([id, eq]) => {
+                    detalhes += `- ${eq.nome || id}: Real ${eq.real || '-'}, Manut ${eq.manutencao || 0}\n`;
+                });
+            }
+            alert(detalhes);
+        }
+
+        function editarObra(id) { showToast('Função em desenvolvimento', 'error'); }
+        function excluirObra(id) {
+            if (!confirm(`Excluir ${obras[id].nome}?`)) return;
+            window.dbRemove(window.dbRef(window.db, `obras/${id}`)).then(() => { showToast('Obra excluída', 'success'); carregarObras(); document.getElementById('equipamentosEditor').style.display = 'none'; }).catch(() => showToast('Erro', 'error'));
+        }
+
+        document.getElementById('modalExportar').addEventListener('click', (e) => { if (e.target.id === 'modalExportar') fecharModalExportar(); });
+    </script>
+</body>
+</html>
