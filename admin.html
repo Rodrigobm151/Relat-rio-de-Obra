@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Squad Geotecnia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS para exportação Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --azul-vale: #3CB5E5;
+            --azul-escuro: #0096d2;
+            --verde-vale: #007E79;
+            --cinza-texto: #555555;
+            --branco: #FFFFFF;
+            --cinza-medio: #747678;
+            --cinza-claro: #BCBEC0;
+            --cinza-mais-claro: #E6E7E8;
+            --laranja: #ff9800;
+            --vermelho: #e74c3c;
+            --fundo: #f5f7fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--fundo);
+            color: var(--cinza-texto);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--azul-vale);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .btn-sair {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            color: var(--azul-vale);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+            color: var(--cinza-texto);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--cinza-mais-claro);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: var(--azul-vale);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover { background: var(--azul-escuro); }
+        .btn-success { background: var(--verde-vale); }
+        .btn-success:hover { background: #006b66; }
+        .btn-warning { background: var(--laranja); }
+        .btn-danger { background: var(--vermelho); }
+
+        .obra-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .obra-info h3 {
+            font-size: 1.1rem;
+            color: var(--cinza-texto);
+            margin-bottom: 0.3rem;
+        }
+
+        .obra-info p {
+            font-size: 0.85rem;
+            color: var(--cinza-medio);
+        }
+
+        .obra-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--cinza-mais-claro);
+        }
+
+        th {
+            background: var(--fundo);
+            font-weight: 600;
+            color: var(--cinza-texto);
+        }
+
+        tr:hover {
+            background: rgba(60, 181, 229, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-enviado { background: #e8f5e9; color: var(--verde-vale); }
+        .status-rascunho { background: #fff3e0; color: var(--laranja); }
+        .status-pendente { background: #ffebee; color: var(--vermelho); }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--cinza-mais-claro);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--cinza-medio);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: var(--azul-vale);
+            border-bottom-color: var(--azul-vale);
+            font-weight: 600;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .export-section {
+            background: linear-gradient(135deg, var(--verde-vale) 0%, #006b66 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .export-section h3 {
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--cinza-mais-claro);
+            border-top-color: var(--azul-vale);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--cinza-texto);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show { opacity: 1; }
+        .toast.success { background: var(--verde-vale); }
+        .toast.error { background: var(--vermelho); }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <h1><i class="fas fa-cog"></i> painel administrativo</h1>
+            <button class="btn-sair" onclick="sair()">
+                <i class="fas fa-sign-out-alt"></i> sair
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('obras', this)">
+                <i class="fas fa-building"></i> obras
+            </button>
+            <button class="tab-btn" onclick="switchTab('relatorios', this)">
+                <i class="fas fa-file-alt"></i> relatórios
+            </button>
+            <button class="tab-btn" onclick="switchTab('exportar', this)">
+                <i class="fas fa-download"></i> exportar excel
+            </button>
+        </div>
+
+        <!-- ABA OBRAS -->
+        <div class="tab-content active" id="tab-obras">
+            
+            <div class="card">
+                <h3 class="card-title"><i class="fas fa-plus-circle"></i> nova obra</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">nome da obra</label>
+                        <input type="text" class="form-input" id="novaObraNome" placeholder="ex: mineração sul">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">data de início</label>
+                        <input type="date" class="form-input" id="novaObraData">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">localização (opcional)</label>
+                    <input type="text" class="form-input" id="novaObraLocal" placeholder="ex: carajás - pa">
+                </div>
+                <button class="btn btn-success" onclick="criarObra()">
+                    <i class="fas fa-save"></i> criar obra
+                </button>
+            </div>
+
+            <div id="obrasList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>carregando obras...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ABA RELATÓRIOS -->
+        <div class="tab-content" id="tab-relatorios">
+            
+            <div class="card">
+                <h3 class="card-title"><i class="fas fa-filter"></i> filtrar relatórios</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">obra</label>
+                        <select class="form-select" id="filtroObra" onchange="carregarRelatorios()">
+                            <option value="">todas as obras</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">mês</label>
+                        <input type="month" class="form-input" id="filtroMes" onchange="carregarRelatorios()">
+                    </div>
+                </div>
+            </div>
+
+            <div id="relatoriosList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>selecione filtros para carregar relatórios...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ABA EXPORTAR -->
+        <div class="tab-content" id="tab-exportar">
+            
+            <div class="export-section">
+                <h3><i class="fas fa-file-excel"></i> exportação de dados</h3>
+                <p>exporte os relatórios para excel com todos os dados detalhados.</p>
+                
+                <div class="export-grid">
+                    <div class="form-group">
+                        <label style="color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; display: block;">obra</label>
+                        <select class="form-select" id="exportObra" style="background: white; color: var(--cinza-texto);">
+                            <option value="">selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; display: block;">período</label>
+                        <select class="form-select" id="exportPeriodo" style="background: white; color: var(--cinza-texto);">
+                            <option value="todos">todo o período</option>
+                            <option value="mes-atual">mês atual</option>
+                            <option value="ultimos-30">últimos 30 dias</option>
+                            <option value="ultimos-7">últimos 7 dias</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="exportarExcel()" style="margin-top: 1rem; background: white; color: var(--verde-vale);">
+                    <i class="fas fa-download"></i> baixar excel
+                </button>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title"><i class="fas fa-info-circle"></i> sobre a exportação</h3>
+                <p style="margin-bottom: 0.5rem;">o arquivo excel conterá as seguintes abas:</p>
+                <ul style="margin-left: 1.5rem; color: var(--cinza-medio);">
+                    <li><strong>resumo</strong> - visão geral de todos os rdcs</li>
+                    <li><strong>equipamentos</strong> - detalhamento de equipamentos por dia</li>
+                    <li><strong>clima</strong> - condições climáticas registradas</li>
+                    <li><strong>atividades</strong> - descrição das atividades executadas</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
+            authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
+            databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
+            projectId: "relatorio-obra-geotecnia",
+            storageBucket: "relatorio-obra-geotecnia.firebasestorage.app",
+            messagingSenderId: "765646735604",
+            appId: "1:765646735604:web:59424d5353813939e976a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.db = db;
+        window.dbRef = ref;
+        window.dbGet = get;
+        window.dbSet = set;
+        window.dbPush = push;
+    </script>
+
+    <script>
+        let obras = {};
+        let relatorios = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarObras();
+            
+            // Set mês atual no filtro
+            const hoje = new Date();
+            document.getElementById('filtroMes').value = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
+        });
+
+        function sair() {
+            window.location.href = 'index.html';
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        // CARREGAR OBRAS
+        async function carregarObras() {
+            try {
+                const snapshot = await window.dbGet(window.dbRef(window.db, 'obras'));
+                
+                if (snapshot.exists()) {
+                    obras = snapshot.val();
+                    renderObrasList();
+                    preencherSelectObras();
+                } else {
+                    document.getElementById('obrasList').innerHTML = '<div class="card"><p>nenhuma obra cadastrada</p></div>';
+                }
+            } catch (error) {
+                showToast('erro ao carregar obras', 'error');
+            }
+        }
+
+        function renderObrasList() {
+            const container = document.getElementById('obrasList');
+            
+            let html = '';
+            Object.keys(obras).forEach(key => {
+                const obra = obras[key];
+                html += `
+                    <div class="obra-item">
+                        <div class="obra-info">
+                            <h3>${obra.nome}</h3>
+                            <p>
+                                <i class="fas fa-calendar"></i> início: ${obra.dataInicio || 'não definido'} 
+                                ${obra.local ? `| <i class="fas fa-map-marker-alt"></i> ${obra.local}` : ''}
+                            </p>
+                        </div>
+                        <div class="obra-actions">
+                            <button class="btn-icon btn-success" onclick="gerenciarEquipamentos('${key}')" title="equipamentos">
+                                <i class="fas fa-tools"></i>
+                            </button>
+                            <button class="btn-icon btn-warning" onclick="editarObra('${key}')" title="editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon btn-danger" onclick="excluirObra('${key}')" title="excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function preencherSelectObras() {
+            const selects = ['filtroObra', 'exportObra'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = '<option value="">selecione...</option>';
+                Object.keys(obras).forEach(key => {
+                    select.innerHTML += `<option value="${key}">${obras[key].nome}</option>`;
+                });
+            });
+        }
+
+        // CRIAR OBRA
+        async function criarObra() {
+            const nome = document.getElementById('novaObraNome').value.trim();
+            const dataInicio = document.getElementById('novaObraData').value;
+            const local = document.getElementById('novaObraLocal').value.trim();
+
+            if (!nome || !dataInicio) {
+                showToast('preencha nome e data de início', 'error');
+                return;
+            }
+
+            try {
+                const obraId = nome.toLowerCase().replace(/\s+/g, '-');
+                await window.dbSet(window.dbRef(window.db, `obras/${obraId}`), {
+                    nome,
+                    dataInicio,
+                    local,
+                    criadaEm: new Date().toISOString()
+                });
+
+                showToast('obra criada com sucesso!', 'success');
+                document.getElementById('novaObraNome').value = '';
+                document.getElementById('novaObraData').value = '';
+                document.getElementById('novaObraLocal').value = '';
+                
+                carregarObras();
+
+            } catch (error) {
+                showToast('erro ao criar obra', 'error');
+            }
+        }
+
+        // GERENCIAR EQUIPAMENTOS
+        function gerenciarEquipamentos(obraId) {
+            const obra = obras[obraId];
+            const mes = prompt(`cadastrar equipamentos para qual mês? (formato: MM-AAAA)\nexemplo: 02-2026`);
+            
+            if (!mes || !/^\d{2}-\d{4}$/.test(mes)) {
+                showToast('formato inválido. use MM-AAAA', 'error');
+                return;
+            }
+
+            const nome = prompt('nome do equipamento:');
+            if (!nome) return;
+
+            const previsto = parseInt(prompt('quantidade prevista:'));
+            if (isNaN(previsto)) {
+                showToast('quantidade inválida', 'error');
+                return;
+            }
+
+            const equipId = nome.toLowerCase().replace(/\s+/g, '-');
+            
+            window.dbSet(window.dbRef(window.db, `obras/${obraId}/contrato/${mes}/${equipId}`), {
+                nome,
+                previsto
+            }).then(() => {
+                showToast('equipamento cadastrado!', 'success');
+            }).catch(() => {
+                showToast('erro ao cadastrar', 'error');
+            });
+        }
+
+        // CARREGAR RELATÓRIOS
+        async function carregarRelatorios() {
+            const obraId = document.getElementById('filtroObra').value;
+            const mesFiltro = document.getElementById('filtroMes').value; // YYYY-MM
+            
+            if (!obraId) {
+                document.getElementById('relatoriosList').innerHTML = '<div class="card"><p>selecione uma obra</p></div>';
+                return;
+            }
+
+            const container = document.getElementById('relatoriosList');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>carregando...</p></div>';
+
+            try {
+                const snapshot = await window.dbGet(window.dbRef(window.db, `obras/${obraId}/relatorios`));
+                
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<div class="card"><p>nenhum relatório encontrado</p></div>';
+                    return;
+                }
+
+                const dados = snapshot.val();
+                relatorios = Object.keys(dados).map(key => ({ id: key, ...dados[key] }));
+
+                // Filtrar por mês se selecionado
+                if (mesFiltro) {
+                    const [ano, mes] = mesFiltro.split('-');
+                    relatorios = relatorios.filter(r => {
+                        const dataRDC = r.dataKey || r.data;
+                        return dataRDC.includes(`${ano}-${mes}`);
+                    });
+                }
+
+                renderRelatoriosTable();
+
+            } catch (error) {
+                container.innerHTML = '<div class="card"><p>erro ao carregar</p></div>';
+            }
+        }
+
+        function renderRelatoriosTable() {
+            const container = document.getElementById('relatoriosList');
+            
+            if (relatorios.length === 0) {
+                container.innerHTML = '<div class="card"><p>nenhum relatório encontrado para o período</p></div>';
+                return;
+            }
+
+            let html = `
+                <div class="card table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>rdc</th>
+                                <th>data</th>
+                                <th>fiscal</th>
+                                <th>status</th>
+                                <th>equipamentos</th>
+                                <th>ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            relatorios.forEach(rel => {
+                const qtdEquip = rel.dados?.equipamentos ? Object.keys(rel.dados.equipamentos).length : 0;
+                
+                html += `
+                    <tr>
+                        <td>${rel.numero || '---'}</td>
+                        <td>${rel.data || rel.dataKey}</td>
+                        <td>${rel.fiscalNome || rel.fiscal}</td>
+                        <td><span class="status-badge status-${rel.status || 'enviado'}">${rel.status || 'enviado'}</span></td>
+                        <td>${qtdEquip} apontados</td>
+                        <td>
+                            <button class="btn-icon btn-success" onclick="verDetalhes('${rel.id}')" title="ver">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // EXPORTAR EXCEL
+        async function exportarExcel() {
+            const obraId = document.getElementById('exportObra').value;
+            const periodo = document.getElementById('exportPeriodo').value;
+
+            if (!obraId) {
+                showToast('selecione uma obra', 'error');
+                return;
+            }
+
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> gerando...';
+            btn.disabled = true;
+
+            try {
+                // Buscar dados
+                const snapshot = await window.dbGet(window.dbRef(window.db, `obras/${obraId}/relatorios`));
+                
+                if (!snapshot.exists()) {
+                    showToast('nenhum dado para exportar', 'error');
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                    return;
+                }
+
+                const dados = snapshot.val();
+                let relatorios = Object.keys(dados).map(key => ({ id: key, ...dados[key] }));
+
+                // Filtrar por período
+                const hoje = new Date();
+                relatorios = relatorios.filter(r => {
+                    const dataRDC = new Date(r.dataKey || r.data);
+                    
+                    switch(periodo) {
+                        case 'mes-atual':
+                            return dataRDC.getMonth() === hoje.getMonth() && dataRDC.getFullYear() === hoje.getFullYear();
+                        case 'ultimos-30':
+                            const trintaDiasAtras = new Date(hoje.getTime() - (30 * 24 * 60 * 60 * 1000));
+                            return dataRDC >= trintaDiasAtras;
+                        case 'ultimos-7':
+                            const seteDiasAtras = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
+                            return dataRDC >= seteDiasAtras;
+                        default:
+                            return true;
+                    }
+                });
+
+                if (relatorios.length === 0) {
+                    showToast('nenhum dado no período selecionado', 'error');
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Criar workbook
+                const wb = XLSX.utils.book_new();
+                wb.Props = {
+                    Title: `Relatórios ${obras[obraId].nome}`,
+                    Subject: "RDC - Relatório Diário de Campo",
+                    Author: "Squad Geotecnia",
+                    CreatedDate: new Date()
+                };
+
+                // ABA 1: Resumo
+                const resumoData = relatorios.map(r => ({
+                    'RDC': r.numero,
+                    'Data': r.data || r.dataKey,
+                    'Fiscal': r.fiscalNome || r.fiscal,
+                    'Status': r.status || 'enviado',
+                    'Condição Climática': r.dados?.clima?.condicao || '',
+                    'Pluviômetro (mm)': r.dados?.clima?.pluviometro || 0,
+                    'Qtd Equipamentos': r.dados?.equipamentos ? Object.keys(r.dados.equipamentos).length : 0
+                }));
+                
+                const wsResumo = XLSX.utils.json_to_sheet(resumoData);
+                XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo");
+
+                // ABA 2: Equipamentos Detalhado
+                const equipamentosData = [];
+                relatorios.forEach(r => {
+                    if (r.dados?.equipamentos) {
+                        Object.entries(r.dados.equipamentos).forEach(([equipId, dados]) => {
+                            equipamentosData.push({
+                                'RDC': r.numero,
+                                'Data': r.data || r.dataKey,
+                                'Equipamento': equipId,
+                                'Real': dados.real,
+                                'Manutenção': dados.manutencao || 0,
+                                'Observações': dados.obs || ''
+                            });
+                        });
+                    }
+                });
+                
+                if (equipamentosData.length > 0) {
+                    const wsEquip = XLSX.utils.json_to_sheet(equipamentosData);
+                    XLSX.utils.book_append_sheet(wb, wsEquip, "Equipamentos");
+                }
+
+                // ABA 3: Atividades
+                const atividadesData = relatorios.map(r => ({
+                    'RDC': r.numero,
+                    'Data': r.data || r.dataKey,
+                    'Atividades': r.dados?.atividades?.descricao || '',
+                    'Comentários': r.dados?.atividades?.comentarios || ''
+                }));
+                
+                const wsAtiv = XLSX.utils.json_to_sheet(atividadesData);
+                XLSX.utils.book_append_sheet(wb, wsAtiv, "Atividades");
+
+                // Download
+                const nomeArquivo = `RDC_${obras[obraId].nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, nomeArquivo);
+
+                showToast('excel gerado com sucesso!', 'success');
+
+            } catch (error) {
+                console.error(error);
+                showToast('erro ao gerar excel', 'error');
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function editarObra(id) {
+            showToast('função em desenvolvimento', 'error');
+        }
+
+        function excluirObra(id) {
+            if (confirm('tem certeza que deseja excluir esta obra?')) {
+                showToast('função em desenvolvimento', 'error');
+            }
+        }
+
+        function verDetalhes(id) {
+            showToast('função em desenvolvimento', 'error');
+        }
+    </script>
+</body>
+</html>
