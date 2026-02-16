@@ -8,7 +8,8 @@
     <style>
         :root {
             --azul-fundo: #3CB5E5;
-            --branco: #FFFFFF;
+            --glitch-red: #ff0011;
+            --glitch-cyan: #00fff9;
         }
 
         @font-face {
@@ -35,21 +36,20 @@
             text-align: center;
         }
 
-        /* VÍDEO NO TOPO COM CROP */
+        /* VÍDEO BACKGROUND - 40vh altura */
         .video-container {
             position: relative;
             width: 100%;
-            height: 40vh;
+            height: 40vh; 
             overflow: hidden;
         }
 
         .header-video {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Faz o crop automático */
+            object-fit: cover;
         }
 
-        /* EFEITO DE FADE PARA O AZUL */
         .video-container::after {
             content: '';
             position: absolute;
@@ -57,7 +57,6 @@
             background: linear-gradient(to bottom, transparent, var(--azul-fundo));
         }
 
-        /* CONTEÚDO CENTRAL */
         .content {
             flex: 1;
             display: flex;
@@ -66,78 +65,126 @@
             width: 100%;
             padding: 0 30px;
             z-index: 10;
-            margin-top: -40px; /* Sobe o logo para cima do fade */
+            margin-top: -45px;
         }
 
-        .squad-logo { width: 120px; height: auto; margin-bottom: 10px; }
+        /* squad-logo.png - 115px */
+        .squad-logo { width: 115px; height: auto; margin-bottom: 10px; }
 
-        .app-title { font-size: 2.2rem; font-weight: normal; margin-bottom: 5px; }
+        /* --- SISTEMA DE GLITCH RGB --- */
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
 
-        .glitch-text { 
-            font-size: 1.1rem; 
-            min-height: 1.5rem;
+        .app-title {
+            font-size: 2.2rem;
+            position: relative;
+            z-index: 2;
+            background: var(--azul-fundo); /* Cobre as camadas de baixo quando inativo */
+        }
+
+        .glitch-subtitle {
+            font-size: 1.2rem;
             margin-bottom: 25px;
-            opacity: 0.9;
+            min-height: 1.5rem;
+            font-style: italic;
+            position: relative;
+            z-index: 2;
+            background: var(--azul-fundo);
         }
 
-        .vale-logo { width: 100px; margin-bottom: 40px; }
-
-        /* INPUTS ESTILO POWERPOINT */
-        #fiscalSelect {
+        /* Camadas sobrepostas */
+        .glitch-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 280px;
-            height: 35px;
-            border: none;
-            border-radius: 2px;
-            padding: 0 10px;
-            font-size: 0.9rem;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #555;
+            height: 100%;
+            z-index: 1;
+            display: none;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* Ativação do efeito */
+        .glitch-active .glitch-layer { display: block; }
+        .glitch-active .app-title, 
+        .glitch-active .glitch-subtitle { background: transparent; }
+
+        .layer-cyan {
+            color: var(--glitch-cyan);
+            animation: glitch-anim-cyan 0.3s infinite;
+            transform: translate(-2px, 0);
+        }
+
+        .layer-red {
+            color: var(--glitch-red);
+            animation: glitch-anim-red 0.3s infinite;
+            transform: translate(2px, 0);
+        }
+
+        /* LOGO VALE - 110px */
+        .vale-logo { width: 110px; height: auto; margin-bottom: 35px; }
+
+        #fiscalSelect {
+            width: 100%; max-width: 280px; height: 38px;
+            border: none; border-radius: 4px; padding: 0 10px;
+            font-size: 1rem; text-align: center; margin-bottom: 20px;
+            color: #444; background: white; outline: none;
         }
 
         .btn-entrar {
-            width: 100%;
-            max-width: 180px;
-            height: 45px;
-            background: #3498db; /* Azul um pouco mais escuro para o botão */
-            color: white;
-            border: 1px solid #2980b9;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            font-style: italic;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
-            transition: transform 0.1s;
+            width: 100%; max-width: 180px; height: 48px;
+            background: #2a8cc2; color: white; border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px; font-size: 1.3rem; font-weight: bold;
+            font-style: italic; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        .btn-entrar:active { transform: scale(0.98); }
-        .btn-entrar:disabled { opacity: 0.6; cursor: not-allowed; }
+        footer { padding-bottom: 20px; font-size: 0.8rem; }
+        .reta-logo { width: 130px; margin-top: 5px; filter: brightness(0) invert(1); }
 
-        /* FOOTER */
-        footer {
-            padding-bottom: 20px;
-            font-size: 0.8rem;
+        /* ANIMAÇÕES DE DESLOCAMENTO RGB */
+        @keyframes glitch-anim-cyan {
+            0% { clip: rect(10px, 9999px, 20px, 0); transform: translate(-3px, -1px); }
+            25% { clip: rect(30px, 9999px, 40px, 0); transform: translate(-1px, 1px); }
+            50% { clip: rect(50px, 9999px, 60px, 0); transform: translate(-3px, -1px); }
+            75% { clip: rect(70px, 9999px, 80px, 0); transform: translate(-1px, 1px); }
+            100% { clip: rect(90px, 9999px, 100px, 0); transform: translate(-3px, -1px); }
         }
 
-        .reta-logo { width: 120px; margin-top: 5px; filter: brightness(0) invert(1); }
-
+        @keyframes glitch-anim-red {
+            0% { clip: rect(15px, 9999px, 25px, 0); transform: translate(3px, 1px); }
+            25% { clip: rect(35px, 9999px, 45px, 0); transform: translate(1px, -1px); }
+            50% { clip: rect(55px, 9999px, 65px, 0); transform: translate(3px, 1px); }
+            75% { clip: rect(75px, 9999px, 85px, 0); transform: translate(1px, -1px); }
+            100% { clip: rect(95px, 9999px, 105px, 0); transform: translate(3px, 1px); }
+        }
     </style>
 </head>
 <body>
 
     <main class="main-container">
         <section class="video-container">
-            <video class="header-video" autoplay muted loop playsinline>
-                <source src="./assets/video/background.mp4" type="video/mp4">
+            <video class="header-video" autoplay muted loop playsinline preload="auto">
+                <source src="./assets/video/background.webm" type="video/webm">
             </video>
         </section>
 
         <section class="content">
             <img src="./assets/imagens/squad-logo.png" class="squad-logo" alt="Logo Squad">
-            <h1 class="app-title">Squad Geotecnia</h1>
-            <div id="glitch-target" class="glitch-text">Obras geotecnicas</div>
+            
+            <div id="title-wrapper" class="glitch-wrapper">
+                <h1 class="app-title">Squad Geotecnia</h1>
+                <div class="glitch-layer layer-cyan">Squad Geotecnia</div>
+                <div class="glitch-layer layer-red">Squad Geotecnia</div>
+            </div>
+            
+            <div id="subtitle-wrapper" class="glitch-wrapper" style="margin-top: 5px;">
+                <div id="glitch-target" class="glitch-subtitle">Obras geotecnicas</div>
+                <div id="sub-cyan" class="glitch-layer layer-cyan" style="font-size:1.2rem; font-style:italic;">Obras geotecnicas</div>
+                <div id="sub-red" class="glitch-layer layer-red" style="font-size:1.2rem; font-style:italic;">Obras geotecnicas</div>
+            </div>
 
             <img src="./assets/imagens/vale-logo.png" class="vale-logo" alt="Vale">
 
@@ -173,32 +220,23 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Busca usuários do Firebase
         async function carregarUsuarios() {
             const select = document.getElementById('fiscalSelect');
             try {
-                // Ajuste o caminho 'usuarios' para o nó correto do seu banco
                 const snapshot = await get(ref(db, 'usuarios')); 
-                select.innerHTML = '<option value="">Selecione usuário</option>';
-                
                 if (snapshot.exists()) {
+                    select.innerHTML = '<option value="">Selecione usuário</option>';
                     snapshot.forEach((child) => {
-                        const user = child.val();
                         const option = document.createElement('option');
                         option.value = child.key;
-                        option.textContent = user.nome || child.key;
+                        option.textContent = child.val().nome || child.key;
                         select.appendChild(option);
                     });
                 }
-            } catch (error) {
-                console.error("Erro ao carregar:", error);
-                select.innerHTML = '<option value="">Erro ao carregar</option>';
-            }
+            } catch (e) { select.innerHTML = '<option>Erro Firebase</option>'; }
         }
-
         carregarUsuarios();
-        
-        // Habilita botão ao selecionar
+
         document.getElementById('fiscalSelect').addEventListener('change', (e) => {
             document.getElementById('btnEntrar').disabled = !e.target.value;
         });
@@ -212,19 +250,46 @@
     </script>
 
     <script>
-        // Lógica do Efeito de Texto Rotativo (Glitch)
         const phrases = ["Obras geotecnicas", "Somons bons", "Precisão digital"];
         let i = 0;
-        const target = document.getElementById("glitch-target");
+        
+        const subTarget = document.getElementById("glitch-target");
+        const subCyan = document.getElementById("sub-cyan");
+        const subRed = document.getElementById("sub-red");
+        const subWrapper = document.getElementById("subtitle-wrapper");
+        const titleWrapper = document.getElementById("title-wrapper");
 
-        setInterval(() => {
-            i = (i + 1) % phrases.length;
-            target.style.opacity = 0;
+        // Função de efeito para o Subtítulo (ocorre na troca de texto)
+        function triggerSubtitleChange() {
+            subWrapper.classList.add('glitch-active');
+            
             setTimeout(() => {
-                target.textContent = phrases[i];
-                target.style.opacity = 1;
-            }, 500);
-        }, 3500);
+                i = (i + 1) % phrases.length;
+                subTarget.textContent = phrases[i];
+                subCyan.textContent = phrases[i];
+                subRed.textContent = phrases[i];
+                
+                setTimeout(() => {
+                    subWrapper.classList.remove('glitch-active');
+                }, 400); 
+            }, 100);
+        }
+
+        // Função de efeito aleatório para o Título (estilo interferência)
+        function triggerTitleGlitch() {
+            titleWrapper.classList.add('glitch-active');
+            setTimeout(() => {
+                titleWrapper.classList.remove('glitch-active');
+            }, 250);
+        }
+
+        // Intervalo para troca de frases
+        setInterval(triggerSubtitleChange, 3500);
+
+        // Intervalo aleatório para o glitch no título (acontece de tempos em tempos)
+        setInterval(() => {
+            if(Math.random() > 0.7) triggerTitleGlitch();
+        }, 2000);
     </script>
 </body>
 </html>
