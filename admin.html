@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VER 2.0</title>
+    <title>VER 2.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -520,39 +520,51 @@
         }
 
 function converterMesParaKey(mesStr) {
-    // Se for número (serial do Excel), converter para data
+    // Converter para string e limpar
+    let str = String(mesStr).trim();
+    
+    // Se for string que parece número (ex: "46357", "46023")
+    if (/^\d+$/.test(str)) {
+        const num = parseInt(str);
+        // Se for número grande o suficiente para ser serial do Excel (> 40000)
+        if (num > 40000) {
+            const excelEpoch = new Date(1900, 0, 1);
+            const data = new Date(excelEpoch.getTime() + (num - 2) * 24 * 60 * 60 * 1000);
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            return `${mes}-${ano}`;
+        }
+    }
+    
+    // Se for número diretamente
     if (typeof mesStr === 'number') {
-        // Excel conta dias desde 01/01/1900 (ou 1904 em Mac)
         const excelEpoch = new Date(1900, 0, 1);
-        // Ajuste: Excel tem bug do ano bissexto 1900, então subtrair 2 dias
         const data = new Date(excelEpoch.getTime() + (mesStr - 2) * 24 * 60 * 60 * 1000);
         const mes = String(data.getMonth() + 1).padStart(2, '0');
         const ano = data.getFullYear();
         return `${mes}-${ano}`;
     }
     
-    // Se for objeto Date do JavaScript
+    // Se for objeto Date
     if (mesStr instanceof Date) {
         const mes = String(mesStr.getMonth() + 1).padStart(2, '0');
         const ano = mesStr.getFullYear();
         return `${mes}-${ano}`;
     }
     
-    // Converter para string
-    const str = String(mesStr).trim();
+    // Formato ISO: 2026-01-01 ou 2026-01-01T00:00:00.000Z
+    const formatoISO = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (formatoISO) {
+        return `${formatoISO[2]}-${formatoISO[1]}`;
+    }
     
-    // Se já vier como data completa (01/01/2026)
+    // Formato data BR: 01/01/2026
     const formatoDataBR = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     if (formatoDataBR) {
         return `${formatoDataBR[2]}-${formatoDataBR[3]}`;
     }
     
-    const formatoDataISO = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (formatoDataISO) {
-        return `${formatoDataISO[2]}-${formatoDataISO[1]}`;
-    }
-    
-    // Mapeamento de meses
+    // Mapeamento de meses em português
     const mesesMap = { 
         'jan': '01', 'janeiro': '01', 'jan.': '01',
         'fev': '02', 'fevereiro': '02', 'fev.': '02',
@@ -569,12 +581,12 @@ function converterMesParaKey(mesStr) {
     };
     
     // Formato MM/AAAA
-    const formatoNumerico = str.match(/^(\d{2})\/(\d{4})$/);
+    const formatoNumerico = str.match(/^(\d{2})[\/\-](\d{4})$/);
     if (formatoNumerico) {
         return `${formatoNumerico[1]}-${formatoNumerico[2]}`;
     }
     
-    // Formato texto
+    // Formato texto (Jan/2026, Janeiro/2026, etc)
     const partes = str.toLowerCase().split(/[\/\s\-]+/);
     const mesEncontrado = partes.find(p => mesesMap[p.replace(/[^a-z.]/g, '')]);
     const anoEncontrado = partes.find(p => /^\d{4}$/.test(p));
@@ -583,7 +595,6 @@ function converterMesParaKey(mesStr) {
         return `${mesesMap[mesEncontrado.replace(/[^a-z.]/g, '')]}-${anoEncontrado}`;
     }
     
-    console.warn('Não conseguiu converter:', mesStr, 'Tipo:', typeof mesStr);
     return null;
 }
 
