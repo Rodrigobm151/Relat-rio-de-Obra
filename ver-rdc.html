@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar RDC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --azul-vale: #3CB5E5;
+            --azul-escuro: #0096d2;
+            --verde-vale: #007E79;
+            --cinza-texto: #555555;
+            --cinza-medio: #747678;
+            --cinza-claro: #BCBEC0;
+            --fundo: #f5f7fa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background-color: var(--fundo); 
+            color: var(--cinza-texto); 
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Tela de carregamento */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--cinza-claro);
+            border-top-color: var(--azul-vale);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Botões de ação (não aparecem no PDF) */
+        .acoes {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: var(--azul-vale);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .btn:hover { background: var(--azul-escuro); }
+        .btn-success { background: var(--verde-vale); }
+        .btn-success:hover { background: #006b66; }
+        .btn-secondary { background: var(--cinza-medio); }
+        .btn-secondary:hover { background: var(--cinza-texto); }
+
+        /* Container do relatório (vai para o PDF) */
+        #relatorio {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Cabeçalho com logos */
+        .header-relatorio {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--azul-vale);
+        }
+        
+        .logo-vale {
+            height: 60px;
+        }
+        
+        .titulo-relatorio {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .titulo-relatorio h1 {
+            color: var(--azul-escuro);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .titulo-relatorio p {
+            color: var(--cinza-medio);
+            font-size: 0.9rem;
+        }
+
+        /* Informações principais */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: var(--fundo);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--cinza-medio);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--cinza-texto);
+        }
+
+        /* Seções */
+        .secao {
+            margin-bottom: 25px;
+        }
+        
+        .secao-titulo {
+            background: var(--azul-vale);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Clima */
+        .clima-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .clima-item {
+            background: var(--fundo);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .clima-icon {
+            font-size: 2rem;
+            color: var(--azul-vale);
+            margin-bottom: 8px;
+        }
+        
+        .clima-label {
+            font-size: 0.8rem;
+            color: var(--cinza-medio);
+            margin-bottom: 5px;
+        }
+        
+        .clima-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--cinza-texto);
+        }
+
+        /* Texto áreas */
+        .texto-box {
+            background: var(--fundo);
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 80px;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .texto-vazio {
+            color: var(--cinza-claro);
+            font-style: italic;
+        }
+
+        /* Tabela de equipamentos */
+        .tabela-equipamentos {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .tabela-equipamentos th {
+            background: var(--azul-vale);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .tabela-equipamentos td {
+            padding: 12px;
+            border-bottom: 1px solid var(--cinza-claro);
+        }
+        
+        .tabela-equipamentos tr:nth-child(even) {
+            background: var(--fundo);
+        }
+        
+        .tabela-equipamentos tr:hover {
+            background: rgba(60, 181, 229, 0.1);
+        }
+
+        /* Assinaturas */
+        .assinaturas {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .assinatura-box {
+            text-align: center;
+        }
+        
+        .linha-assinatura {
+            border-top: 1px solid var(--cinza-texto);
+            margin-top: 60px;
+            padding-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Rodapé */
+        .rodape {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--cinza-claro);
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--cinza-medio);
+        }
+
+        /* Mensagem de erro */
+        .erro {
+            text-align: center;
+            padding: 40px;
+            color: var(--vermelho);
+        }
+        
+        .erro i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* Estilos para impressão/PDF */
+        @media print {
+            body { background: white; padding: 0; }
+            .acoes { display: none !important; }
+            #relatorio { 
+                box-shadow: none; 
+                max-width: 100%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA DE CARREGAMENTO -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Carregando relatório...</p>
+    </div>
+
+    <!-- BOTÕES DE AÇÃO (não vão para o PDF) -->
+    <div id="acoes" class="acoes" style="display: none;">
+        <button class="btn btn-success" onclick="gerarPDF()">
+            <i class="fas fa-file-pdf"></i> Baixar PDF
+        </button>
+        <button class="btn" onclick="window.print()">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+        <button class="btn btn-secondary" onclick="fechar()">
+            <i class="fas fa-times"></i> Fechar
+        </button>
+    </div>
+
+    <!-- RELATÓRIO (vai para o PDF) -->
+    <div id="relatorio" style="display: none;">
+        
+        <!-- CABEÇALHO -->
+        <div class="header-relatorio">
+            <img src="assets/images/logo-vale.png" alt="Vale" class="logo-vale" onerror="this.style.display='none'">
+            <div class="titulo-relatorio">
+                <h1>RELATÓRIO DIÁRIO DE CAMPO</h1>
+                <p>RDC - Sistema de Gestão de Obras</p>
+            </div>
+            <img src="assets/images/logo-cliente.png" alt="Cliente" class="logo-vale" onerror="this.style.display='none'">
+        </div>
+
+        <!-- INFORMAÇÕES PRINCIPAIS -->
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Número do RDC</span>
+                <span class="info-value" id="rdcNumero">---</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Data</span>
+                <span class="info-value" id="rdcData">---</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Obra</span>
+                <span class="info-value" id="rdcObra">---</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Fiscal Responsável</span>
+                <span class="info-value" id="rdcFiscal">---</span>
+            </div>
+        </div>
+
+        <!-- CLIMA -->
+        <div class="secao">
+            <div class="secao-titulo">
+                <i class="fas fa-cloud-sun"></i> CONDIÇÕES DO TEMPO
+            </div>
+            <div class="clima-grid">
+                <div class="clima-item">
+                    <div class="clima-icon"><i class="fas fa-sun"></i></div>
+                    <div class="clima-label">Condição</div>
+                    <div class="clima-value" id="climaCondicao">-</div>
+                </div>
+                <div class="clima-item">
+                    <div class="clima-icon"><i class="fas fa-tint"></i></div>
+                    <div class="clima-label">Pluviômetro</div>
+                    <div class="clima-value" id="climaPluviometro">0 mm</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ATIVIDADES -->
+        <div class="secao">
+            <div class="secao-titulo">
+                <i class="fas fa-tasks"></i> DESCRIÇÃO DAS ATIVIDADES
+            </div>
+            <div class="texto-box" id="descAtividades">
+                <span class="texto-vazio">Nenhuma atividade registrada</span>
+            </div>
+        </div>
+
+        <!-- COMENTÁRIOS -->
+        <div class="secao">
+            <div class="secao-titulo">
+                <i class="fas fa-comment-alt"></i> COMENTÁRIOS E OCORRÊNCIAS
+            </div>
+            <div class="texto-box" id="comentarios">
+                <span class="texto-vazio">Nenhum comentário registrado</span>
+            </div>
+        </div>
+
+        <!-- EQUIPAMENTOS -->
+        <div class="secao">
+            <div class="secao-titulo">
+                <i class="fas fa-truck-monster"></i> EQUIPAMENTOS
+            </div>
+            <table class="tabela-equipamentos">
+                <thead>
+                    <tr>
+                        <th>Equipamento</th>
+                        <th style="text-align: center;">Previsto</th>
+                        <th style="text-align: center;">Real</th>
+                        <th style="text-align: center;">Manut.</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaEquipamentos">
+                    <!-- Preenchido via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ASSINATURAS -->
+        <div class="assinaturas">
+            <div class="assinatura-box">
+                <div class="linha-assinatura">
+                    <strong>Fiscal de Campo</strong><br>
+                    <span id="assinaturaFiscal">---</span>
+                </div>
+            </div>
+            <div class="assinatura-box">
+                <div class="linha-assinatura">
+                    <strong>Engenheiro/Coordenador</strong><br>
+                    Carimbo e Assinatura
+                </div>
+            </div>
+        </div>
+
+        <!-- RODAPÉ -->
+        <div class="rodape">
+            <p>Documento gerado automaticamente pelo sistema RDC - Geotecnia</p>
+            <p id="dataGeracao"></p>
+        </div>
+
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
+            authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
+            databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
+            projectId: "relatorio-obra-geotecnia",
+            storageBucket: "relatorio-obra-geotecnia.firebasestorage.app",
+            messagingSenderId: "765646735604",
+            appId: "1:765646735604:web:59424d5353813939e976a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.db = db;
+        window.dbRef = ref;
+        window.dbGet = get;
+
+        // Carregar dados ao iniciar
+        carregarRDC();
+    </script>
+
+    <script>
+        let dadosRDC = null;
+        let dadosObra = null;
+
+        async function carregarRDC() {
+            // Pegar parâmetros da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const obraId = urlParams.get('obra');
+            const rdcId = urlParams.get('rdc');
+
+            if (!obraId || !rdcId) {
+                mostrarErro('Parâmetros inválidos. Obra ou RDC não especificado.');
+                return;
+            }
+
+            try {
+                // Buscar dados da obra
+                const obraSnap = await window.dbGet(window.dbRef(window.db, `obras/${obraId}`));
+                if (!obraSnap.exists()) {
+                    mostrarErro('Obra não encontrada.');
+                    return;
+                }
+                dadosObra = obraSnap.val();
+
+                // Buscar dados do RDC
+                const rdcSnap = await window.dbGet(window.dbRef(window.db, `obras/${obraId}/relatorios/${rdcId}`));
+                if (!rdcSnap.exists()) {
+                    mostrarErro('RDC não encontrado.');
+                    return;
+                }
+                dadosRDC = rdcSnap.val();
+
+                // Preencher relatório
+                preencherRelatorio();
+
+                // Mostrar interface
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('acoes').style.display = 'flex';
+                document.getElementById('relatorio').style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                mostrarErro('Erro ao carregar dados. Tente novamente.');
+            }
+        }
+
+        function preencherRelatorio() {
+            // Informações principais
+            document.getElementById('rdcNumero').textContent = dadosRDC.numero ? String(dadosRDC.numero).padStart(3, '0') : '---';
+            document.getElementById('rdcData').textContent = dadosRDC.data || '---';
+            document.getElementById('rdcObra').textContent = dadosObra.nome || '---';
+            document.getElementById('rdcFiscal').textContent = dadosRDC.fiscalNome || dadosRDC.fiscal || '---';
+            document.getElementById('assinaturaFiscal').textContent = dadosRDC.fiscalNome || dadosRDC.fiscal || '---';
+
+            // Data de geração
+            document.getElementById('dataGeracao').textContent = `Gerado em: ${new Date().toLocaleString('pt-BR')}`;
+
+            // Clima
+            if (dadosRDC.dados?.clima) {
+                document.getElementById('climaCondicao').textContent = dadosRDC.dados.clima.condicao || '-';
+                document.getElementById('climaPluviometro').textContent = (dadosRDC.dados.clima.pluviometro || 0) + ' mm';
+            }
+
+            // Atividades
+            if (dadosRDC.dados?.atividades?.descricao) {
+                document.getElementById('descAtividades').textContent = dadosRDC.dados.atividades.descricao;
+            }
+
+            // Comentários
+            if (dadosRDC.dados?.atividades?.comentarios) {
+                document.getElementById('comentarios').textContent = dadosRDC.dados.atividades.comentarios;
+            }
+
+            // Equipamentos
+            const tbody = document.getElementById('tabelaEquipamentos');
+            if (dadosRDC.dados?.equipamentos) {
+                let html = '';
+                Object.entries(dadosRDC.dados.equipamentos).forEach(([id, eq]) => {
+                    html += `
+                        <tr>
+                            <td>${eq.nome || id}</td>
+                            <td style="text-align: center;">${eq.previsto || '-'}</td>
+                            <td style="text-align: center;">${eq.real !== undefined ? eq.real : '-'}</td>
+                            <td style="text-align: center;">${eq.manutencao || 0}</td>
+                            <td>${eq.obs || '-'}</td>
+                        </tr>`;
+                });
+                tbody.innerHTML = html;
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--cinza-claro);">Nenhum equipamento registrado</td></tr>';
+            }
+        }
+
+        function mostrarErro(msg) {
+            document.getElementById('loading').innerHTML = `
+                <div class="erro">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h2>Erro</h2>
+                    <p>${msg}</p>
+                    <button class="btn" onclick="fechar()" style="margin-top: 20px;">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>
+            `;
+        }
+
+        function gerarPDF() {
+            const elemento = document.getElementById('relatorio');
+            const nomeArquivo = `RDC_${dadosRDC.numero || '000'}_${dadosObra.nome.replace(/\s+/g, '_')}_${dadosRDC.data.replace(/\//g, '-')}.pdf`;
+            
+            const opcoes = {
+                margin: [10, 10, 10, 10],
+                filename: nomeArquivo,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait'
+                }
+            };
+
+            // Esconder botões temporariamente
+            const acoes = document.getElementById('acoes');
+            acoes.style.display = 'none';
+
+            html2pdf().set(opcoes).from(elemento).save().then(() => {
+                // Mostrar botões novamente
+                acoes.style.display = 'flex';
+            }).catch((error) => {
+                console.error(error);
+                alert('Erro ao gerar PDF. Tente usar a função Imprimir.');
+                acoes.style.display = 'flex';
+            });
+        }
+
+        function fechar() {
+            window.close();
+            // Se não conseguir fechar (alguns navegadores bloqueiam), volta para o admin
+            setTimeout(() => {
+                window.location.href = 'admin.html';
+            }, 100);
+        }
+    </script>
+</body>
+</html>
