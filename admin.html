@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geotecnia-1.7</title>
+    <title>VER 1.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.0.0/dist/handsontable.full.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.0.0/dist/handsontable.full.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -24,591 +22,112 @@
             --fundo: #f5f7fa;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--fundo);
-            color: var(--cinza-texto);
-            line-height: 1.6;
-        }
-
-        .header {
-            background: var(--azul-vale);
-            color: white;
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            font-style: italic;
-        }
-
-        .btn-sair {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-sair:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--cinza-mais-claro);
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 1rem 1.5rem;
-            cursor: pointer;
-            font-size: 0.95rem;
-            color: var(--cinza-medio);
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .tab-btn.active {
-            color: var(--azul-vale);
-            border-bottom-color: var(--azul-vale);
-            font-weight: 600;
-        }
-
-        .tab-btn:hover {
-            color: var(--azul-vale);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .card-title {
-            color: var(--azul-vale);
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            font-style: italic;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            font-style: italic;
-            color: var(--cinza-texto);
-        }
-
-        .form-input, .form-select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--cinza-mais-claro);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--azul-vale);
-        }
-
-        .btn {
-            background: var(--azul-vale);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn:hover {
-            background: var(--azul-escuro);
-            transform: translateY(-1px);
-        }
-
-        .btn-success {
-            background: var(--verde-vale);
-        }
-
-        .btn-success:hover {
-            background: #006b66;
-        }
-
-        .btn-danger {
-            background: var(--vermelho);
-        }
-
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-
-        .btn-warning {
-            background: var(--laranja);
-        }
-
-        .btn-secondary {
-            background: var(--cinza-mais-claro);
-            color: var(--cinza-texto);
-        }
-
-        .btn-secondary:hover {
-            background: var(--cinza-claro);
-        }
-
-        .obra-item {
-            background: white;
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-
-        .obra-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .obra-info h3 {
-            font-size: 1.1rem;
-            color: var(--cinza-texto);
-            margin-bottom: 0.3rem;
-        }
-
-        .obra-info p {
-            font-size: 0.85rem;
-            color: var(--cinza-medio);
-        }
-
-        .obra-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            transition: all 0.3s;
-        }
-
-        .btn-icon:hover {
-            transform: scale(1.1);
-        }
-
-        .fiscal-item {
-            background: white;
-            border-radius: 12px;
-            padding: 1rem 1.2rem;
-            margin-bottom: 0.8rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .fiscal-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .fiscal-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--azul-vale);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .fiscal-status {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 0.2rem;
-        }
-
-        .fiscal-status.ativo {
-            background: #e8f5e9;
-            color: var(--verde-vale);
-        }
-
-        .fiscal-status.inativo {
-            background: #ffebee;
-            color: var(--vermelho);
-        }
-
-        .equip-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .equip-info {
-            background: var(--fundo);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .equip-info p {
-            margin: 0.3rem 0;
-            font-size: 0.9rem;
-            color: var(--cinza-medio);
-        }
-
-        .equip-info strong {
-            color: var(--cinza-texto);
-        }
-
-        .hot-table-container {
-            margin: 1rem 0;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .handsontable {
-            font-size: 14px !important;
-        }
-
-        .handsontable .htCore th {
-            background-color: var(--azul-vale) !important;
-            color: white !important;
-            font-weight: 600 !important;
-        }
-
-        .handsontable .htCore td {
-            padding: 8px !important;
-        }
-
-        .dica-box {
-            background: #e3f2fd;
-            border-left: 4px solid var(--azul-vale);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: var(--cinza-texto);
-        }
-
-        .dica-box i {
-            color: var(--azul-vale);
-            margin-right: 0.5rem;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th, td {
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid var(--cinza-mais-claro);
-        }
-
-        th {
-            background: var(--fundo);
-            font-weight: 600;
-            color: var(--cinza-texto);
-        }
-
-        tr:hover {
-            background: rgba(60, 181, 229, 0.05);
-        }
-
-        .status-badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--fundo); color: var(--cinza-texto); line-height: 1.6; }
+        
+        .header { background: var(--azul-vale); color: white; padding: 1rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.3rem; font-weight: 600; font-style: italic; }
+        .btn-sair { background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; transition: all 0.3s; }
+        .btn-sair:hover { background: rgba(255,255,255,0.3); }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 1rem; }
+        
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 2px solid var(--cinza-mais-claro); overflow-x: auto; }
+        .tab-btn { background: none; border: none; padding: 1rem 1.5rem; cursor: pointer; font-size: 0.95rem; color: var(--cinza-medio); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.3s; white-space: nowrap; }
+        .tab-btn.active { color: var(--azul-vale); border-bottom-color: var(--azul-vale); font-weight: 600; }
+        .tab-btn:hover { color: var(--azul-vale); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card-title { color: var(--azul-vale); font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; font-style: italic; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; font-style: italic; color: var(--cinza-texto); }
+        .form-input, .form-select { width: 100%; padding: 0.8rem; border: 2px solid var(--cinza-mais-claro); border-radius: 8px; font-size: 1rem; transition: all 0.3s; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--azul-vale); }
+        
+        .btn { background: var(--azul-vale); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn:hover { background: var(--azul-escuro); transform: translateY(-1px); }
+        .btn-success { background: var(--verde-vale); }
+        .btn-success:hover { background: #006b66; }
+        .btn-danger { background: var(--vermelho); }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-warning { background: var(--laranja); }
+        .btn-secondary { background: var(--cinza-mais-claro); color: var(--cinza-texto); }
+        .btn-secondary:hover { background: var(--cinza-claro); }
+        
+        .obra-item { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; cursor: pointer; }
+        .obra-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .obra-info h3 { font-size: 1.1rem; color: var(--cinza-texto); margin-bottom: 0.3rem; }
+        .obra-info p { font-size: 0.85rem; color: var(--cinza-medio); }
+        .obra-actions { display: flex; gap: 0.5rem; }
+        .btn-icon { width: 40px; height: 40px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s; }
+        .btn-icon:hover { transform: scale(1.1); }
+        
+        .fiscal-item { background: white; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .fiscal-info { display: flex; align-items: center; gap: 1rem; }
+        .fiscal-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--azul-vale); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 600; }
+        .fiscal-status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-top: 0.2rem; }
+        .fiscal-status.ativo { background: #e8f5e9; color: var(--verde-vale); }
+        .fiscal-status.inativo { background: #ffebee; color: var(--vermelho); }
+        
+        .equip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+        .equip-info { background: var(--fundo); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+        .equip-info p { margin: 0.3rem 0; font-size: 0.9rem; color: var(--cinza-medio); }
+        .equip-info strong { color: var(--cinza-texto); }
+        
+        .dica-box { background: #e3f2fd; border-left: 4px solid var(--azul-vale); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; color: var(--cinza-texto); }
+        .dica-box i { color: var(--azul-vale); margin-right: 0.5rem; }
+        
+        #dropZone { border: 2px dashed var(--cinza-claro); border-radius: 12px; padding: 2rem; text-align: center; background: white; transition: all 0.3s; }
+        #dropZone.dragover { border-color: var(--azul-vale); background: #e3f2fd; }
+        
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--cinza-mais-claro); }
+        th { background: var(--fundo); font-weight: 600; color: var(--cinza-texto); }
+        tr:hover { background: rgba(60, 181, 229, 0.05); }
+        
+        .rdc-item { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .rdc-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .rdc-info h3 { font-size: 1.1rem; color: var(--cinza-texto); margin-bottom: 0.3rem; }
+        .rdc-info p { font-size: 0.85rem; color: var(--cinza-medio); }
+        
+        .status-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
         .status-enviado { background: #e8f5e9; color: var(--verde-vale); }
         .status-rascunho { background: #fff3e0; color: var(--laranja); }
         .status-pendente { background: #ffebee; color: var(--vermelho); }
-
-        .export-card {
-            background: linear-gradient(135deg, var(--verde-vale) 0%, #006b66 100%);
-            color: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .export-card h3 {
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .export-card .form-select {
-            background: white;
-            color: var(--cinza-texto);
-        }
-
-        .rdc-item {
-            background: white;
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-
-        .rdc-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .rdc-info h3 {
-            font-size: 1.1rem;
-            color: var(--cinza-texto);
-            margin-bottom: 0.3rem;
-        }
-
-        .rdc-info p {
-            font-size: 0.85rem;
-            color: var(--cinza-medio);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--cinza-mais-claro);
-            border-top-color: var(--azul-vale);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: var(--cinza-medio);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--cinza-claro);
-        }
-
-        .toast {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: var(--cinza-texto);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .toast.show {
-            opacity: 1;
-        }
-
-        .toast.success {
-            background: var(--verde-vale);
-        }
-
-        .toast.error {
-            background: var(--vermelho);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-title {
-            color: var(--azul-vale);
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            font-style: italic;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .modal-footer .btn {
-            flex: 1;
-            justify-content: center;
-        }
-
-        .preview-excel {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            font-family: monospace;
-            font-size: 0.85rem;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .preview-excel table {
-            width: 100%;
-            font-size: 0.8rem;
-        }
-
-        .preview-excel th {
-            background: var(--azul-vale);
-            color: white;
-            padding: 0.5rem;
-        }
-
-        .preview-excel td {
-            padding: 0.5rem;
-            border-bottom: 1px solid var(--cinza-mais-claro);
-        }
+        
+        .export-card { background: linear-gradient(135deg, var(--verde-vale) 0%, #006b66 100%); color: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+        .export-card h3 { margin-bottom: 1rem; font-style: italic; }
+        .export-card .form-select { background: white; color: var(--cinza-texto); }
+        
+        .loading { text-align: center; padding: 3rem; }
+        .spinner { width: 40px; height: 40px; border: 4px solid var(--cinza-mais-claro); border-top-color: var(--azul-vale); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .empty-state { text-align: center; padding: 3rem; color: var(--cinza-medio); }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; color: var(--cinza-claro); }
+        
+        .toast { position: fixed; top: 80px; right: 20px; background: var(--cinza-texto); color: white; padding: 1rem 1.5rem; border-radius: 8px; opacity: 0; transition: all 0.3s; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .toast.show { opacity: 1; }
+        .toast.success { background: var(--verde-vale); }
+        .toast.error { background: var(--vermelho); }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 16px; padding: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-title { color: var(--azul-vale); font-size: 1.3rem; font-weight: 600; margin-bottom: 1.5rem; font-style: italic; }
+        .modal-footer { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .modal-footer .btn { flex: 1; justify-content: center; }
     </style>
 </head>
 <body>
@@ -616,24 +135,16 @@
     <header class="header">
         <div class="header-content">
             <h1><i class="fas fa-cog"></i> Painel Administrativo</h1>
-            <button class="btn-sair" onclick="sair()">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </button>
+            <button class="btn-sair" onclick="sair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
         </div>
     </header>
 
     <div class="container">
         
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('obras', this)">
-                <i class="fas fa-building"></i> Obras e Equipamentos
-            </button>
-            <button class="tab-btn" onclick="switchTab('fiscais', this)">
-                <i class="fas fa-users"></i> Fiscais
-            </button>
-            <button class="tab-btn" onclick="switchTab('rdcs', this)">
-                <i class="fas fa-clipboard-list"></i> RDCs
-            </button>
+            <button class="tab-btn active" onclick="switchTab('obras', this)"><i class="fas fa-building"></i> Obras e Equipamentos</button>
+            <button class="tab-btn" onclick="switchTab('fiscais', this)"><i class="fas fa-users"></i> Fiscais</button>
+            <button class="tab-btn" onclick="switchTab('rdcs', this)"><i class="fas fa-clipboard-list"></i> RDCs</button>
         </div>
 
         <!-- ABA OBRAS E EQUIPAMENTOS -->
@@ -655,136 +166,75 @@
                         <input type="text" class="form-input" id="novaObraLocal" placeholder="Ex: Carajás - PA">
                     </div>
                 </div>
-                <button class="btn btn-success" onclick="criarObra()">
-                    <i class="fas fa-save"></i> Criar Obra
-                </button>
+                <button class="btn btn-success" onclick="criarObra()"><i class="fas fa-save"></i> Criar Obra</button>
             </div>
 
             <div id="obrasList">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Carregando obras...</p>
+                <div class="loading"><div class="spinner"></div><p>Carregando obras...</p></div>
+            </div>
+
+            <div id="equipamentosEditor" style="display: none;">
+                <div class="card">
+                    <div class="equip-header">
+                        <div>
+                            <h3 class="card-title"><i class="fas fa-file-excel"></i> Importar Equipamentos</h3>
+                        </div>
+                    </div>
+
+                    <div class="equip-info">
+                        <p><strong>Obra:</strong> <span id="equipObraNome">-</span></p>
+                    </div>
+
+                    <div class="dica-box">
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Como importar:</strong> Baixe o modelo, preencha com os meses no formato <strong>Jan/2026, Fev/2026...</strong> e faça o upload. O sistema salvará todos os meses automaticamente.
+                    </div>
+
+                    <div style="background: var(--fundo); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--cinza-texto);"><i class="fas fa-download" style="color: var(--azul-vale);"></i> Passo 1: Baixar modelo</h4>
+                        <button class="btn btn-secondary" onclick="baixarModelo()"><i class="fas fa-file-excel"></i> Baixar modelo Excel</button>
+                    </div>
+
+                    <div style="background: var(--fundo); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--cinza-texto);"><i class="fas fa-upload" style="color: var(--verde-vale);"></i> Passo 2: Enviar arquivo preenchido</h4>
+                        
+                        <div id="dropZone">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--azul-vale); margin-bottom: 1rem;"></i>
+                            <p style="margin-bottom: 1rem; color: var(--cinza-medio);">Arraste o arquivo Excel aqui ou clique para selecionar</p>
+                            <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="processarArquivo(this.files[0])">
+                            <button class="btn" onclick="document.getElementById('fileInput').click()"><i class="fas fa-folder-open"></i> Selecionar arquivo</button>
+                        </div>
+                    </div>
+
+                    <div id="previewContainer" style="display: none;">
+                        <h4 style="margin-bottom: 1rem;"><i class="fas fa-eye" style="color: var(--azul-vale);"></i> Passo 3: Revisar e salvar</h4>
+                        
+                        <div class="table-container" style="background: white; border-radius: 8px; max-height: 400px; overflow-y: auto;">
+                            <table id="previewTabela">
+                                <thead id="previewThead"></thead>
+                                <tbody id="previewTbody"></tbody>
+                            </table>
+                        </div>
+
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            <button class="btn btn-success" onclick="salvarEquipamentosExcel()"><i class="fas fa-save"></i> Salvar no Firebase</button>
+                            <button class="btn btn-danger" onclick="limparUpload()"><i class="fas fa-trash"></i> Limpar</button>
+                        </div>
+                    </div>
+
+                    <div id="listaExistente" style="margin-top: 2rem; display: none;">
+                        <h4 class="card-title"><i class="fas fa-list"></i> Equipamentos Cadastrados</h4>
+                        <div class="table-container" style="background: white; border-radius: 8px; max-height: 400px; overflow-y: auto;">
+                            <table id="tabelaExistente">
+                                <thead><tr><th>Mês</th><th>Equipamento</th><th>Previsto</th><th>Ação</th></tr></thead>
+                                <tbody id="tbodyExistente"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-<div id="equipamentosEditor" style="display: none;">
-    <div class="card">
-
-        <div class="equip-header">
-            <h3 class="card-title">
-                <i class="fas fa-file-excel"></i> Importar Equipamentos
-            </h3>
         </div>
-
-        <div class="equip-info">
-            <p><strong>Obra:</strong> <span id="equipObraNome">-</span></p>
-
-            <p><strong>Mês:</strong>
-						<select id="mesEquipamento"
-					        class="form-select"
-					        style="width:200px"
-					        onchange="mesSelecionado=this.value; carregarEquipamentosExistentes();">
-						</select>
-
-            </p>
-        </div>
-
-        <div class="dica-box">
-            <i class="fas fa-lightbulb"></i>
-            Baixe o modelo, preencha no Excel e envie.
-        </div>
-
-        <!-- PASSO 1 -->
-        <div class="card" style="background:var(--fundo)">
-            <h4><i class="fas fa-download"></i> Baixar modelo</h4>
-
-            <button class="btn btn-secondary" onclick="baixarModelo()">
-                <i class="fas fa-file-excel"></i> Baixar Excel
-            </button>
-        </div>
-
-        <!-- PASSO 2 -->
-        <div class="card" style="background:var(--fundo)">
-
-            <h4><i class="fas fa-upload"></i> Enviar arquivo</h4>
-
-            <div id="dropZone"
-                 style="border:2px dashed var(--cinza-claro);
-                 padding:2rem;
-                 border-radius:12px;
-                 text-align:center">
-
-                <p>Arraste ou clique</p>
-
-                <input type="file"
-                       id="fileInput"
-                       accept=".xlsx,.xls"
-                       hidden
-                       onchange="processarArquivo(this.files[0])">
-
-                <button class="btn"
-                        onclick="document.getElementById('fileInput').click()">
-                    Selecionar
-                </button>
-            </div>
-        </div>
-
-        <!-- PASSO 3 -->
-        <div id="previewContainer" style="display:none">
-
-            <h4><i class="fas fa-eye"></i> Revisar</h4>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Previsto</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="previewTbody"></tbody>
-                </table>
-            </div>
-
-            <div style="margin-top:1rem;display:flex;gap:10px">
-
-                <button class="btn btn-success"
-                        onclick="salvarEquipamentosExcel()">
-                    Salvar
-                </button>
-
-                <button class="btn btn-danger"
-                        onclick="limparUpload()">
-                    Limpar
-                </button>
-
-            </div>
-        </div>
-
-        <!-- EXISTENTES -->
-        <div id="listaExistente"
-             style="display:none;margin-top:2rem">
-
-            <h4>Já cadastrados</h4>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Previsto</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-
-                <tbody id="tbodyExistente"></tbody>
-            </table>
-
-        </div>
-
-    </div>
-</div>
-
 
         <!-- ABA FISCAIS -->
         <div class="tab-content" id="tab-fiscais">
@@ -801,19 +251,12 @@
                         <input type="email" class="form-input" id="novoFiscalEmail" placeholder="Ex: joao@email.com">
                     </div>
                 </div>
-                <button class="btn btn-success" onclick="criarFiscal()">
-                    <i class="fas fa-save"></i> Cadastrar Fiscal
-                </button>
+                <button class="btn btn-success" onclick="criarFiscal()"><i class="fas fa-save"></i> Cadastrar Fiscal</button>
             </div>
 
             <div class="card">
                 <h3 class="card-title"><i class="fas fa-users"></i> Fiscais Cadastrados</h3>
-                <div id="fiscaisList">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>Carregando fiscais...</p>
-                    </div>
-                </div>
+                <div id="fiscaisList"><div class="loading"><div class="spinner"></div><p>Carregando fiscais...</p></div></div>
             </div>
 
         </div>
@@ -826,9 +269,7 @@
                 <div class="grid-2">
                     <div class="form-group">
                         <label class="form-label">Obra</label>
-                        <select class="form-select" id="filtroObraRDC" onchange="carregarRDCs()">
-                            <option value="">Selecione uma obra...</option>
-                        </select>
+                        <select class="form-select" id="filtroObraRDC" onchange="carregarRDCs()"><option value="">Selecione uma obra...</option></select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Período</label>
@@ -842,55 +283,35 @@
                 </div>
             </div>
 
-            <div id="rdcListContainer">
-                <div class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
-                    <p>Selecione uma obra para ver os RDCs</p>
-                </div>
-            </div>
+            <div id="rdcListContainer"><div class="empty-state"><i class="fas fa-clipboard-list"></i><p>Selecione uma obra para ver os RDCs</p></div></div>
 
         </div>
 
     </div>
 
-    <!-- Modal de Exportação -->
+    <!-- Modal Exportar -->
     <div class="modal" id="modalExportar">
         <div class="modal-content">
-            <h3 class="modal-title"><i class="fas fa-file-excel"></i> Exportar RDCs para Excel</h3>
-            
+            <h3 class="modal-title"><i class="fas fa-file-excel"></i> Exportar RDCs</h3>
             <div class="form-group">
-                <label class="form-label">Obra selecionada</label>
+                <label class="form-label">Obra</label>
                 <input type="text" class="form-input" id="exportObraNome" readonly>
             </div>
-
             <div class="form-group">
                 <label class="form-label">Período</label>
                 <input type="text" class="form-input" id="exportPeriodoNome" readonly>
             </div>
-
             <div class="form-group">
                 <label class="form-label">RDCs encontrados</label>
                 <input type="text" class="form-input" id="exportQuantidade" readonly>
             </div>
-
-            <div class="preview-excel" id="previewExcel">
-                <p>Pré-visualização das abas do Excel:</p>
-                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-                    <li><strong>Aba "Geral":</strong> Resumo de todos os RDCs</li>
-                    <li><strong>Aba "Equipamentos":</strong> Detalhamento por equipamento</li>
-                </ul>
-            </div>
-
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="fecharModalExportar()">Cancelar</button>
-                <button class="btn btn-success" onclick="confirmarExportacao()">
-                    <i class="fas fa-download"></i> Baixar Excel
-                </button>
+                <button class="btn btn-success" onclick="confirmarExportacao()"><i class="fas fa-download"></i> Baixar Excel</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <!-- Firebase -->
@@ -920,94 +341,92 @@
     </script>
 
     <script>
-        // VARIÁVEIS GLOBAIS
+        // ==================== VARIÁVEIS GLOBAIS ====================
         let obras = {};
         let fiscais = {};
-        let hot = null;
         let obraSelecionada = null;
-        let mesSelecionado = null;
-				let dadosExcel = [];
+        let dadosExcel = {};
         let rdcsParaExportar = [];
         let obraExportacao = null;
 
-        // INICIALIZAÇÃO
+        // ==================== INICIALIZAÇÃO ====================
         document.addEventListener('DOMContentLoaded', () => {
             carregarObras();
             carregarFiscais();
             
-         
+            // Drag and drop
+            const dropZone = document.getElementById('dropZone');
+            if (dropZone) {
+                dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+                dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                    if (e.dataTransfer.files.length > 0) processarArquivo(e.dataTransfer.files[0]);
+                });
+            }
         });
 
-        function sair() {
-            window.location.href = 'index.html';
-        }
-
+        function sair() { window.location.href = 'index.html'; }
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(`tab-${tab}`).classList.add('active');
         }
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        function formatarDataBR(dataStr) {
+            if (!dataStr) return '-';
+            if (dataStr.includes('/')) return dataStr;
+            const [ano, mes, dia] = dataStr.split('-');
+            return `${dia}/${mes}/${ano}`;
+        }
 
         // ==================== OBRAS ====================
-
         async function carregarObras() {
             try {
                 const snapshot = await window.dbGet(window.dbRef(window.db, 'obras'));
-                
                 if (snapshot.exists()) {
                     obras = snapshot.val();
                     renderObrasList();
                     preencherSelectsObras();
                 } else {
-                    document.getElementById('obrasList').innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-folder-open"></i>
-                            <p>Nenhuma obra cadastrada</p>
-                        </div>`;
+                    document.getElementById('obrasList').innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Nenhuma obra cadastrada</p></div>';
                 }
-            } catch (error) {
-                showToast('Erro ao carregar obras', 'error');
-            }
+            } catch (error) { showToast('Erro ao carregar obras', 'error'); }
         }
 
         function renderObrasList() {
             const container = document.getElementById('obrasList');
-            
             let html = '<div style="margin-bottom: 1rem; font-weight: 600; color: var(--cinza-medio);">Clique em uma obra para gerenciar equipamentos:</div>';
             
             Object.keys(obras).forEach(key => {
                 const obra = obras[key];
                 const dataInicio = obra.dataInicio ? formatarDataBR(obra.dataInicio) : 'Não definido';
-                
                 html += `
-                    <div class="obra-item" onclick="selecionarObra('${key}')" style="cursor: pointer;">
+                    <div class="obra-item" onclick="selecionarObra('${key}')">
                         <div class="obra-info">
                             <h3>${obra.nome}</h3>
-                            <p>
-                                <i class="fas fa-calendar-alt"></i> Início: ${dataInicio}
-                                ${obra.local ? `| <i class="fas fa-map-marker-alt"></i> ${obra.local}` : ''}
-                            </p>
+                            <p><i class="fas fa-calendar-alt"></i> Início: ${dataInicio} ${obra.local ? `| <i class="fas fa-map-marker-alt"></i> ${obra.local}` : ''}</p>
                         </div>
                         <div class="obra-actions" onclick="event.stopPropagation();">
-                            <button class="btn-icon btn-success" onclick="editarObra('${key}')" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon btn-danger" onclick="excluirObra('${key}')" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button class="btn-icon btn-success" onclick="editarObra('${key}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon btn-danger" onclick="excluirObra('${key}')" title="Excluir"><i class="fas fa-trash"></i></button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
-            
             container.innerHTML = html;
         }
 
         function preencherSelectsObras() {
             const selectRDC = document.getElementById('filtroObraRDC');
             selectRDC.innerHTML = '<option value="">Selecione uma obra...</option>';
-            
             Object.keys(obras).forEach(key => {
                 selectRDC.innerHTML += `<option value="${key}">${obras[key].nome}</option>`;
             });
@@ -1018,685 +437,333 @@
             const dataInicio = document.getElementById('novaObraData').value;
             const local = document.getElementById('novaObraLocal').value.trim();
 
-            if (!nome || !dataInicio) {
-                showToast('Preencha nome e data de início', 'error');
-                return;
-            }
+            if (!nome || !dataInicio) { showToast('Preencha nome e data de início', 'error'); return; }
 
             try {
                 const obraId = nome.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                
-                await window.dbSet(window.dbRef(window.db, `obras/${obraId}`), {
-                    nome,
-                    dataInicio,
-                    local,
-                    criadaEm: new Date().toISOString()
-                });
-
+                await window.dbSet(window.dbRef(window.db, `obras/${obraId}`), { nome, dataInicio, local, criadaEm: new Date().toISOString() });
                 showToast('Obra criada com sucesso!', 'success');
                 document.getElementById('novaObraNome').value = '';
                 document.getElementById('novaObraData').value = '';
                 document.getElementById('novaObraLocal').value = '';
-                
                 carregarObras();
-
-            } catch (error) {
-                showToast('Erro ao criar obra', 'error');
-            }
+            } catch (error) { showToast('Erro ao criar obra', 'error'); }
         }
 
+        function selecionarObra(obraId) {
+            obraSelecionada = obraId;
+            document.getElementById('equipamentosEditor').style.display = 'block';
+            document.getElementById('equipObraNome').textContent = obras[obraId].nome;
+            setTimeout(() => document.getElementById('equipamentosEditor').scrollIntoView({ behavior: 'smooth' }), 100);
+            carregarEquipamentosExistentes();
+        }
 
+        // ==================== EQUIPAMENTOS - UPLOAD EXCEL ====================
+        function baixarModelo() {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([
+                ['Nome do Equipamento', 'Jan/2026', 'Fev/2026', 'Mar/2026', 'Abr/2026', 'Mai/2026', 'Jun/2026', 'Jul/2026', 'Ago/2026', 'Set/2026', 'Out/2026', 'Nov/2026', 'Dez/2026'],
+                ['Escavadeira', 1, 2, 3, 3, 3, 3, 3, 2, 2, 2, 1, 0],
+                ['Caminhão 14m³', 5, 7, 12, 12, 12, 12, 10, 7, 5, 5, 3, 0],
+                ['Trator', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                ['Retroescavadeira', 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                ['Rolo Compactador', 0, 1, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0],
+                ['Motoniveladora', 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0]
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws, 'Equipamentos');
+            XLSX.writeFile(wb, 'modelo_equipamentos_anual.xlsx');
+        }
 
-     
-     // ==================== EQUIPAMENTOS ====================
-
-function selecionarObra(obraId) {
-
-    obraSelecionada = obraId;
-
-    document.getElementById('equipamentosEditor').style.display = 'block';
-
-    document.getElementById('equipObraNome').textContent =
-        obras[obraId].nome;
-
-    preencherMeses();
-
-    carregarEquipamentosExistentes();
-
-    setTimeout(() => {
-        document.getElementById('equipamentosEditor')
-            .scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-}
-
-
-// Preenche meses (único lugar)
-function preencherMeses() {
-
-    const select = document.getElementById('mesEquipamento');
-
-    select.innerHTML = '';
-
-    const hoje = new Date();
-
-    for (let i = -3; i < 12; i++) {
-
-        const d = new Date(
-            hoje.getFullYear(),
-            hoje.getMonth() + i,
-            1
-        );
-
-        const valor =
-            `${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
-
-        const texto =
-            d.toLocaleDateString('pt-BR',
-            { month: 'long', year: 'numeric' });
-
-        select.innerHTML +=
-            `<option value="${valor}"
-            ${i===0?'selected':''}>
-            ${texto}</option>`;
-    }
-
-    mesSelecionado = select.value;
-}
-
-
-// Baixar modelo
-function baixarModelo() {
-
-    const wb = XLSX.utils.book_new();
-
-    const hoje = new Date();
-    const meses = [];
-
-    const mesesTxt = [
-        'jan','fev','mar','abr','mai','jun',
-        'jul','ago','set','out','nov','dez'
-    ];
-
-    // Gerar 12 meses a partir de agora
-    for(let i=0;i<12;i++){
-
-        const d = new Date(hoje.getFullYear(), hoje.getMonth()+i, 1);
-
-        const mes = mesesTxt[d.getMonth()];
-        const ano = String(d.getFullYear()).slice(2);
-
-        meses.push(`${mes}/${ano}`);
-    }
-
-    const header = ['Equipamento', ...meses];
-
-    const exemplo = [
-        'Escavadeira',
-        ...Array(meses.length).fill(0)
-    ];
-
-    const ws = XLSX.utils.aoa_to_sheet([
-        header,
-        exemplo
-    ]);
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Histograma');
-
-    XLSX.writeFile(wb, 'modelo_histograma.xlsx');
-}
-
-
-// Ler Excel (Histograma completo)
-function processarArquivo(file) {
-
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = e => {
-
-        try {
-
-            const data = new Uint8Array(e.target.result);
-
-            const wb = XLSX.read(data, { type: 'array' });
-
-            const ws = wb.Sheets[wb.SheetNames[0]];
-
-            const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
-
-            dadosExcel = [];
-
-            if (json.length < 2) {
-                showToast('Planilha inválida', 'error');
-                return;
-            }
-
-            // Mapa meses PT-BR
-            const mesesMap = {
-                jan: '01',
-                fev: '02',
-                mar: '03',
-                abr: '04',
-                mai: '05',
-                jun: '06',
-                jul: '07',
-                ago: '08',
-                set: '09',
-                out: '10',
-                nov: '11',
-                dez: '12'
-            };
-
-            // Cabeçalho
-            const header = json[0];
-
-            // Detectar colunas de meses
-            const colunasMeses = [];
-
-            header.forEach((col, i) => {
-
-                if (!col) return;
-
-                const valor = col.toString().toLowerCase().trim();
-
-                const match = valor.match(/^([a-z]{3})\/(\d{2})$/);
-
-                if (match) {
-
-                    const mes = mesesMap[match[1]];
-                    const ano = '20' + match[2];
-
-                    if (mes) {
-
-                        colunasMeses.push({
-                            index: i,
-                            chave: `${mes}-${ano}`
+        function processarArquivo(file) {
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const primeiraAba = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(primeiraAba, { header: 1 });
+                    
+                    if (json.length < 2) { showToast('Arquivo vazio ou formato inválido', 'error'); return; }
+                    
+                    const cabecalho = json[0];
+                    const colunasMeses = cabecalho.slice(1).filter(m => m);
+                    
+                    dadosExcel = {};
+                    for (let i = 1; i < json.length; i++) {
+                        const linha = json[i];
+                        if (!linha[0]) continue;
+                        
+                        const nomeEquip = String(linha[0]).trim();
+                        const equipId = nomeEquip.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                        
+                        colunasMeses.forEach((mesColuna, idx) => {
+                            if (!mesColuna) return;
+                            const mesKey = converterMesParaKey(String(mesColuna));
+                            if (!mesKey) return;
+                            
+                            if (!dadosExcel[mesKey]) dadosExcel[mesKey] = {};
+                            dadosExcel[mesKey][equipId] = { nome: nomeEquip, previsto: parseInt(linha[idx + 1]) || 0 };
                         });
+                    }
+                    
+                    const totalMeses = Object.keys(dadosExcel).length;
+                    if (totalMeses === 0) { showToast('Nenhum mês válido encontrado', 'error'); return; }
+                    
+                    mostrarPreview(colunasMeses, json.slice(1));
+                    showToast(`${json.length - 1} equipamentos em ${totalMeses} meses carregados`, 'success');
+                    
+                } catch (error) { showToast('Erro ao ler arquivo', 'error'); }
+            };
+            reader.readAsArrayBuffer(file);
+        }
 
+        function converterMesParaKey(mesStr) {
+            const mesesMap = { 'jan': '01', 'janeiro': '01', 'fev': '02', 'fevereiro': '02', 'mar': '03', 'março': '03', 'marco': '03', 'abr': '04', 'abril': '04', 'mai': '05', 'maio': '05', 'jun': '06', 'junho': '06', 'jul': '07', 'julho': '07', 'ago': '08', 'agosto': '08', 'set': '09', 'setembro': '09', 'out': '10', 'outubro': '10', 'nov': '11', 'novembro': '11', 'dez': '12', 'dezembro': '12' };
+            
+            const formatoNumerico = mesStr.match(/^(\d{2})\/(\d{4})$/);
+            if (formatoNumerico) return `${formatoNumerico[1]}-${formatoNumerico[2]}`;
+            
+            const partes = mesStr.toLowerCase().split(/[\/\s]+/);
+            const mesEncontrado = partes.find(p => mesesMap[p.replace(/[^a-z]/g, '')]);
+            const anoEncontrado = partes.find(p => /^\d{4}$/.test(p));
+            
+            if (mesEncontrado && anoEncontrado) {
+                return `${mesesMap[mesEncontrado.replace(/[^a-z]/g, '')]}-${anoEncontrado}`;
+            }
+            return null;
+        }
+
+        function mostrarPreview(colunasMeses, linhas) {
+            const thead = document.getElementById('previewThead');
+            const tbody = document.getElementById('previewTbody');
+            
+            let htmlHead = '<tr><th>Equipamento</th>';
+            colunasMeses.forEach(mes => { if (mes) htmlHead += `<th style="text-align:center">${mes}</th>`; });
+            htmlHead += '</tr>';
+            thead.innerHTML = htmlHead;
+            
+            let htmlBody = '';
+            linhas.slice(0, 10).forEach(linha => {
+                if (!linha[0]) return;
+                htmlBody += `<tr><td>${linha[0]}</td>`;
+                for (let i = 1; i <= colunasMeses.length; i++) {
+                    htmlBody += `<td style="text-align:center">${linha[i] !== undefined ? linha[i] : '-'}</td>`;
+                }
+                htmlBody += '</tr>';
+            });
+            if (linhas.length > 10) htmlBody += `<tr><td colspan="${colunasMeses.length + 1}" style="text-align:center;color:var(--cinza-medio)">... e mais ${linhas.length - 10} equipamentos</td></tr>`;
+            tbody.innerHTML = htmlBody;
+            
+            document.getElementById('previewContainer').style.display = 'block';
+        }
+
+        async function salvarEquipamentosExcel() {
+            if (!obraSelecionada || Object.keys(dadosExcel).length === 0) { showToast('Nenhum dado para salvar', 'error'); return; }
+
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+            btn.disabled = true;
+
+            try {
+                let salvos = 0;
+                for (const mesKey of Object.keys(dadosExcel)) {
+                    const equipamentos = {};
+                    Object.entries(dadosExcel[mesKey]).forEach(([id, eq]) => {
+                        if (eq.previsto > 0) equipamentos[id] = eq;
+                    });
+                    
+                    if (Object.keys(equipamentos).length > 0) {
+                        await window.dbSet(window.dbRef(window.db, `obras/${obraSelecionada}/contrato/${mesKey}`), equipamentos);
+                        salvos++;
                     }
                 }
-            });
 
-            if (colunasMeses.length === 0) {
-
-                showToast('Nenhum mês válido encontrado no Excel', 'error');
-                return;
-            }
-
-            // Ler equipamentos
-            for (let i = 1; i < json.length; i++) {
-
-                const linha = json[i];
-
-                const nome = linha[0];
-
-                if (!nome) continue;
-
-                const meses = {};
-
-                colunasMeses.forEach(col => {
-
-                    const valor = linha[col.index];
-
-                    meses[col.chave] = parseInt(valor) || 0;
-
-                });
-
-                dadosExcel.push({
-                    nome: String(nome).trim(),
-                    meses
-                });
-            }
-
-            if (dadosExcel.length === 0) {
-
-                showToast('Nenhum equipamento encontrado', 'error');
-                return;
-            }
-
-            mostrarPreview();
-
-            showToast(
-                `${dadosExcel.length} equipamentos carregados`,
-                'success'
-            );
-
-        } catch (err) {
-
-            console.error(err);
-
-            showToast('Erro ao ler Excel', 'error');
+                showToast(`${salvos} meses salvos com sucesso!`, 'success');
+                limparUpload();
+                carregarEquipamentosExistentes();
+            } catch (error) { showToast('Erro ao salvar', 'error'); }
+            finally { btn.innerHTML = originalHTML; btn.disabled = false; }
         }
-    };
 
-    reader.readAsArrayBuffer(file);
-}
+        function limparUpload() {
+            dadosExcel = {};
+            document.getElementById('fileInput').value = '';
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('previewThead').innerHTML = '';
+            document.getElementById('previewTbody').innerHTML = '';
+        }
 
-
-
-
-// Mostrar preview
-function mostrarPreview(){
-
-    const tbody =
-        document.getElementById('previewTbody');
-
-    tbody.innerHTML = dadosExcel.map(e=>`
-        <tr>
-            <td>${e.nome}</td>
-            <td>${e.previsto}</td>
-        </tr>
-    `).join('');
-
-    document.getElementById('previewContainer')
-        .style.display='block';
-}
-
-
-// Salvar Firebase (Histograma completo)
-async function salvarEquipamentosExcel(){
-
-    if(!obraSelecionada || dadosExcel.length===0){
-
-        showToast('Selecione a obra e envie o arquivo','error');
-        return;
-    }
-
-    try {
-
-        const updates = {};
-
-        dadosExcel.forEach(e=>{
-
-            const id =
-                e.nome.toLowerCase()
-                .replace(/\s+/g,'-')
-                .replace(/[^a-z0-9-]/g,'');
-
-            // Para cada mês do equipamento
-            Object.entries(e.meses).forEach(([mes, valor])=>{
-
-                if(!updates[mes]){
-                    updates[mes] = {};
+        async function carregarEquipamentosExistentes() {
+            if (!obraSelecionada) return;
+            
+            try {
+                const snapshot = await window.dbGet(window.dbRef(window.db, `obras/${obraSelecionada}/contrato`));
+                const container = document.getElementById('listaExistente');
+                const tbody = document.getElementById('tbodyExistente');
+                
+                if (snapshot.exists()) {
+                    const contratos = snapshot.val();
+                    let html = '';
+                    let total = 0;
+                    
+                    Object.keys(contratos).sort().forEach(mesKey => {
+                        const [mes, ano] = mesKey.split('-');
+                        const data = new Date(ano, mes - 1);
+                        const mesNome = data.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+                        
+                        Object.entries(contratos[mesKey]).forEach(([id, eq]) => {
+                            total++;
+                            html += `<tr><td>${mesNome}</td><td>${eq.nome}</td><td style="text-align:center">${eq.previsto}</td><td style="text-align:center"><button class="btn-icon btn-danger" style="width:30px;height:30px" onclick="excluirEquipamentoMes('${mesKey}','${id}')" title="Excluir"><i class="fas fa-trash" style="font-size:0.8rem"></i></button></td></tr>`;
+                        });
+                    });
+                    
+                    tbody.innerHTML = html;
+                    container.querySelector('h4').innerHTML = `<i class="fas fa-list"></i> ${total} equipamentos cadastrados`;
+                    container.style.display = 'block';
+                } else {
+                    container.style.display = 'none';
                 }
-
-                updates[mes][id] = {
-                    nome: e.nome,
-                    previsto: valor
-                };
-
-            });
-
-        });
-
-        // Salvar todos os meses
-        const promises = [];
-
-        Object.entries(updates).forEach(([mes, dados])=>{
-
-            promises.push(
-
-                window.dbSet(
-                    window.dbRef(
-                        window.db,
-                        `obras/${obraSelecionada}/contrato/${mes}`
-                    ),
-                    dados
-                )
-
-            );
-
-        });
-
-        await Promise.all(promises);
-
-        showToast('Planejamento salvo com sucesso','success');
-
-        limparUpload();
-
-        carregarEquipamentosExistentes();
-
-    } catch(err){
-
-        console.error(err);
-
-        showToast('Erro ao salvar','error');
-    }
-}
-
-
-
-// Limpar
-function limparUpload(){
-
-    dadosExcel=[];
-
-    document.getElementById('fileInput').value='';
-
-    document.getElementById('previewContainer')
-        .style.display='none';
-
-    document.getElementById('previewTbody').innerHTML='';
-}
-
-
-// Carregar existentes
-async function carregarEquipamentosExistentes(){
-
-    if(!obraSelecionada || !mesSelecionado) return;
-
-    try {
-
-        const snap = await window.dbGet(
-            window.dbRef(window.db,
-            `obras/${obraSelecionada}/contrato/${mesSelecionado}`)
-        );
-
-        const cont =
-            document.getElementById('listaExistente');
-
-        const tbody =
-            document.getElementById('tbodyExistente');
-
-        if(!snap.exists()){
-
-            cont.style.display='none';
-
-            return;
+            } catch (error) { console.error(error); }
         }
 
-        const lista = Object.entries(snap.val());
-
-        tbody.innerHTML = lista.map(([id,e])=>`
-            <tr>
-                <td>${e.nome}</td>
-                <td>${e.previsto}</td>
-                <td>
-                    <button class="btn-icon btn-danger"
-                    onclick="excluirEquipamento('${id}')">
-                    <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-
-        cont.style.display='block';
-
-    } catch(err){
-
-        console.error(err);
-    }
-}
-
-
-// Excluir
-async function excluirEquipamento(id){
-
-    if(!confirm('Deseja excluir?')) return;
-
-    try {
-
-        await window.dbRemove(
-            window.dbRef(window.db,
-            `obras/${obraSelecionada}/contrato/${mesSelecionado}/${id}`)
-        );
-
-        showToast('Equipamento excluído','success');
-
-        carregarEquipamentosExistentes();
-
-    } catch(err){
-
-        console.error(err);
-
-        showToast('Erro ao excluir','error');
-    }
-}
-
-
-// Drag and drop
-document.addEventListener('DOMContentLoaded',()=>{
-
-    const dz = document.getElementById('dropZone');
-
-    if(!dz) return;
-
-    dz.addEventListener('dragover',e=>{
-        e.preventDefault();
-        dz.style.borderColor='var(--azul-vale)';
-        dz.style.background='#e3f2fd';
-    });
-
-    dz.addEventListener('dragleave',e=>{
-        e.preventDefault();
-        dz.style.borderColor='var(--cinza-claro)';
-        dz.style.background='white';
-    });
-
-    dz.addEventListener('drop',e=>{
-        e.preventDefault();
-
-        dz.style.borderColor='var(--cinza-claro)';
-        dz.style.background='white';
-
-        if(e.dataTransfer.files.length){
-
-            processarArquivo(e.dataTransfer.files[0]);
+        async function excluirEquipamentoMes(mesKey, equipId) {
+            if (!confirm('Deseja excluir?')) return;
+            try {
+                await window.dbRemove(window.dbRef(window.db, `obras/${obraSelecionada}/contrato/${mesKey}/${equipId}`));
+                showToast('Excluído', 'success');
+                carregarEquipamentosExistentes();
+            } catch (error) { showToast('Erro', 'error'); }
         }
-    });
-
-});
-
-
 
         // ==================== FISCAIS ====================
-
         async function carregarFiscais() {
             try {
                 const snapshot = await window.dbGet(window.dbRef(window.db, 'fiscais'));
-                
                 if (snapshot.exists()) {
                     fiscais = snapshot.val();
                     renderFiscaisList();
                 } else {
-                    document.getElementById('fiscaisList').innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-users-slash"></i>
-                            <p>Nenhum fiscal cadastrado</p>
-                        </div>`;
+                    document.getElementById('fiscaisList').innerHTML = '<div class="empty-state"><i class="fas fa-users-slash"></i><p>Nenhum fiscal cadastrado</p></div>';
                 }
-            } catch (error) {
-                showToast('Erro ao carregar fiscais', 'error');
-            }
+            } catch (error) { showToast('Erro ao carregar fiscais', 'error'); }
         }
 
         function renderFiscaisList() {
             const container = document.getElementById('fiscaisList');
-            
             let html = '';
             Object.keys(fiscais).forEach(key => {
                 const fiscal = fiscais[key];
                 const iniciais = fiscal.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                
                 html += `
                     <div class="fiscal-item">
                         <div class="fiscal-info">
                             <div class="fiscal-avatar">${iniciais}</div>
                             <div>
-                                <div style="font-weight: 600;">${fiscal.nome}</div>
-                                <div style="font-size: 0.85rem; color: var(--cinza-medio);">
-                                    ${fiscal.email || 'Sem e-mail'}
-                                </div>
-                                <span class="fiscal-status ${fiscal.ativo !== false ? 'ativo' : 'inativo'}">
-                                    ${fiscal.ativo !== false ? 'Ativo' : 'Inativo'}
-                                </span>
+                                <div style="font-weight:600">${fiscal.nome}</div>
+                                <div style="font-size:0.85rem;color:var(--cinza-medio)">${fiscal.email || 'Sem e-mail'}</div>
+                                <span class="fiscal-status ${fiscal.ativo !== false ? 'ativo' : 'inativo'}">${fiscal.ativo !== false ? 'Ativo' : 'Inativo'}</span>
                             </div>
                         </div>
                         <div class="obra-actions">
-                            <button class="btn-icon btn-warning" onclick="toggleFiscal('${key}')" title="${fiscal.ativo !== false ? 'Desativar' : 'Ativar'}">
-                                <i class="fas ${fiscal.ativo !== false ? 'fa-pause' : 'fa-play'}"></i>
-                            </button>
-                            <button class="btn-icon btn-danger" onclick="excluirFiscal('${key}')" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button class="btn-icon btn-warning" onclick="toggleFiscal('${key}')" title="${fiscal.ativo !== false ? 'Desativar' : 'Ativar'}"><i class="fas ${fiscal.ativo !== false ? 'fa-pause' : 'fa-play'}"></i></button>
+                            <button class="btn-icon btn-danger" onclick="excluirFiscal('${key}')" title="Excluir"><i class="fas fa-trash"></i></button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
-            
             container.innerHTML = html;
         }
 
         async function criarFiscal() {
             const nome = document.getElementById('novoFiscalNome').value.trim();
             const email = document.getElementById('novoFiscalEmail').value.trim();
-
-            if (!nome) {
-                showToast('Digite o nome do fiscal', 'error');
-                return;
-            }
+            if (!nome) { showToast('Digite o nome', 'error'); return; }
 
             try {
                 const fiscalId = nome.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                
-                await window.dbSet(window.dbRef(window.db, `fiscais/${fiscalId}`), {
-                    nome,
-                    email,
-                    ativo: true,
-                    criadoEm: new Date().toISOString()
-                });
-
-                showToast('Fiscal cadastrado com sucesso!', 'success');
+                await window.dbSet(window.dbRef(window.db, `fiscais/${fiscalId}`), { nome, email, ativo: true, criadoEm: new Date().toISOString() });
+                showToast('Fiscal cadastrado!', 'success');
                 document.getElementById('novoFiscalNome').value = '';
                 document.getElementById('novoFiscalEmail').value = '';
-                
                 carregarFiscais();
-
-            } catch (error) {
-                showToast('Erro ao cadastrar fiscal', 'error');
-            }
+            } catch (error) { showToast('Erro ao cadastrar', 'error'); }
         }
 
         async function toggleFiscal(fiscalId) {
-            const fiscal = fiscais[fiscalId];
-            const novoStatus = fiscal.ativo === false ? true : false;
-            
+            const novoStatus = fiscais[fiscalId].ativo === false ? true : false;
             try {
-                await window.dbSet(
-                    window.dbRef(window.db, `fiscais/${fiscalId}/ativo`),
-                    novoStatus
-                );
+                await window.dbSet(window.dbRef(window.db, `fiscais/${fiscalId}/ativo`), novoStatus);
                 showToast(`Fiscal ${novoStatus ? 'ativado' : 'desativado'}`, 'success');
                 carregarFiscais();
-            } catch (error) {
-                showToast('Erro ao alterar status', 'error');
-            }
+            } catch (error) { showToast('Erro', 'error'); }
         }
 
         function excluirFiscal(fiscalId) {
-            if (confirm(`Deseja realmente excluir ${fiscais[fiscalId].nome}?`)) {
-                window.dbRemove(window.dbRef(window.db, `fiscais/${fiscalId}`))
-                    .then(() => {
-                        showToast('Fiscal excluído', 'success');
-                        carregarFiscais();
-                    })
-                    .catch(() => showToast('Erro ao excluir', 'error'));
-            }
+            if (!confirm('Deseja excluir?')) return;
+            window.dbRemove(window.dbRef(window.db, `fiscais/${fiscalId}`)).then(() => { showToast('Excluído', 'success'); carregarFiscais(); }).catch(() => showToast('Erro', 'error'));
         }
 
-        // ==================== RDCs E EXPORTAÇÃO ====================
-
+        // ==================== RDCs ====================
         async function carregarRDCs() {
             const obraId = document.getElementById('filtroObraRDC').value;
             const periodo = document.getElementById('filtroPeriodoRDC').value;
             
             if (!obraId) {
-                document.getElementById('rdcListContainer').innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-list"></i>
-                        <p>Selecione uma obra para ver os RDCs</p>
-                    </div>`;
+                document.getElementById('rdcListContainer').innerHTML = '<div class="empty-state"><i class="fas fa-clipboard-list"></i><p>Selecione uma obra</p></div>';
                 return;
             }
 
             const container = document.getElementById('rdcListContainer');
-            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Carregando RDCs...</p></div>';
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Carregando...</p></div>';
 
             try {
                 const snapshot = await window.dbGet(window.dbRef(window.db, `obras/${obraId}/relatorios`));
-                
                 if (!snapshot.exists()) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-clipboard-check"></i>
-                            <p>Nenhum RDC encontrado para esta obra</p>
-                        </div>`;
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-clipboard-check"></i><p>Nenhum RDC encontrado</p></div>';
                     return;
                 }
 
                 let rdcs = Object.entries(snapshot.val()).map(([id, r]) => ({ id, ...r }));
-                
-                // Filtrar por período
                 const hoje = new Date();
+                
                 rdcs = rdcs.filter(r => {
                     const dataRDC = new Date(r.dataKey || r.data);
                     switch(periodo) {
-                        case 'mes-atual':
-                            return dataRDC.getMonth() === hoje.getMonth() && dataRDC.getFullYear() === hoje.getFullYear();
-                        case 'ultimos-30':
-                            return dataRDC >= new Date(hoje.getTime() - (30 * 24 * 60 * 60 * 1000));
-                        case 'ultimos-7':
-                            return dataRDC >= new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
-                        default:
-                            return true;
+                        case 'mes-atual': return dataRDC.getMonth() === hoje.getMonth() && dataRDC.getFullYear() === hoje.getFullYear();
+                        case 'ultimos-30': return dataRDC >= new Date(hoje.getTime() - (30 * 24 * 60 * 60 * 1000));
+                        case 'ultimos-7': return dataRDC >= new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
+                        default: return true;
                     }
-                });
-
-                // Ordenar por data (mais recente primeiro)
-                rdcs.sort((a, b) => new Date(b.dataKey || b.data) - new Date(a.dataKey || a.data));
+                }).sort((a, b) => new Date(b.dataKey || b.data) - new Date(a.dataKey || a.data));
 
                 renderRDCList(rdcs, obraId, periodo);
-
-            } catch (error) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar RDCs</p></div>';
-            }
+            } catch (error) { container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar</p></div>'; }
         }
 
         function renderRDCList(rdcs, obraId, periodo) {
             const container = document.getElementById('rdcListContainer');
-            
             if (rdcs.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum RDC no período selecionado</p></div>';
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum RDC no período</p></div>';
                 return;
             }
 
-            // Salvar para exportação
             rdcsParaExportar = rdcs;
             obraExportacao = obraId;
-
-            const periodoNomes = {
-                'todos': 'Todos os RDCs',
-                'mes-atual': 'Mês atual',
-                'ultimos-30': 'Últimos 30 dias',
-                'ultimos-7': 'Últimos 7 dias'
-            };
+            const periodoNomes = { 'todos': 'Todos', 'mes-atual': 'Mês atual', 'ultimos-30': 'Últimos 30 dias', 'ultimos-7': 'Últimos 7 dias' };
 
             let html = `
                 <div class="card" style="background: linear-gradient(135deg, var(--azul-vale) 0%, var(--azul-escuro) 100%); color: white;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                         <div>
                             <h3 style="font-style: italic; margin-bottom: 0.5rem;"><i class="fas fa-chart-bar"></i> Resumo</h3>
-                            <p>${rdcs.length} RDC(s) encontrado(s) | Período: ${periodoNomes[periodo]}</p>
+                            <p>${rdcs.length} RDC(s) | Período: ${periodoNomes[periodo]}</p>
                         </div>
-                        <button class="btn" onclick="abrirModalExportar()" style="background: white; color: var(--azul-vale);">
-                            <i class="fas fa-file-excel"></i> Exportar Excel
-                        </button>
+                        <button class="btn" onclick="abrirModalExportar()" style="background: white; color: var(--azul-vale);"><i class="fas fa-file-excel"></i> Exportar Excel</button>
                     </div>
                 </div>
-
-                <div style="margin-bottom: 1rem; font-weight: 600; color: var(--cinza-medio);">Lista de RDCs:</div>
-            `;
+                <div style="margin-bottom: 1rem; font-weight: 600; color: var(--cinza-medio);">Lista de RDCs:</div>`;
 
             rdcs.forEach(rdc => {
                 const qtdEquip = rdc.dados?.equipamentos ? Object.keys(rdc.dados.equipamentos).length : 0;
@@ -1706,28 +773,14 @@ document.addEventListener('DOMContentLoaded',()=>{
                     <div class="rdc-item">
                         <div class="rdc-info">
                             <h3><i class="fas fa-file-alt" style="color: var(--azul-vale); margin-right: 0.5rem;"></i>RDC ${rdc.numero || '---'}</h3>
-                            <p>
-                                <i class="fas fa-calendar"></i> ${dataFormatada} | 
-                                <i class="fas fa-user"></i> ${rdc.fiscalNome || rdc.fiscal} | 
-                                <i class="fas fa-tools"></i> ${qtdEquip} equipamento(s)
-                            </p>
-                            ${rdc.dados?.clima?.condicao ? `
-                                <p style="margin-top: 0.3rem;">
-                                    <i class="fas fa-cloud-sun"></i> ${rdc.dados.clima.condicao} | 
-                                    <i class="fas fa-tint"></i> ${rdc.dados.clima.pluviometro || 0}mm
-                                </p>
-                            ` : ''}
+                            <p><i class="fas fa-calendar"></i> ${dataFormatada} | <i class="fas fa-user"></i> ${rdc.fiscalNome || rdc.fiscal} | <i class="fas fa-tools"></i> ${qtdEquip} equip(s)</p>
+                            ${rdc.dados?.clima?.condicao ? `<p style="margin-top: 0.3rem;"><i class="fas fa-cloud-sun"></i> ${rdc.dados.clima.condicao} | <i class="fas fa-tint"></i> ${rdc.dados.clima.pluviometro || 0}mm</p>` : ''}
                         </div>
                         <div class="obra-actions">
-                            <span class="status-badge status-${rdc.status || 'enviado'}" style="margin-right: 0.5rem;">
-                                ${rdc.status || 'enviado'}
-                            </span>
-                            <button class="btn-icon btn-success" onclick="verDetalhesRDC('${rdc.id}')" title="Ver detalhes">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                            <span class="status-badge status-${rdc.status || 'enviado'}" style="margin-right: 0.5rem;">${rdc.status || 'enviado'}</span>
+                            <button class="btn-icon btn-success" onclick="verDetalhesRDC('${rdc.id}')" title="Ver"><i class="fas fa-eye"></i></button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
 
             container.innerHTML = html;
@@ -1736,23 +789,15 @@ document.addEventListener('DOMContentLoaded',()=>{
         function abrirModalExportar() {
             const obra = obras[obraExportacao];
             const periodo = document.getElementById('filtroPeriodoRDC').value;
-            const periodoNomes = {
-                'todos': 'Todos os RDCs',
-                'mes-atual': 'Mês atual',
-                'ultimos-30': 'Últimos 30 dias',
-                'ultimos-7': 'Últimos 7 dias'
-            };
+            const periodoNomes = { 'todos': 'Todos os RDCs', 'mes-atual': 'Mês atual', 'ultimos-30': 'Últimos 30 dias', 'ultimos-7': 'Últimos 7 dias' };
 
             document.getElementById('exportObraNome').value = obra.nome;
             document.getElementById('exportPeriodoNome').value = periodoNomes[periodo];
             document.getElementById('exportQuantidade').value = `${rdcsParaExportar.length} RDC(s)`;
-            
             document.getElementById('modalExportar').classList.add('active');
         }
 
-        function fecharModalExportar() {
-            document.getElementById('modalExportar').classList.remove('active');
-        }
+        function fecharModalExportar() { document.getElementById('modalExportar').classList.remove('active'); }
 
         async function confirmarExportacao() {
             const btn = event.target;
@@ -1763,7 +808,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             try {
                 const wb = XLSX.utils.book_new();
                 
-                // ===== ABA 1: GERAL (Resumo dos RDCs) =====
+                // ABA GERAL
                 const geralData = rdcsParaExportar.map(rdc => ({
                     'RDC': rdc.numero || '-',
                     'Data': formatarDataBR(rdc.dataKey || rdc.data),
@@ -1771,59 +816,44 @@ document.addEventListener('DOMContentLoaded',()=>{
                     'Status': rdc.status || 'enviado',
                     'Condição Climática': rdc.dados?.clima?.condicao || '-',
                     'Pluviômetro (mm)': rdc.dados?.clima?.pluviometro || 0,
-                    'Qtd Equipamentos Apontados': rdc.dados?.equipamentos ? Object.keys(rdc.dados.equipamentos).length : 0,
-                    'Descrição Atividades': rdc.dados?.atividades?.descricao || '-',
+                    'Qtd Equipamentos': rdc.dados?.equipamentos ? Object.keys(rdc.dados.equipamentos).length : 0,
+                    'Atividades': rdc.dados?.atividades?.descricao || '-',
                     'Comentários': rdc.dados?.atividades?.comentarios || '-'
                 }));
                 
                 const wsGeral = XLSX.utils.json_to_sheet(geralData);
-                
-                // Ajustar larguras das colunas
-                wsGeral['!cols'] = [
-                    {wch: 10}, {wch: 12}, {wch: 20}, {wch: 12}, 
-                    {wch: 18}, {wch: 15}, {wch: 22}, {wch: 40}, {wch: 40}
-                ];
-                
+                wsGeral['!cols'] = [{wch:10}, {wch:12}, {wch:20}, {wch:12}, {wch:18}, {wch:15}, {wch:18}, {wch:40}, {wch:40}];
                 XLSX.utils.book_append_sheet(wb, wsGeral, "Geral");
 
-                // ===== ABA 2: EQUIPAMENTOS (Detalhamento) =====
-                const equipamentosData = [];
-                
+                // ABA EQUIPAMENTOS
+                const equipData = [];
                 rdcsParaExportar.forEach(rdc => {
                     if (rdc.dados?.equipamentos) {
-                        Object.entries(rdc.dados.equipamentos).forEach(([equipId, eq]) => {
-                            equipamentosData.push({
+                        Object.entries(rdc.dados.equipamentos).forEach(([id, eq]) => {
+                            equipData.push({
                                 'RDC': rdc.numero || '-',
                                 'Data': formatarDataBR(rdc.dataKey || rdc.data),
                                 'Fiscal': rdc.fiscalNome || rdc.fiscal,
-                                'Equipamento': eq.nome || equipId,
-                                'Quantidade Prevista': eq.previsto || '-',
-                                'Quantidade Real': eq.real !== undefined ? eq.real : '-',
-                                'Em Manutenção': eq.manutencao || 0,
+                                'Equipamento': eq.nome || id,
+                                'Previsto': eq.previsto || '-',
+                                'Real': eq.real !== undefined ? eq.real : '-',
+                                'Manutenção': eq.manutencao || 0,
                                 'Observações': eq.obs || '-'
                             });
                         });
                     }
                 });
                 
-                if (equipamentosData.length > 0) {
-                    const wsEquip = XLSX.utils.json_to_sheet(equipamentosData);
-                    wsEquip['!cols'] = [
-                        {wch: 10}, {wch: 12}, {wch: 20}, {wch: 25}, 
-                        {wch: 18}, {wch: 15}, {wch: 15}, {wch: 30}
-                    ];
+                if (equipData.length > 0) {
+                    const wsEquip = XLSX.utils.json_to_sheet(equipData);
+                    wsEquip['!cols'] = [{wch:10}, {wch:12}, {wch:20}, {wch:25}, {wch:12}, {wch:10}, {wch:12}, {wch:30}];
                     XLSX.utils.book_append_sheet(wb, wsEquip, "Equipamentos");
                 }
 
-                // Download
-                const nomeArquivo = `RDCs_${obras[obraExportacao].nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
-                XLSX.writeFile(wb, nomeArquivo);
-
+                XLSX.writeFile(wb, `RDCs_${obras[obraExportacao].nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
                 showToast('Excel gerado com sucesso!', 'success');
                 fecharModalExportar();
-
             } catch (error) {
-                console.error(error);
                 showToast('Erro ao gerar Excel', 'error');
             } finally {
                 btn.innerHTML = originalHTML;
@@ -1834,64 +864,24 @@ document.addEventListener('DOMContentLoaded',()=>{
         function verDetalhesRDC(rdcId) {
             const rdc = rdcsParaExportar.find(r => r.id === rdcId);
             if (!rdc) return;
-
-            let detalhes = `RDC ${rdc.numero || '-'}\n`;
-            detalhes += `Data: ${formatarDataBR(rdc.dataKey || rdc.data)}\n`;
-            detalhes += `Fiscal: ${rdc.fiscalNome || rdc.fiscal}\n\n`;
-            
-            if (rdc.dados?.clima) {
-                detalhes += `CLIMA:\n`;
-                detalhes += `Condição: ${rdc.dados.clima.condicao || '-'}\n`;
-                detalhes += `Pluviômetro: ${rdc.dados.clima.pluviometro || 0}mm\n\n`;
-            }
-            
+            let detalhes = `RDC ${rdc.numero || '-'}\nData: ${formatarDataBR(rdc.dataKey || rdc.data)}\nFiscal: ${rdc.fiscalNome || rdc.fiscal}\n\n`;
+            if (rdc.dados?.clima) detalhes += `CLIMA:\nCondição: ${rdc.dados.clima.condicao || '-'}\nPluviômetro: ${rdc.dados.clima.pluviometro || 0}mm\n\n`;
             if (rdc.dados?.equipamentos) {
                 detalhes += `EQUIPAMENTOS:\n`;
                 Object.entries(rdc.dados.equipamentos).forEach(([id, eq]) => {
                     detalhes += `- ${eq.nome || id}: Real ${eq.real || '-'}, Manut ${eq.manutencao || 0}\n`;
                 });
             }
-
             alert(detalhes);
         }
 
-        // ==================== UTILITÁRIOS ====================
-
-        function editarObra(id) {
-            showToast('Função em desenvolvimento', 'error');
-        }
-
+        function editarObra(id) { showToast('Função em desenvolvimento', 'error'); }
         function excluirObra(id) {
-            if (confirm(`Deseja realmente excluir ${obras[id].nome}?`)) {
-                window.dbRemove(window.dbRef(window.db, `obras/${id}`))
-                    .then(() => {
-                        showToast('Obra excluída', 'success');
-                        carregarObras();
-                        document.getElementById('equipamentosEditor').style.display = 'none';
-                    })
-                    .catch(() => showToast('Erro ao excluir', 'error'));
-            }
+            if (!confirm(`Excluir ${obras[id].nome}?`)) return;
+            window.dbRemove(window.dbRef(window.db, `obras/${id}`)).then(() => { showToast('Obra excluída', 'success'); carregarObras(); document.getElementById('equipamentosEditor').style.display = 'none'; }).catch(() => showToast('Erro', 'error'));
         }
 
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = `toast ${type}`;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function formatarDataBR(dataStr) {
-            if (!dataStr) return '-';
-            if (dataStr.includes('/')) return dataStr;
-            const [ano, mes, dia] = dataStr.split('-');
-            return `${dia}/${mes}/${ano}`;
-        }
-
-        // Fechar modal ao clicar fora
-        document.getElementById('modalExportar').addEventListener('click', (e) => {
-            if (e.target.id === 'modalExportar') fecharModalExportar();
-        });
+        document.getElementById('modalExportar').addEventListener('click', (e) => { if (e.target.id === 'modalExportar') fecharModalExportar(); });
     </script>
 </body>
 </html>
