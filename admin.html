@@ -1251,19 +1251,11 @@ function converterMesParaKey(mesStr) {
             }
         }
 
-        function verDetalhesRDC(rdcId) {
-            const rdc = rdcsParaExportar.find(r => r.id === rdcId);
-            if (!rdc) return;
-            let detalhes = `RDC ${rdc.numero || '-'}\nData: ${formatarDataBR(rdc.dataKey || rdc.data)}\nFiscal: ${rdc.fiscalNome || rdc.fiscal}\n\n`;
-            if (rdc.dados?.clima) detalhes += `CLIMA:\nCondição: ${rdc.dados.clima.condicao || '-'}\nPluviômetro: ${rdc.dados.clima.pluviometro || 0}mm\n\n`;
-            if (rdc.dados?.equipamentos) {
-                detalhes += `EQUIPAMENTOS:\n`;
-                Object.entries(rdc.dados.equipamentos).forEach(([id, eq]) => {
-                    detalhes += `- ${eq.nome || id}: Real ${eq.real || '-'}, Manut ${eq.manutencao || 0}\n`;
-                });
-            }
-            alert(detalhes);
-        }
+function verDetalhesRDC(rdcId) {
+    const obraId = obraExportacao;
+    // Abrir em nova aba
+    window.open(`ver-rdc.html?obra=${obraId}&rdc=${rdcId}`, '_blank');
+}
 
         function editarObra(id) { showToast('Função em desenvolvimento', 'error'); }
         function excluirObra(id) {
