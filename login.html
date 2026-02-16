@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>squad geotecnia</title>
     <style>
-        /* --- FONTE VALE (APENAS ITALIC) --- */
+        /* FONTE VALE - ITALIC APENAS */
         @font-face {
             font-family: 'ValeSans';
             src: url('./assets/fonts/ValeSans-Italic.woff2') format('woff2');
@@ -13,7 +13,6 @@
             font-style: italic !important;
         }
 
-        /* --- RESET GLOBAL (MINÚSCULAS E SEM NEGRITO) --- */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             font-family: 'ValeSans', sans-serif !important; 
@@ -38,7 +37,7 @@
             text-align: center;
         }
 
-        /* --- CABEÇALHO COM VÍDEO DISCRETO --- */
+        /* CABEÇALHO COM VÍDEO MASCARADO */
         header {
             position: relative;
             width: 100%;
@@ -48,6 +47,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            background: #001220;
         }
 
         .header-video {
@@ -57,80 +57,62 @@
             transform: translate(-50%, -50%);
             min-width: 100%;
             min-height: 100%;
-            z-index: -1;
-            opacity: 0.3; /* BEM DISCRETO */
+            width: auto;
+            height: auto;
+            z-index: 0;
+            opacity: 0.35;
             object-fit: cover;
-            /* Efeito HUD: vídeo some suavemente nas bordas */
-            mask-image: radial-gradient(circle, black 30%, transparent 80%);
-            -webkit-mask-image: radial-gradient(circle, black 30%, transparent 80%);
+            pointer-events: none; /* Ignora cliques no vídeo */
+            mask-image: radial-gradient(circle, black 30%, transparent 85%);
+            -webkit-mask-image: radial-gradient(circle, black 30%, transparent 85%);
+        }
+
+        .content-over-video {
+            position: relative;
+            z-index: 2; /* Garante que texto e logo fiquem acima do vídeo */
         }
 
         .icon-main { 
-            width: 130px; /* Logo aumentada conforme pedido */
+            width: 120px; 
             margin-bottom: 10px;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); 
         }
 
         .title { font-size: 1.5rem; color: #fff; margin-top: 5px; }
 
-        /* --- GLITCH (MINÚSCULO) --- */
         .glitch-wrapper { margin-top: 5px; }
         .glitch { font-size: 0.95rem; position: relative; color: rgba(255,255,255,0.7); }
-        .glitch::before, .glitch::after { 
-            content: attr(data-text); 
-            position: absolute; top: 0; left: 0; width: 100%; 
-            text-transform: lowercase !important;
-        }
+        .glitch::before, .glitch::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; text-transform: lowercase !important; }
         .glitch::before { left: 1px; text-shadow: -1px 0 #ff00c1; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 5s infinite linear alternate-reverse; }
         .glitch::after { left: -1px; text-shadow: -1px 0 #00fff9; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 3s infinite linear alternate-reverse; }
 
         @keyframes glitch-anim { 0%, 15% { clip: rect(10px, 999px, 40px, 0); } 16%, 100% { clip: rect(0,0,0,0); } }
         @keyframes glitch-anim2 { 0%, 70% { clip: rect(0,0,0,0); } 71%, 100% { clip: rect(40px, 999px, 90px, 0); } }
 
-        /* --- FORMULÁRIO --- */
-        .form-area { width: 100%; max-width: 300px; margin-top: -20px; }
-        
-        select { 
-            width: 100%; height: 50px; background: rgba(255, 255, 255, 0.08); 
-            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; 
-            color: white; padding: 0 15px; font-size: 16px; margin-bottom: 20px; 
-            outline: none; -webkit-appearance: none; 
-        }
-        
-        .btn-entrar { 
-            width: 100%; height: 50px; background: #0096d2; color: white; 
-            border: none; border-radius: 10px; font-size: 1.1rem; 
-            box-shadow: 0 4px 15px rgba(0, 150, 210, 0.3);
-        }
+        /* FORMULÁRIO */
+        .form-area { width: 100%; max-width: 300px; margin-top: -20px; z-index: 10; }
+        select { width: 100%; height: 50px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: white; padding: 0 15px; font-size: 16px; margin-bottom: 20px; outline: none; -webkit-appearance: none; }
+        .btn-entrar { width: 100%; height: 50px; background: #0096d2; color: white; border: none; border-radius: 10px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0, 150, 210, 0.3); }
 
-        /* --- RODAPÉ (LOGOS MAIORES E JUNTAS) --- */
-        .footer-logos { 
-            display: flex; 
-            gap: 15px; /* Logos bem juntas no centro */
-            align-items: center; 
-            padding: 30px 0;
-            width: 100%; 
-            justify-content: center;
-        }
-        .footer-logos img { 
-            height: 48px; /* Logos maiores */
-            width: auto; 
-            opacity: 0.9;
-        }
+        /* RODAPÉ */
+        .footer-logos { display: flex; gap: 20px; align-items: center; padding: 30px 0; width: 100%; justify-content: center; }
+        .footer-logos img { height: 48px; width: auto; opacity: 1; }
     </style>
 </head>
 <body>
 
     <main class="main-container">
         <header>
-            <video class="header-video" autoplay muted loop playsinline>
+            <video class="header-video" autoplay muted loop playsinline preload="auto">
                 <source src="./assets/video/background.mp4" type="video/mp4">
             </video>
             
-            <img src="./assets/imagens/squad-logo.png" class="icon-main">
-            <h1 class="title">squad geotecnia</h1>
-            <div class="glitch-wrapper">
-                <div class="glitch" id="glitch-text" data-text="geotechnical works">geotechnical works</div>
+            <div class="content-over-video">
+                <img src="./assets/imagens/squad-logo.png" class="icon-main">
+                <h1 class="title">squad geotecnia</h1>
+                <div class="glitch-wrapper">
+                    <div class="glitch" id="glitch-text" data-text="geotechnical works">geotechnical works</div>
+                </div>
             </div>
         </header>
 
@@ -151,7 +133,6 @@
         const phrases = ["geotechnical works", "geotecnia digital", "squad vale"];
         let count = 0;
         const textElement = document.getElementById("glitch-text");
-        
         setInterval(() => {
             count = (count + 1) % phrases.length;
             const nextText = phrases[count].toLowerCase();
