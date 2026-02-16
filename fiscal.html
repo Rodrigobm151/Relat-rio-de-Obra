@@ -3,214 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>------</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>XXX</title>
+    
+    <!-- Font ValeSans local com fallback -->
     <style>
         @font-face {
-            font-family: 'ValeSans-Italic';
+            font-family: 'ValeSans';
             src: url('assets/fonts/ValeSans-Italic.woff2') format('woff2');
-            font-weight: normal;
+            font-weight: 700;
             font-style: italic;
+            font-display: swap;
         }
-
+    </style>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
         :root {
             --azul-vale: #3CB5E5;
             --azul-escuro: #0096d2;
-            --cinza-texto: #555555;
-            --cinza-claro: #f5f7fa;
             --verde-vale: #007E79;
+            --cinza-texto: #555555;
+            --fundo: #f5f7fa;
             --laranja: #ff9800;
-            --vermelho: #e74c3c;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; color: var(--cinza-texto); }
-        
-        h1, h2, h3, .titulo-vale { 
-            font-family: 'ValeSans-Italic', sans-serif; 
-            font-style: italic;
-            color: white;
-        }
+        body { background-color: var(--fundo); -webkit-font-smoothing: antialiased; padding-bottom: 80px; }
 
-        body { background-color: var(--cinza-claro); }
-
-        /* Header */
+        /* Headers Estilizados com ValeSans */
         .header-vale { 
             background: linear-gradient(135deg, var(--azul-vale), var(--azul-escuro)); 
+            color: white; 
             padding: 20px; 
             border-bottom-left-radius: 20px; 
             border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
             position: relative;
         }
-        .btn-voltar-topo {
+        
+        .header-vale h1 { 
+            font-size: 1.3rem; 
+            font-family: 'ValeSans', 'Inter', sans-serif;
+            font-style: italic; 
+            font-weight: 700; 
+            color: white;
+        }
+        
+        .header-vale p { 
+            font-size: 0.85rem; 
+            opacity: 0.9; 
+            color: white;
+        }
+
+        .btn-voltar {
             position: absolute;
             top: 20px;
             right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
             color: white;
-            font-size: 1.2rem;
-            text-decoration: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
         }
+        
+        .btn-voltar:hover { background: rgba(255,255,255,0.3); }
 
-        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
 
-        /* Cards de Listagem */
-        .card-rdc {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 10px;
+        /* Botão Estilo PowerPoint - Reduzido */
+        .btn-criar-pp {
+            background: linear-gradient(to bottom, #4fc3f7, #0199d9);
+            color: white;
+            border: none;
+            padding: 8px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-style: italic;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 0 #0077a8, 0 6px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        
+        .btn-criar-pp:active { transform: translateY(3px); box-shadow: 0 1px 0 #0077a8; }
+
+        /* Cards */
+        .card-obra { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 12px; 
+            border-left: 6px solid var(--azul-vale);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .status-tag {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-        .status-pendente { background: #fee2e2; color: var(--vermelho); }
-        .status-enviado { background: #dcfce7; color: var(--verde-vale); }
-
-        .btn-criar-sm {
-            background: linear-gradient(to bottom, #4fc3f7, #0199d9);
-            color: white !important;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.8rem;
             cursor: pointer;
-            box-shadow: 0 2px 0 #0077a8;
         }
 
-        /* Tabs */
-        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
+        .status-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Tabs Principais */
+        .tabs-principais { 
+            display: flex; 
+            gap: 5px; 
+            margin-bottom: 15px; 
             background: #e0e0e0;
+            padding: 5px;
+            border-radius: 10px;
+        }
+        
+        .tab-principal { 
+            flex: 1; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            background: transparent; 
+            color: var(--cinza-texto); 
+            font-weight: 600; 
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            font-weight: 600;
+            transition: all 0.3s;
         }
-        .tab-btn.active { background: var(--azul-vale); color: white; }
-        .tab-btn.active i { color: white; }
+        
+        .tab-principal.active { 
+            background: var(--azul-vale); 
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .tab-principal i { font-size: 1.1rem; }
 
-        /* Formulario */
+        /* Conteúdo das Abas */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+
+        /* Accordion de Equipamentos */
+        .equip-card { margin-bottom: 10px; border-radius: 8px; overflow: hidden; }
         
-        .form-group { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .label-form { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; color: var(--azul-vale); }
+        .equip-header { 
+            background: var(--azul-vale); 
+            color: white; 
+            padding: 12px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            font-weight: 600; 
+            cursor: pointer;
+        }
         
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #fdfdfd;
+        .equip-header span { color: white; }
+        
+        .equip-body { 
+            background: white; 
+            padding: 15px; 
+            border: 1px solid var(--azul-vale); 
+            border-top: none; 
+            display: none;
+        }
+        
+        .equip-body.active { display: block; }
+
+        .grid-campos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        
+        .input-rdc { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            text-align: center; 
+            font-weight: bold;
+            color: var(--cinza-texto);
+        }
+        
+        .label-peq { 
+            font-size: 0.7rem; 
+            font-style: italic; 
+            display: block; 
+            margin-bottom: 4px; 
+            color: var(--cinza-texto);
         }
 
-        /* Equipamentos */
-        .equip-barra {
-            background: var(--azul-vale);
-            padding: 12px 15px;
-            border-radius: 8px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
+        textarea { 
+            width: 100%; 
+            height: 60px; 
+            background: #f0f0f0; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            padding: 8px; 
+            color: var(--cinza-texto);
+            font-family: 'Inter', sans-serif;
         }
-        .equip-barra span { color: white; font-weight: bold; }
 
-        .action-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
+        /* Campos da Aba Geral */
+        .campo-geral {
             background: white;
             padding: 15px;
-            display: flex;
-            gap: 10px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .campo-geral label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--cinza-texto);
+        }
+        
+        .campo-geral input,
+        .campo-geral select,
+        .campo-geral textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: var(--cinza-texto);
+        }
+        
+        .campo-geral textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        .action-bar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            padding: 15px; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+            display: flex; 
+            gap: 10px; 
+            z-index: 100; 
+        }
+        
+        .btn-acao { 
+            flex: 1; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: none; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-size: 0.9rem;
+        }
+        
+        .btn-cancelar { background: #eee; color: #666; }
+        .btn-confirmar { background: var(--verde-vale); color: white; }
+
+        .toast { 
+            position: fixed; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: rgba(0,0,0,0.8); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            z-index: 1000; 
+            display: none; 
+        }
+        
+        /* Status indicators */
+        .status-pendente { color: var(--laranja) !important; font-weight: 600; }
+        .status-enviado { color: var(--verde-vale) !important; font-weight: 600; }
+        
+        /* Data do relatório pendente */
+        .rdc-pendente-card {
+            border-left-color: var(--laranja) !important;
+            background: #fff8e1;
         }
     </style>
 </head>
 <body>
 
-    <section id="tela-obras">
-        <header class="header-vale">
-            <h1 class="titulo-vale">Minhas Obras</h1>
-            <p style="color:white">Gestão de Campo</p>
-        </header>
-        <div class="container" id="lista-obras-container"></div>
-    </section>
+    <div id="toast" class="toast"></div>
 
-    <section id="tela-dashboard" style="display:none">
+    <!-- PANEL: LISTA DE OBRAS -->
+    <div id="obrasPanel">
         <header class="header-vale">
-            <a class="btn-voltar-topo" onclick="voltarParaObras()"><i class="fas fa-times"></i></a>
-            <h1 class="titulo-vale" id="dash-nome-obra">Nome da Obra</h1>
-            <p id="dash-fiscal-nome" style="color:white">Fiscal</p>
+            <h1>Minhas Obras</h1>
+            <p id="userGreeting">Olá, Fiscal</p>
         </header>
-        <div class="container">
-            <h3 style="margin-bottom:15px; font-size: 0.9rem;">Relatórios do Período</h3>
-            <div id="historico-rdc-container"></div>
+        <div class="container" id="obrasList">
+            <p>Carregando obras...</p>
         </div>
-    </section>
+    </div>
 
-    <section id="tela-formulario" style="display:none">
+    <!-- PANEL: HISTÓRICO DE RDCs -->
+    <div id="rdcPanel" style="display: none;">
         <header class="header-vale">
-            <h1 class="titulo-vale" id="form-titulo">RDC 001</h1>
-            <p id="form-data-ref" style="color:white">16/02/2026</p>
+            <h1 id="headerObraNome">Nome da Obra</h1>
+            <p>Histórico de Relatórios</p>
+            <button class="btn-voltar" onclick="location.reload()" title="Voltar para Obras">
+                <i class="fas fa-arrow-left"></i>
+            </button>
         </header>
+        
+        <div class="container">
+            <div class="status-box" id="statusBoxHoje">
+                <p style="margin-bottom: 15px; font-style: italic;">
+                    Relatório de campo de hoje: <br>
+                    <strong id="dataHojeStr">16/02/2026</strong> – <span id="statusHoje" class="status-pendente">Pendente</span>
+                </p>
+                <button class="btn-criar-pp" id="btnCriarRDC" onclick="criarNovoRDC()">Criar</button>
+            </div>
+            
+            <p style="font-size: 0.8rem; font-style: italic; color: var(--azul-vale); margin-bottom: 10px;">
+                Lista dos relatórios anteriores
+            </p>
+            <div id="rdcList"></div>
+        </div>
+    </div>
 
-        <div class="container" style="padding-bottom: 100px;">
-            <div class="tabs-container">
-                <button class="tab-btn active" onclick="switchTab('geral', this)">
+    <!-- PANEL: FORMULÁRIO RDC -->
+    <div id="formPanel" style="display: none;">
+        <header class="header-vale">
+            <h1 id="formObraNome">Obra</h1>
+            <p id="formFiscalNome">Fiscal</p>
+            <button class="btn-voltar" onclick="voltarParaRDCs()" title="Voltar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </header>
+        
+        <div class="container">
+            <p style="font-size: 0.85rem; font-style: italic; margin-bottom: 15px; color: var(--azul-vale)">
+                RDC <span id="rdcNum">000</span>: <span id="rdcData">00/00/0000</span> – <span style="color: var(--laranja)">Em elaboração</span>
+            </p>
+
+            <!-- Abas Principais -->
+            <div class="tabs-principais">
+                <button class="tab-principal active" onclick="switchTab('geral')">
                     <i class="fas fa-cloud-sun"></i> Geral
                 </button>
-                <button class="tab-btn" onclick="switchTab('equipamentos', this)">
-                    <i class="fas fa-truck-pickup"></i> Equipamentos
+                <button class="tab-principal" onclick="switchTab('equipamentos')">
+                    <i class="fas fa-truck-monster"></i> Equipamentos
                 </button>
             </div>
 
+            <!-- ABA GERAL -->
             <div id="tab-geral" class="tab-content active">
-                <div class="form-group">
-                    <label class="label-form">Condição do Tempo</label>
-                    <select id="clima">
+                <div class="campo-geral">
+                    <label>Condição do Tempo</label>
+                    <select id="climaCondicao">
                         <option value="Bom">Bom / Ensolarado</option>
                         <option value="Nublado">Nublado</option>
                         <option value="Chuva Leve">Chuva Leve</option>
-                        <option value="Chuva Forte">Chuva Forte / Paralisado</option>
+                        <option value="Paralisado">Chuva Forte / Paralisado</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="label-form">Pluviômetro (mm)</label>
-                    <input type="number" id="pluviometro" placeholder="0">
+
+                <div class="campo-geral">
+                    <label>Pluviômetro (mm)</label>
+                    <input type="number" id="pluviometro" placeholder="0.0" step="0.1">
                 </div>
-                <div class="form-group">
-                    <label class="label-form">Descrição das Atividades</label>
-                    <textarea id="atividades" rows="4" placeholder="Descreva os serviços realizados..."></textarea>
+
+                <div class="campo-geral">
+                    <label>Descrição das Atividades</label>
+                    <textarea id="descAtividades" placeholder="Descreva as atividades realizadas hoje..."></textarea>
+                </div>
+
+                <div class="campo-geral">
+                    <label>Comentários / Ocorrências</label>
+                    <textarea id="comentarios" placeholder="Registre ocorrências, problemas ou observações importantes..."></textarea>
                 </div>
             </div>
 
+            <!-- ABA EQUIPAMENTOS -->
             <div id="tab-equipamentos" class="tab-content">
-                <div id="equipamentos-lista"></div>
+                <div id="equipamentosContainer">
+                    <p>Carregando equipamentos...</p>
+                </div>
             </div>
         </div>
 
         <div class="action-bar">
-            <button onclick="fecharForm()" style="flex:1; padding:12px; border:none; border-radius:8px">Cancelar</button>
-            <button onclick="salvarRDC()" style="flex:2; padding:12px; border:none; border-radius:8px; background:var(--verde-vale); color:white; font-weight:bold">
-                FINALIZAR E ENVIAR
-            </button>
+            <button class="btn-acao btn-cancelar" onclick="voltarParaRDCs()">CANCELAR</button>
+            <button class="btn-acao btn-confirmar" onclick="enviarRDC()">FINALIZAR E ENVIAR</button>
         </div>
-    </section>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
@@ -228,158 +422,282 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        window.db = db; window.dbRef = ref; window.dbGet = get; window.dbSet = set;
 
-        // --- LÓGICA DE NEGÓCIO ---
-        let obraAtiva = null;
-        let rdcDiaSelecionado = null;
-        let rdcNumeroGerado = "";
+        // Globais
+        window.db = db;
+        window.dbRef = ref;
+        window.dbGet = get;
+        window.dbSet = set;
+        window.dbPush = push;
 
+        // Inicializar
+        const currentFiscalNome = localStorage.getItem('currentFiscalNome') || 'Fiscal de Campo';
+        document.getElementById('userGreeting').textContent = `Olá, ${currentFiscalNome}`;
+        document.getElementById('dataHojeStr').textContent = new Date().toLocaleDateString('pt-BR');
+        
+        carregarObras();
+    </script>
+
+    <script>
+        let currentObraId = null;
+        let currentObraData = null;
+        let currentRDC = null;
+        let proximoRDCNumero = 1;
+
+        // --- NAVEGAÇÃO E OBRAS ---
         async function carregarObras() {
-            const snap = await get(ref(db, 'obras'));
-            const container = document.getElementById('lista-obras-container');
-            container.innerHTML = '';
-
-            snap.forEach(child => {
-                const obra = child.val();
-                const div = document.createElement('div');
-                div.className = 'card-rdc';
-                div.onclick = () => abrirDashboardObra(child.key, obra);
-                div.innerHTML = `<div><strong>${obra.nome}</strong><br><small>Início: ${obra.dataInicio || 'N/A'}</small></div>
-                                 <i class="fas fa-chevron-right" style="color:var(--azul-vale)"></i>`;
-                container.appendChild(div);
-            });
-        }
-
-        async function abrirDashboardObra(id, obra) {
-            obraAtiva = { id, ...obra };
-            document.getElementById('dash-nome-obra').innerText = obra.nome;
-            document.getElementById('tela-obras').style.display = 'none';
-            document.getElementById('tela-dashboard').style.display = 'block';
+            const list = document.getElementById('obrasList');
+            list.innerHTML = '<p>Carregando obras...</p>';
             
-            gerarListaPendencias(obra);
-        }
-
-        async function gerarListaPendencias(obra) {
-            const container = document.getElementById('historico-rdc-container');
-            container.innerHTML = 'Carregando dias...';
-
-            const dataInicio = new Date(obra.dataInicio + "T00:00:00");
-            const dataHoje = new Date();
-            dataHoje.setHours(0,0,0,0);
-
-            // Busca RDCs já enviados
-            const snapEnviados = await get(ref(db, `obras/${obraAtiva.id}/relatorios`));
-            const enviados = snapEnviados.exists() ? snapEnviados.val() : {};
-
-            let html = '';
-            let dataCursor = new Date(dataInicio);
-            let index = 1;
-
-            while (dataCursor <= dataHoje) {
-                const dataKey = dataCursor.toISOString().split('T')[0];
-                const rdcEnviado = Object.values(enviados).find(r => r.dataReferencia === dataKey);
-                const numRDC = String(index).padStart(3, '0');
-
-                html += `
-                    <div class="card-rdc">
-                        <div>
-                            <strong>RDC ${numRDC}</strong> - ${dataCursor.toLocaleDateString('pt-BR')}<br>
-                            ${rdcEnviado ? 
-                                `<span class="status-tag status-enviado">Enviado por ${rdcEnviado.fiscal}</span>` : 
-                                `<span class="status-tag status-pendente">Pendente</span>`}
-                        </div>
-                        ${rdcEnviado ? '' : `<button class="btn-criar-sm" onclick="abrirForm('${dataKey}', '${numRDC}')">CRIAR</button>`}
-                    </div>`;
-                
-                dataCursor.setDate(dataCursor.getDate() + 1);
-                index++;
+            try {
+                const snap = await window.dbGet(window.dbRef(window.db, 'obras'));
+                if (snap.exists()) {
+                    let html = '';
+                    snap.forEach(child => {
+                        const obra = child.val();
+                        html += `
+                            <div class="card-obra" onclick="abrirObra('${child.key}')">
+                                <div>
+                                    <strong style="color: var(--azul-escuro)">${obra.nome}</strong><br>
+                                    <small style="color: #777">Toque para gerenciar relatórios</small>
+                                </div>
+                                <i class="fas fa-chevron-right" style="color: var(--azul-vale)"></i>
+                            </div>`;
+                    });
+                    list.innerHTML = html;
+                } else {
+                    list.innerHTML = '<p style="color: #777">Nenhuma obra encontrada.</p>';
+                }
+            } catch (e) { 
+                console.error(e);
+                list.innerHTML = '<p style="color: #777">Erro ao carregar obras.</p>';
             }
-            container.innerHTML = html;
         }
 
-        window.abrirForm = async (dataKey, numRDC) => {
-            rdcDiaSelecionado = dataKey;
-            rdcNumeroGerado = numRDC;
-            document.getElementById('form-titulo').innerText = `RDC ${numRDC}`;
-            document.getElementById('form-data-ref').innerText = dataKey.split('-').reverse().join('/');
+        async function abrirObra(id) {
+            currentObraId = id;
             
-            // Carregar Equipamentos do Contrato
-            const mesKey = dataKey.substring(5, 7) + "-" + dataKey.substring(0, 4);
-            const snapEq = await get(ref(db, `obras/${obraAtiva.id}/contrato/${mesKey}`));
+            // Buscar dados completos da obra
+            const snap = await window.dbGet(window.dbRef(window.db, `obras/${id}`));
+            if (!snap.exists()) return;
             
-            const listEq = document.getElementById('equipamentos-lista');
-            listEq.innerHTML = '';
+            currentObraData = snap.val();
             
-            if(snapEq.exists()) {
-                snapEq.forEach(child => {
-                    const eq = child.val();
-                    listEq.innerHTML += `
-                        <div class="form-group">
-                            <div class="equip-barra"><span>${eq.nome}</span> <span>Previsto: ${eq.previsto}</span></div>
-                            <div style="display:flex; gap:10px; margin-top:10px">
-                                <div style="flex:1">
-                                    <label class="label-form">Real</label>
-                                    <input type="number" class="eq-real" data-id="${child.key}" data-nome="${eq.nome}" value="${eq.previsto}">
-                                </div>
-                                <div style="flex:1">
-                                    <label class="label-form">Manut.</label>
-                                    <input type="number" class="eq-manut" data-id="${child.key}" value="0">
-                                </div>
+            document.getElementById('headerObraNome').textContent = currentObraData.nome;
+            document.getElementById('formObraNome').textContent = currentObraData.nome;
+            document.getElementById('obrasPanel').style.display = 'none';
+            document.getElementById('rdcPanel').style.display = 'block';
+            
+            await carregarHistoricoRDCs();
+        }
+
+        async function carregarHistoricoRDCs() {
+            const container = document.getElementById('rdcList');
+            const statusEl = document.getElementById('statusHoje');
+            const btnCriar = document.getElementById('btnCriarRDC');
+            const statusBox = document.getElementById('statusBoxHoje');
+            
+            container.innerHTML = '<small style="color: #777">Buscando histórico...</small>';
+            
+            const hoje = new Date().toLocaleDateString('pt-BR');
+            let rdcHojeEnviado = false;
+            let ultimoNumero = 0;
+            
+            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/relatorios`));
+            let html = '';
+            
+            if (snap.exists()) {
+                const rdcList = [];
+                snap.forEach(child => {
+                    const rdc = child.val();
+                    rdcList.push(rdc);
+                    if (parseInt(rdc.numero) > ultimoNumero) {
+                        ultimoNumero = parseInt(rdc.numero);
+                    }
+                    if (rdc.data === hoje) {
+                        rdcHojeEnviado = true;
+                    }
+                });
+                
+                // Ordenar por número decrescente
+                rdcList.sort((a, b) => parseInt(b.numero) - parseInt(a.numero));
+                
+                rdcList.forEach(rdc => {
+                    const isHoje = rdc.data === hoje;
+                    html += `
+                        <div class="card-obra ${isHoje ? 'rdc-pendente-card' : ''}" style="border-left-color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}">
+                            <div style="font-size: 0.9rem">
+                                <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
+                                <small style="color: #777">Fiscal: ${rdc.fiscal}</small>
                             </div>
+                            <span style="font-size: 0.75rem; color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}; font-weight: bold;">
+                                ${isHoje ? 'HOJE' : 'ENVIADO'}
+                            </span>
                         </div>`;
                 });
             }
+            
+            // Determinar próximo número do RDC
+            // Se obra tem dataInicio, calcular quantos dias se passaram
+            if (currentObraData.dataInicio && !rdcHojeEnviado) {
+                const dataInicio = new Date(currentObraData.dataInicio.split('/').reverse().join('-'));
+                const hojeDate = new Date();
+                const diffTime = Math.abs(hojeDate - dataInicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                proximoRDCNumero = diffDays + 1; // RDC 001 = primeiro dia
+            } else if (ultimoNumero > 0) {
+                proximoRDCNumero = ultimoNumero + 1;
+            }
+            
+            // Atualizar status de hoje
+            if (rdcHojeEnviado) {
+                statusEl.textContent = 'Enviado';
+                statusEl.className = 'status-enviado';
+                btnCriar.style.display = 'none';
+                statusBox.style.background = '#e8f5e9';
+            } else {
+                statusEl.textContent = 'Pendente';
+                statusEl.className = 'status-pendente';
+                btnCriar.style.display = 'inline-block';
+                statusBox.style.background = 'white';
+            }
+            
+            container.innerHTML = html || '<p style="font-size: 0.8rem; color: #777">Nenhum relatório anterior.</p>';
+        }
 
-            document.getElementById('tela-dashboard').style.display = 'none';
-            document.getElementById('tela-formulario').style.display = 'block';
-        };
-
-        window.salvarRDC = async () => {
-            const rdc = {
-                numero: rdcNumeroGerado,
-                dataReferencia: rdcDiaSelecionado,
-                dataEnvio: new Date().toISOString(),
+        // --- LÓGICA DO FORMULÁRIO RDC ---
+        async function criarNovoRDC() {
+            const hoje = new Date();
+            const mesKey = (hoje.getMonth() + 1).toString().padStart(2, '0') + '-' + hoje.getFullYear();
+            
+            currentRDC = {
+                numero: proximoRDCNumero,
+                data: hoje.toLocaleDateString('pt-BR'),
+                mesRef: mesKey,
                 fiscal: localStorage.getItem('currentFiscalNome') || 'Fiscal',
-                clima: document.getElementById('clima').value,
-                pluviometro: document.getElementById('pluviometro').value,
-                atividades: document.getElementById('atividades').value,
-                equipamentos: {}
+                dados: { 
+                    geral: {},
+                    equipamentos: {} 
+                }
             };
 
-            document.querySelectorAll('.eq-real').forEach(el => {
-                const id = el.dataset.id;
-                rdc.equipamentos[id] = {
-                    nome: el.dataset.nome,
-                    real: el.value,
-                    manutencao: document.querySelector(`.eq-manut[data-id="${id}"]`).value
+            document.getElementById('rdcNum').textContent = String(currentRDC.numero).padStart(3, '0');
+            document.getElementById('rdcData').textContent = currentRDC.data;
+            document.getElementById('formFiscalNome').textContent = currentRDC.fiscal;
+            
+            // Resetar campos
+            document.getElementById('climaCondicao').value = 'Bom';
+            document.getElementById('pluviometro').value = '';
+            document.getElementById('descAtividades').value = '';
+            document.getElementById('comentarios').value = '';
+            
+            // Voltar para aba geral
+            switchTab('geral');
+            
+            document.getElementById('rdcPanel').style.display = 'none';
+            document.getElementById('formPanel').style.display = 'block';
+
+            carregarEquipamentosDoContrato(mesKey);
+        }
+
+        function switchTab(tabName) {
+            // Esconder todos os conteúdos
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-principal').forEach(el => el.classList.remove('active'));
+            
+            // Mostrar o selecionado
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.closest('.tab-principal').classList.add('active');
+        }
+
+        async function carregarEquipamentosDoContrato(mesKey) {
+            const container = document.getElementById('equipamentosContainer');
+            container.innerHTML = '<p style="color: #777">Carregando contrato do mês...</p>';
+            
+            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
+            
+            if (!snap.exists()) {
+                container.innerHTML = '<div class="status-box" style="color: #777">Nenhum contrato de equipamentos encontrado para este mês.</div>';
+                return;
+            }
+
+            let html = '';
+            snap.forEach(child => {
+                const eq = child.val();
+                const id = child.key;
+                html += `
+                    <div class="equip-card">
+                        <div class="equip-header" onclick="this.nextElementSibling.classList.toggle('active')">
+                            <span style="color: white">${eq.nome}</span>
+                            <span style="color: white">${String(eq.previsto).padStart(2, '0')} <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                        <div class="equip-body">
+                            <div class="grid-campos">
+                                <div>
+                                    <label class="label-peq">Previsto</label>
+                                    <input type="text" class="input-rdc" value="${eq.previsto}" disabled style="background: #f0f0f0;">
+                                </div>
+                                <div>
+                                    <label class="label-peq" style="color: var(--azul-vale)">Real</label>
+                                    <input type="number" class="input-rdc in-real" data-id="${id}" data-nome="${eq.nome}" value="${eq.previsto}">
+                                </div>
+                                <div>
+                                    <label class="label-peq" style="color: var(--laranja)">Manut.</label>
+                                    <input type="number" class="input-rdc in-manut" data-id="${id}" value="0">
+                                </div>
+                            </div>
+                            <label class="label-peq">Observações</label>
+                            <textarea class="in-obs" data-id="${id}" placeholder="Notas sobre este equipamento..."></textarea>
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        async function enviarRDC() {
+            if (!confirm("Confirmar fechamento e envio do RDC?")) return;
+
+            // Coleta dados da aba Geral
+            currentRDC.dados.geral = {
+                clima: document.getElementById('climaCondicao').value,
+                pluviometro: parseFloat(document.getElementById('pluviometro').value) || 0,
+                descricaoAtividades: document.getElementById('descAtividades').value,
+                comentarios: document.getElementById('comentarios').value
+            };
+
+            // Coleta dados de equipamentos
+            document.querySelectorAll('.in-real').forEach(input => {
+                const id = input.dataset.id;
+                currentRDC.dados.equipamentos[id] = {
+                    nome: input.dataset.nome,
+                    real: parseInt(input.value) || 0,
+                    manutencao: parseInt(document.querySelector(`.in-manut[data-id="${id}"]`).value) || 0,
+                    obs: document.querySelector(`.in-obs[data-id="${id}"]`).value
                 };
             });
 
-            await push(ref(db, `obras/${obraAtiva.id}/relatorios`), rdc);
-            alert("Relatório enviado com sucesso!");
-            fecharForm();
-        };
+            try {
+                const relRef = window.dbRef(window.db, `obras/${currentObraId}/relatorios`);
+                await window.dbPush(relRef, currentRDC);
+                showToast("RDC enviado com sucesso!");
+                voltarParaRDCs();
+            } catch (e) {
+                alert("Erro ao salvar: " + e.message);
+            }
+        }
 
-        window.fecharForm = () => {
-            document.getElementById('tela-formulario').style.display = 'none';
-            document.getElementById('tela-dashboard').style.display = 'block';
-            gerarListaPendencias(obraAtiva);
-        };
+        function voltarParaRDCs() {
+            document.getElementById('formPanel').style.display = 'none';
+            document.getElementById('rdcPanel').style.display = 'block';
+            carregarHistoricoRDCs();
+        }
 
-        window.switchTab = (tab, btn) => {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            btn.classList.add('active');
-        };
-
-        window.voltarParaObras = () => {
-            document.getElementById('tela-dashboard').style.display = 'none';
-            document.getElementById('tela-obras').style.display = 'block';
-        };
-
-        carregarObras();
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
     </script>
 </body>
 </html>
