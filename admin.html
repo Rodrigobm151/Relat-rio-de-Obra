@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VER 1.8</title>
+    <title>VER 1.9</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -519,21 +519,64 @@
             reader.readAsArrayBuffer(file);
         }
 
-        function converterMesParaKey(mesStr) {
-            const mesesMap = { 'jan': '01', 'janeiro': '01', 'fev': '02', 'fevereiro': '02', 'mar': '03', 'março': '03', 'marco': '03', 'abr': '04', 'abril': '04', 'mai': '05', 'maio': '05', 'jun': '06', 'junho': '06', 'jul': '07', 'julho': '07', 'ago': '08', 'agosto': '08', 'set': '09', 'setembro': '09', 'out': '10', 'outubro': '10', 'nov': '11', 'novembro': '11', 'dez': '12', 'dezembro': '12' };
-            
-            const formatoNumerico = mesStr.match(/^(\d{2})\/(\d{4})$/);
-            if (formatoNumerico) return `${formatoNumerico[1]}-${formatoNumerico[2]}`;
-            
-            const partes = mesStr.toLowerCase().split(/[\/\s]+/);
-            const mesEncontrado = partes.find(p => mesesMap[p.replace(/[^a-z]/g, '')]);
-            const anoEncontrado = partes.find(p => /^\d{4}$/.test(p));
-            
-            if (mesEncontrado && anoEncontrado) {
-                return `${mesesMap[mesEncontrado.replace(/[^a-z]/g, '')]}-${anoEncontrado}`;
-            }
-            return null;
-        }
+function converterMesParaKey(mesStr) {
+    // Se for objeto Date do Excel, converter para string primeiro
+    if (mesStr instanceof Date) {
+        const mes = String(mesStr.getMonth() + 1).padStart(2, '0');
+        const ano = mesStr.getFullYear();
+        return `${mes}-${ano}`;
+    }
+    
+    // Converter para string se não for
+    const str = String(mesStr).trim();
+    
+    // Se já vier como data completa (01/01/2026 ou 2026-01-01)
+    const formatoDataBR = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (formatoDataBR) {
+        return `${formatoDataBR[2]}-${formatoDataBR[3]}`; // MM-AAAA
+    }
+    
+    const formatoDataISO = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (formatoDataISO) {
+        return `${formatoDataISO[2]}-${formatoDataISO[1]}`; // MM-AAAA
+    }
+    
+    // Mapeamento de meses em português
+    const mesesMap = { 
+        'jan': '01', 'janeiro': '01', 'jan.': '01',
+        'fev': '02', 'fevereiro': '02', 'fev.': '02',
+        'mar': '03', 'março': '03', 'marco': '03', 'mar.': '03',
+        'abr': '04', 'abril': '04', 'abr.': '04',
+        'mai': '05', 'maio': '05', 'mai.': '05',
+        'jun': '06', 'junho': '06', 'jun.': '06',
+        'jul': '07', 'julho': '07', 'jul.': '07',
+        'ago': '08', 'agosto': '08', 'ago.': '08',
+        'set': '09', 'setembro': '09', 'set.': '09',
+        'out': '10', 'outubro': '10', 'out.': '10',
+        'nov': '11', 'novembro': '11', 'nov.': '11',
+        'dez': '12', 'dezembro': '12', 'dez.': '12'
+    };
+    
+    // Tenta formato MM/AAAA (01/2026)
+    const formatoNumerico = str.match(/^(\d{2})\/(\d{4})$/);
+    if (formatoNumerico) {
+        return `${formatoNumerico[1]}-${formatoNumerico[2]}`;
+    }
+    
+    // Tenta formato texto (Jan/2026, Janeiro/2026, etc)
+    const partes = str.toLowerCase().split(/[\/\s\-]+/);
+    const mesEncontrado = partes.find(p => mesesMap[p.replace(/[^a-z.]/g, '')]);
+    const anoEncontrado = partes.find(p => /^\d{4}$/.test(p));
+    
+    if (mesEncontrado && anoEncontrado) {
+        const mesNum = mesesMap[mesEncontrado.replace(/[^a-z.]/g, '')];
+        return `${mesNum}-${anoEncontrado}`;
+    }
+    
+    // Se não conseguiu converter, loga para debug
+    console.warn('Não conseguiu converter:', str);
+    return null;
+}
 
         function mostrarPreview(colunasMeses, linhas) {
             const thead = document.getElementById('previewThead');
