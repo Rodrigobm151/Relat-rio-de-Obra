@@ -3,27 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>squad geotecnia</title>
+    <title>Squad Geotecnia - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* FONTE VALE - ITALIC APENAS */
+        /* VARIÁVEIS DO SISTEMA - CORES VALE */
+        :root {
+            --azul-vale: #3CB5E5;
+            --azul-escuro: #0096d2;
+            --azul-mais-escuro: #0077b3;
+            --verde-vale: #007E79;
+            --branco: #FFFFFF;
+            --cinza-claro: #BCBEC0;
+        }
+
+        /* FONTE VALE - ITALIC NATURAL (não forçar no CSS) */
         @font-face {
             font-family: 'ValeSans';
             src: url('./assets/fonts/ValeSans-Italic.woff2') format('woff2');
-            font-weight: 400 !important;
-            font-style: italic !important;
+            font-weight: 400;
+            font-style: normal; /* Fonte já é itálica fisicamente */
         }
 
         * { 
-            margin: 0; padding: 0; box-sizing: border-box; 
-            font-family: 'ValeSans', sans-serif !important; 
-            font-style: italic !important;
-            font-weight: 400 !important;
-            text-transform: lowercase !important; 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'ValeSans', 'Inter', sans-serif; 
         }
         
         body, html { 
             height: 100%; 
-            background-color: #001220; 
+            background: linear-gradient(135deg, #3CB5E5 0%, #0096d2 50%, #0077b3 100%);
             color: white;
             overflow: hidden;
         }
@@ -32,113 +42,404 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
-            text-align: center;
         }
 
-        /* CABEÇALHO COM VÍDEO MASCARADO */
-        header {
+        /* VÍDEO NO TOPO (BANNER) */
+        .video-header {
             position: relative;
             width: 100%;
-            height: 240px; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            height: 35vh;
             overflow: hidden;
-            background: #001220;
         }
 
         .header-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: 0;
-            opacity: 0.35;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            pointer-events: none; /* Ignora cliques no vídeo */
-            mask-image: radial-gradient(circle, black 30%, transparent 85%);
-            -webkit-mask-image: radial-gradient(circle, black 30%, transparent 85%);
+            opacity: 0.6;
         }
 
-        .content-over-video {
-            position: relative;
-            z-index: 2; /* Garante que texto e logo fiquem acima do vídeo */
+        /* GRADIENTE DO VÍDEO PARA O FUNDO AZUL */
+        .video-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80%;
+            background: linear-gradient(to bottom, transparent, #3CB5E5);
+        }
+
+        /* CONTEÚDO CENTRALIZADO - LOGO ACIMA DO TÍTULO */
+        .brand-section {
+            display: flex;
+            flex-direction: column; /* LOGO ACIMA DO TÍTULO */
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 0 20px;
+            z-index: 10;
         }
 
         .icon-main { 
-            width: 120px; 
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); 
+            width: 80px; /* Logo maior */
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
         }
 
-        .title { font-size: 1.5rem; color: #fff; margin-top: 5px; }
+        .title-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centralizado */
+            text-align: center;
+        }
 
-        .glitch-wrapper { margin-top: 5px; }
-        .glitch { font-size: 0.95rem; position: relative; color: rgba(255,255,255,0.7); }
-        .glitch::before, .glitch::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; text-transform: lowercase !important; }
-        .glitch::before { left: 1px; text-shadow: -1px 0 #ff00c1; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 5s infinite linear alternate-reverse; }
-        .glitch::after { left: -1px; text-shadow: -1px 0 #00fff9; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 3s infinite linear alternate-reverse; }
+        .title { 
+            font-size: 1.8rem; 
+            color: white; 
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-weight: 600;
+        }
 
-        @keyframes glitch-anim { 0%, 15% { clip: rect(10px, 999px, 40px, 0); } 16%, 100% { clip: rect(0,0,0,0); } }
-        @keyframes glitch-anim2 { 0%, 70% { clip: rect(0,0,0,0); } 71%, 100% { clip: rect(40px, 999px, 90px, 0); } }
+        .glitch { 
+            font-size: 1rem; 
+            color: rgba(255,255,255,0.9);
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
 
-        /* FORMULÁRIO */
-        .form-area { width: 100%; max-width: 300px; margin-top: -20px; z-index: 10; }
-        select { width: 100%; height: 50px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: white; padding: 0 15px; font-size: 16px; margin-bottom: 20px; outline: none; -webkit-appearance: none; }
-        .btn-entrar { width: 100%; height: 50px; background: #0096d2; color: white; border: none; border-radius: 10px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0, 150, 210, 0.3); }
+        /* ÁREA DE LOGIN */
+        .form-area { 
+            width: 100%; 
+            max-width: 320px; 
+            margin-top: 50px; 
+            flex-grow: 1;
+            z-index: 10;
+            padding: 0 20px;
+        }
 
-        /* RODAPÉ */
-        .footer-logos { display: flex; gap: 20px; align-items: center; padding: 30px 0; width: 100%; justify-content: center; }
-        .footer-logos img { height: 48px; width: auto; opacity: 1; }
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: rgba(255,255,255,0.95);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+        
+        select { 
+            width: 100%; 
+            height: 52px; 
+            background: rgba(255, 255, 255, 0.15); 
+            border: 2px solid rgba(255, 255, 255, 0.3); 
+            border-radius: 12px; 
+            color: white; 
+            padding: 0 15px; 
+            font-size: 16px; 
+            outline: none; 
+            -webkit-appearance: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover, select:focus {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        select option {
+            background: #0096d2;
+            color: white;
+            padding: 10px;
+        }
+        
+        .btn-entrar { 
+            width: 100%; 
+            height: 52px; 
+            background: white; 
+            color: #3CB5E5; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 1.1rem; 
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-entrar:hover:not(:disabled) {
+            background: rgba(255,255,255,0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-entrar:disabled {
+            background: rgba(255,255,255,0.4);
+            color: rgba(60, 181, 229, 0.6);
+            cursor: not-allowed;
+        }
+
+        /* LINK ADMIN */
+        .admin-link {
+            text-align: center;
+            margin-top: 25px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .admin-link a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .admin-link:hover {
+            opacity: 1;
+        }
+
+        /* RODAPÉ CENTRALIZADO */
+        .footer-logos { 
+            display: flex; 
+            gap: 40px; 
+            align-items: center; 
+            justify-content: center;
+            padding-bottom: 40px;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .footer-logos img { 
+            height: 50px; 
+            width: auto; 
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+        }
+
+        /* LOADING */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(60, 181, 229, 0.98);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: white;
+            color: #e74c3c;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            color: #007E79;
+        }
     </style>
 </head>
 <body>
 
     <main class="main-container">
-        <header>
-            <video class="header-video" autoplay muted loop playsinline preload="auto">
-                <source src="./assets/video/background.mp4" type="video/mp4">
-            </video>
-            
-            <div class="content-over-video">
-                <img src="./assets/imagens/squad-logo.png" class="icon-main">
-                <h1 class="title">squad geotecnia</h1>
-                <div class="glitch-wrapper">
-                    <div class="glitch" id="glitch-text" data-text="geotechnical works">geotechnical works</div>
-                </div>
+        <section class="video-header">
+           <video class="header-video" autoplay muted loop playsinline preload="auto">
+    <source src="./assets/video/background.webm" type="video/webm">
+    <source src="./assets/video/background.mp4" type="video/mp4">
+    <!-- Fallback imagem estática -->
+    <img src="./assets/imagens/fallback-bg.jpg" style="width:100%;height:100%;object-fit:cover;">
+</video>
+        </section>
+
+        <section class="brand-section">
+            <!-- LOGO ACIMA DO TÍTULO -->
+            <img src="./assets/imagens/squad-logo.png" class="icon-main" alt="Squad Geotecnia">
+            <div class="title-wrapper">
+                <h1 class="title">Squad Geotecnia</h1>
+                <div class="glitch" id="glitch-text">Geotechnical Works</div>
             </div>
-        </header>
+        </section>
 
         <section class="form-area">
-            <select>
-                <option value="">selecione usuário</option>
-            </select>
-            <button class="btn-entrar">entrar</button>
+            <div class="form-group">
+                <label class="form-label">Selecione o fiscal</label>
+                <select id="fiscalSelect">
+                    <option value="">Selecione usuário</option>
+                </select>
+            </div>
+            <button class="btn-entrar" id="btnEntrar" onclick="entrarSistema()" disabled>
+                Entrar
+            </button>
+
+            <div class="admin-link">
+                <a href="#" onclick="mostrarAcessoAdmin(event)">
+                    <i class="fas fa-lock" style="margin-right: 5px;"></i>
+                    Acesso Administrativo
+                </a>
+            </div>
         </section>
 
         <footer class="footer-logos">
-            <img src="./assets/imagens/vale-logo.png" alt="vale">
-            <img src="./assets/imagens/reta-logo.png" alt="reta">
+            <img src="./assets/imagens/vale-logo.png" alt="Vale">
+            <img src="./assets/imagens/reta-logo.png" alt="Reta Engenharia">
         </footer>
     </main>
 
+    <!-- Loading -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
+            authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
+            databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
+            projectId: "relatorio-obra-geotecnia",
+            storageBucket: "relatorio-obra-geotecnia.firebasestorage.app",
+            messagingSenderId: "765646735604",
+            appId: "1:765646735604:web:59424d5353813939e976a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.db = db;
+        window.dbRef = ref;
+        window.dbGet = get;
+    </script>
+
     <script>
-        const phrases = ["geotechnical works", "geotecnia digital", "squad vale"];
+        const FISCAIS = [
+            { id: 'joao-silva', nome: 'João Silva' },
+            { id: 'maria-santos', nome: 'Maria Santos' },
+            { id: 'pedro-oliveira', nome: 'Pedro Oliveira' },
+            { id: 'ana-costa', nome: 'Ana Costa' },
+            { id: 'carlos-lima', nome: 'Carlos Lima' }
+        ];
+
+        function carregarFiscais() {
+            const select = document.getElementById('fiscalSelect');
+            FISCAIS.forEach(f => {
+                const option = document.createElement('option');
+                option.value = f.id;
+                option.textContent = f.nome;
+                select.appendChild(option);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarFiscais();
+            
+            const fiscalSalvo = localStorage.getItem('currentFiscal');
+            if (fiscalSalvo) {
+                document.getElementById('fiscalSelect').value = fiscalSalvo;
+                document.getElementById('btnEntrar').disabled = false;
+            }
+
+            document.getElementById('fiscalSelect').addEventListener('change', (e) => {
+                document.getElementById('btnEntrar').disabled = !e.target.value;
+            });
+        });
+
+        function entrarSistema() {
+            const fiscal = document.getElementById('fiscalSelect').value;
+            if (!fiscal) {
+                showToast('Selecione um fiscal');
+                return;
+            }
+
+            const fiscalNome = FISCAIS.find(f => f.id === fiscal)?.nome || fiscal;
+            
+            localStorage.setItem('currentFiscal', fiscal);
+            localStorage.setItem('currentFiscalNome', fiscalNome);
+
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            setTimeout(() => {
+                window.location.href = 'fiscal.html';
+            }, 500);
+        }
+
+        function mostrarAcessoAdmin(e) {
+            e.preventDefault();
+            const senha = prompt('Digite a senha de administrador:');
+            if (senha === 'admin123') {
+                window.location.href = 'admin.html';
+            } else if (senha) {
+                showToast('Senha incorreta');
+            }
+        }
+
+        // Glitch effect
+        const phrases = ["Geotechnical Works", "Geotecnia Digital", "Squad Vale", "Relatórios RDC"];
         let count = 0;
         const textElement = document.getElementById("glitch-text");
+        
         setInterval(() => {
             count = (count + 1) % phrases.length;
-            const nextText = phrases[count].toLowerCase();
-            textElement.innerText = nextText;
-            textElement.setAttribute("data-text", nextText);
+            textElement.textContent = phrases[count];
         }, 4000);
+
+        function showToast(msg, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
     </script>
 </body>
 </html>
