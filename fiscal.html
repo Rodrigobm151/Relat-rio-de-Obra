@@ -1,1129 +1,501 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RDC - Área do Fiscal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --azul-vale: #3CB5E5;
-            --azul-escuro: #0096d2;
-            --verde-vale: #007E79;
-            --cinza-texto: #555555;
-            --branco: #FFFFFF;
-            --cinza-medio: #747678;
-            --cinza-claro: #BCBEC0;
-            --cinza-mais-claro: #E6E7E8;
-            --laranja: #ff9800;
-            --vermelho: #e74c3c;
-            --fundo: #f5f7fa;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+<title>RDC - Área do Fiscal</title>
 
-        body {
-            background-color: var(--fundo);
-            color: var(--cinza-texto);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        /* Header */
-        .header {
-            background: var(--azul-vale);
-            color: white;
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+<style>
 
-        .header-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* ================= VARIÁVEIS ================= */
 
-        .header-info h1 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            font-style: italic;
-        }
+:root {
 
-        .header-info p {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
+--azul-vale: #3CB5E5;
+--verde-vale: #007E79;
+--cinza-texto: #555;
+--cinza-medio: #747678;
+--cinza-claro: #BCBEC0;
+--cinza-mais-claro: #E6E7E8;
+--laranja: #ff9800;
+--vermelho: #e74c3c;
+--fundo: #f5f7fa;
+--branco: #fff;
 
-        .btn-sair {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-        }
+}
 
-        .btn-sair:hover {
-            background: rgba(255,255,255,0.3);
-        }
+/* ================= RESET ================= */
 
-        /* Container */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 1rem;
-            padding-bottom: 100px;
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
 
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+body{
+background:var(--fundo);
+color:var(--cinza-texto);
+}
 
-        .card-title {
-            color: var(--azul-vale);
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            font-style: italic;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+/* ================= HEADER ================= */
 
-        /* Obras List */
-        .obra-item {
-            background: white;
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: all 0.3s;
-            border-left: 4px solid var(--azul-vale);
-        }
+.header{
+background:var(--azul-vale);
+color:white;
+padding:1rem;
+position:sticky;
+top:0;
+z-index:100;
+}
 
-        .obra-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+.header-content{
+max-width:800px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-        .obra-nome {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--cinza-texto);
-            margin-bottom: 0.3rem;
-        }
+.btn-sair{
+background:rgba(255,255,255,.2);
+border:none;
+color:white;
+padding:.5rem 1rem;
+border-radius:20px;
+cursor:pointer;
+}
 
-        .obra-meta {
-            font-size: 0.85rem;
-            color: var(--cinza-medio);
-        }
+/* ================= CONTAINER ================= */
 
-        /* RDC List */
-        .rdc-filters {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-        }
+.container{
+max-width:800px;
+margin:auto;
+padding:1rem;
+padding-bottom:120px;
+}
 
-        .filter-btn {
-            background: white;
-            border: 2px solid var(--cinza-mais-claro);
-            color: var(--cinza-texto);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
+/* ================= CARD ================= */
 
-        .filter-btn.active {
-            background: var(--azul-vale);
-            color: white;
-            border-color: var(--azul-vale);
-        }
+.card{
+background:white;
+border-radius:16px;
+padding:1.5rem;
+margin-bottom:1rem;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
 
-        .rdc-item {
-            background: white;
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.card-title{
+color:var(--azul-vale);
+margin-bottom:1rem;
+}
 
-        .rdc-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+/* ================= EQUIPAMENTOS ================= */
 
-        .rdc-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
+.equip-list{
+background:white;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
 
-        .rdc-status.enviado { background: #e8f5e9; color: var(--verde-vale); }
-        .rdc-status.rascunho { background: #fff3e0; color: var(--laranja); }
-        .rdc-status.pendente { background: #ffebee; color: var(--vermelho); }
+.equip-item{
+padding:1rem;
+border-bottom:1px solid var(--cinza-mais-claro);
+}
 
-        /* Form RDC */
-        .rdc-header {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+.equip-item:last-child{
+border-bottom:none;
+}
 
-        .rdc-numero {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--azul-vale);
-        }
+.equip-detail{
+background:#f9f9f9;
+padding:0;
+max-height:0;
+overflow:hidden;
+transition:.3s;
+}
 
-        .rdc-data {
-            color: var(--cinza-medio);
-            font-size: 0.9rem;
-        }
+.equip-detail.open{
+padding:1rem;
+max-height:600px;
+}
 
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            overflow-x: auto;
-        }
+/* ================= FORM ================= */
 
-        .tab-btn {
-            background: white;
-            border: 2px solid var(--cinza-mais-claro);
-            color: var(--cinza-texto);
-            padding: 0.8rem 1.2rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+.form-group{
+margin-bottom:1rem;
+}
 
-        .tab-btn.active {
-            background: var(--azul-vale);
-            color: white;
-            border-color: var(--azul-vale);
-        }
+.form-label{
+font-size:.9rem;
+display:block;
+margin-bottom:.3rem;
+}
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+.form-input,
+.form-textarea{
+width:100%;
+padding:.7rem;
+border:2px solid var(--cinza-mais-claro);
+border-radius:8px;
+}
 
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
+.btn-salvar-item{
+background:var(--verde-vale);
+color:white;
+border:none;
+padding:.8rem;
+border-radius:8px;
+width:100%;
+cursor:pointer;
+font-weight:600;
+}
 
-        .form-label {
-            display: block;
-            color: var(--cinza-texto);
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            font-style: italic;
-        }
+/* ================= TOAST ================= */
 
-        .form-select, .form-input, .form-textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--cinza-mais-claro);
-            border-radius: 10px;
-            font-size: 1rem;
-            color: var(--cinza-texto);
-            background: white;
-        }
+.toast{
+position:fixed;
+top:90px;
+left:50%;
+transform:translateX(-50%) translateY(-100px);
+background:#333;
+color:white;
+padding:1rem 2rem;
+border-radius:30px;
+opacity:0;
+transition:.3s;
+z-index:999;
+}
 
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
+.toast.show{
+opacity:1;
+transform:translateX(-50%) translateY(0);
+}
 
-        /* Equipamentos */
-        .equip-list {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .equip-item {
-            padding: 1.2rem;
-            border-bottom: 1px solid var(--cinza-mais-claro);
-            cursor: pointer;
-        }
-
-        .equip-item:last-child { border-bottom: none; }
-
-        .equip-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .equip-nome { font-weight: 600; color: var(--cinza-texto); }
-
-        .equip-previsto {
-            background: var(--cinza-mais-claro);
-            color: var(--cinza-medio);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .equip-detail {
-            background: #f8f9fa;
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-
-        .equip-detail.open {
-            padding: 1.2rem;
-            max-height: 500px;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .detail-box {
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .input-real {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-align: center;
-            color: var(--azul-vale);
-            border-bottom: 2px solid var(--cinza-claro);
-        }
-
-        .btn-salvar-item {
-            background: var(--verde-vale);
-            color: white;
-            border: none;
-            padding: 0.8rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        /* Action Bar */
-        .action-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 1rem;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 1rem;
-            z-index: 100;
-        }
-
-        .btn-primary {
-            flex: 1;
-            background: var(--azul-vale);
-            color: white;
-            border: none;
-            padding: 1rem;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-secondary {
-            flex: 1;
-            background: var(--cinza-mais-claro);
-            color: var(--cinza-texto);
-            border: none;
-            padding: 1rem;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Loading & Empty */
-        .loading-container {
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--cinza-mais-claro);
-            border-top-color: var(--azul-vale);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: var(--cinza-medio);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-            color: var(--azul-vale);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: var(--cinza-texto);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-    </style>
+</style>
 </head>
+
 <body>
 
-    <header class="header">
-        <div class="header-content">
-            <div class="header-info">
-                <h1 id="headerTitle">minhas obras</h1>
-                <p id="headerSubtitle">selecione uma obra</p>
-            </div>
-            <button class="btn-sair" onclick="sair()">
-                <i class="fas fa-sign-out-alt"></i> sair
-            </button>
-        </div>
-    </header>
-
-    <div class="container">
-        
-        <!-- PAINEL 1: LISTA DE OBRAS -->
-        <div id="obrasPanel">
-            <div id="obrasList">
-                <div class="loading-container">
-                    <div class="spinner"></div>
-                    <p>carregando obras...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- PAINEL 2: LISTA DE RDCs -->
-        <div id="rdcPanel" style="display: none;">
-            <div class="card" style="padding: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <span style="font-weight: 600;">filtrar:</span>
-                    <button class="btn-primary" onclick="criarNovoRDC()" style="width: auto; padding: 0.5rem 1rem; font-size: 0.9rem;">
-                        <i class="fas fa-plus"></i> novo rdc
-                    </button>
-                </div>
-                <div class="rdc-filters">
-                    <button class="filter-btn active" onclick="filtrarRDCs('todos', this)">todos</button>
-                    <button class="filter-btn" onclick="filtrarRDCs('rascunho', this)">rascunho</button>
-                    <button class="filter-btn" onclick="filtrarRDCs('pendente', this)">pendente</button>
-                    <button class="filter-btn" onclick="filtrarRDCs('enviado', this)">enviado</button>
-                </div>
-            </div>
-            <div id="rdcList"></div>
-        </div>
-
-        <!-- PAINEL 3: FORMULÁRIO RDC -->
-        <div id="formPanel" style="display: none;">
-            
-            <div class="rdc-header">
-                <div class="rdc-numero" id="rdcNumero">rdc 001</div>
-                <div class="rdc-data" id="rdcData">16/02/2026</div>
-                <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--cinza-medio);">
-                    <i class="fas fa-user"></i> <span id="rdcFiscal">fiscal</span>
-                </div>
-            </div>
-
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('clima', this)">
-                    <i class="fas fa-cloud-sun"></i> clima
-                </button>
-                <button class="tab-btn" onclick="switchTab('atividades', this)">
-                    <i class="fas fa-tasks"></i> atividades
-                </button>
-                <button class="tab-btn" onclick="switchTab('equipamentos', this)">
-                    <i class="fas fa-truck"></i> equip.
-                </button>
-                <button class="tab-btn" onclick="switchTab('maoobra', this)">
-                    <i class="fas fa-users"></i> m. obra
-                </button>
-            </div>
-
-            <!-- ABA CLIMA -->
-            <div class="tab-content active" id="tab-clima">
-                <div class="card">
-                    <h3 class="card-title"><i class="fas fa-cloud-sun"></i> condições climáticas</h3>
-                    <div class="form-group">
-                        <label class="form-label">condição do tempo</label>
-                        <select class="form-select" id="climaCondicao">
-                            <option value="">selecione...</option>
-                            <option value="chuva-intensa">chuva intensa</option>
-                            <option value="chuva-moderada">chuva moderada</option>
-                            <option value="nublado">nublado</option>
-                            <option value="ensolarado">ensolarado</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">pluviômetro (mm)</label>
-                        <input type="number" class="form-input" id="pluviometro" step="0.1" placeholder="0.0">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ABA ATIVIDADES -->
-            <div class="tab-content" id="tab-atividades">
-                <div class="card">
-                    <h3 class="card-title"><i class="fas fa-tasks"></i> atividades do dia</h3>
-                    <div class="form-group">
-                        <label class="form-label">descrição das atividades</label>
-                        <textarea class="form-textarea" id="atividadesDesc" placeholder="descreva as atividades executadas..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">comentários extras</label>
-                        <textarea class="form-textarea" id="comentariosExtras" placeholder="ocorrências ou informações adicionais..."></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ABA EQUIPAMENTOS -->
-            <div class="tab-content" id="tab-equipamentos">
-                <div class="card">
-                    <h3 class="card-title"><i class="fas fa-truck"></i> equipamentos</h3>
-                    <p style="font-size: 0.85rem; color: var(--cinza-medio);">
-                        toque para contestar quantidade ou indicar manutenção
-                    </p>
-                </div>
-                <div id="equipamentosContainer">
-                    <div class="loading-container">
-                        <div class="spinner"></div>
-                        <p>carregando equipamentos...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ABA MÃO DE OBRA -->
-            <div class="tab-content" id="tab-maoobra">
-                <div class="card">
-                    <h3 class="card-title"><i class="fas fa-users"></i> mão de obra</h3>
-                    <div class="empty-state">
-                        <i class="fas fa-hard-hat"></i>
-                        <p>módulo em desenvolvimento</p>
-                        <p style="font-size: 0.8rem;">disponível na versão 2.0</p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Action Bar -->
-    <div class="action-bar" id="actionBar" style="display: none;">
-        <button class="btn-secondary" onclick="salvarRascunho()">
-            <i class="fas fa-save"></i> salvar
-        </button>
-        <button class="btn-primary" onclick="enviarRDC()">
-            <i class="fas fa-paper-plane"></i> enviar
-        </button>
-    </div>
-
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
-
-    <!-- Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
-            authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
-            databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
-            projectId: "relatorio-obra-geotecnia",
-            storageBucket: "relatorio-obra-geotecnia.firebasestorage.app",
-            messagingSenderId: "765646735604",
-            appId: "1:765646735604:web:59424d5353813939e976a1"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        window.db = db;
-        window.dbRef = ref;
-        window.dbGet = get;
-        window.dbSet = set;
-        window.dbPush = push;
-    </script>
-
-    <script>
-        // ESTADO GLOBAL
-        let currentFiscal = '';
-        let currentFiscalNome = '';
-        let currentObra = null;
-        let currentRDC = null;
-        let rdcsList = [];
-        let equipamentosContrato = [];
-        let filtroAtual = 'todos';
-
-        // INICIALIZAÇÃO
-        document.addEventListener('DOMContentLoaded', () => {
-            currentFiscal = localStorage.getItem('currentFiscal');
-            currentFiscalNome = localStorage.getItem('currentFiscalNome');
-            
-            if (!currentFiscal) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            document.getElementById('headerSubtitle').textContent = `olá, ${currentFiscalNome.toLowerCase()}`;
-            carregarObras();
-        });
-
-        function sair() {
-            localStorage.removeItem('currentFiscal');
-            localStorage.removeItem('currentFiscalNome');
-            window.location.href = 'index.html';
-        }
-
-        // CARREGAR OBRAS
-        async function carregarObras() {
-            const container = document.getElementById('obrasList');
-            
-            try {
-                const obrasRef = window.dbRef(window.db, 'obras');
-                const snapshot = await window.dbGet(obrasRef);
-                
-                if (!snapshot.exists()) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-folder-open"></i>
-                            <p>nenhuma obra cadastrada</p>
-                        </div>`;
-                    return;
-                }
-
-                const obras = snapshot.val();
-                let html = '';
-                
-                Object.keys(obras).forEach(key => {
-                    const obra = obras[key];
-                    const dataInicio = obra.dataInicio ? formatarDataBR(obra.dataInicio) : 'data não definida';
-                    
-                    html += `
-                        <div class="obra-item" onclick="selecionarObra('${key}', '${obra.nome}')">
-                            <div class="obra-nome">${obra.nome.toLowerCase()}</div>
-                            <div class="obra-meta">
-                                <i class="fas fa-calendar-alt"></i> início: ${dataInicio}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                container.innerHTML = html;
-
-            } catch (error) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>erro ao carregar obras</p>
-                    </div>`;
-            }
-        }
-
-        function selecionarObra(obraId, obraNome) {
-            currentObra = { id: obraId, nome: obraNome };
-            document.getElementById('headerTitle').textContent = obraNome.toLowerCase();
-            document.getElementById('headerSubtitle').textContent = 'selecione um rdc';
-            
-            document.getElementById('obrasPanel').style.display = 'none';
-            document.getElementById('rdcPanel').style.display = 'block';
-            
-            carregarRDCs();
-        }
-
-        // GERAR E CARREGAR RDCs
-        function gerarRDCs(dataInicioStr) {
-            const hoje = new Date();
-            hoje.setHours(0,0,0,0);
-            
-            const dataInicio = new Date(dataInicioStr + 'T00:00:00');
-            const rdcs = [];
-            let numero = 1;
-            
-            for (let d = new Date(dataInicio); d <= hoje; d.setDate(d.getDate() + 1)) {
-                const dataKey = formatarDataKey(new Date(d));
-                rdcs.push({
-                    id: `rdc-${String(numero).padStart(3, '0')}`,
-                    numero: numero,
-                    numeroStr: String(numero).padStart(3, '0'),
-                    data: new Date(d),
-                    dataKey: dataKey,
-                    dataBR: formatarDataBR(dataKey),
-                    status: 'pendente'
-                });
-                numero++;
-            }
-            
-            return rdcs.reverse();
-        }
-
-        async function carregarRDCs() {
-            const container = document.getElementById('rdcList');
-            container.innerHTML = '<div class="loading-container"><div class="spinner"></div><p>gerando rdcs...</p></div>';
-
-            try {
-                const obraRef = window.dbRef(window.db, `obras/${currentObra.id}`);
-                const obraSnap = await window.dbGet(obraRef);
-                
-                if (!obraSnap.val()?.dataInicio) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-calendar-times"></i>
-                            <p>obra sem data de início</p>
-                        </div>`;
-                    return;
-                }
-
-                rdcsList = gerarRDCs(obraSnap.val().dataInicio);
-                
-                // Verificar status no Firebase e localStorage
-                const relatoriosRef = window.dbRef(window.db, `obras/${currentObra.id}/relatorios`);
-                const relSnap = await window.dbGet(relatoriosRef);
-                const relatorios = relSnap.exists() ? relSnap.val() : {};
-                
-                const rascunhosLocais = JSON.parse(localStorage.getItem('rascunhosRDC') || '{}');
-                
-                rdcsList.forEach(rdc => {
-                    // Verificar Firebase
-                    const noFirebase = Object.values(relatorios).some(r => r.dataKey === rdc.dataKey);
-                    if (noFirebase) {
-                        rdc.status = 'enviado';
-                    } else {
-                        // Verificar local
-                        const chave = `${currentObra.id}_${rdc.dataKey}`;
-                        if (rascunhosLocais[chave]) {
-                            rdc.status = 'rascunho';
-                        }
-                    }
-                });
-
-                renderRDCList();
-
-            } catch (error) {
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>erro ao carregar</p></div>`;
-            }
-        }
-
-        function renderRDCList() {
-            const container = document.getElementById('rdcList');
-            let rdcsFiltrados = filtroAtual === 'todos' ? rdcsList : rdcsList.filter(r => r.status === filtroAtual);
-            
-            if (rdcsFiltrados.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-check"></i><p>nenhum rdc encontrado</p></div>`;
-                return;
-            }
-
-            container.innerHTML = rdcsFiltrados.map(rdc => {
-                const statusConfig = {
-                    'enviado': { classe: 'enviado', icone: 'check-circle', texto: 'enviado' },
-                    'rascunho': { classe: 'rascunho', icone: 'edit', texto: 'rascunho' },
-                    'pendente': { classe: 'pendente', icone: 'clock', texto: 'pendente' }
-                }[rdc.status];
-
-                return `
-                    <div class="rdc-item" onclick="abrirRDC('${rdc.dataKey}', '${rdc.numeroStr}')">
-                        <div>
-                            <div style="font-weight: 600; color: var(--cinza-texto);">rdc ${rdc.numeroStr}</div>
-                            <div style="font-size: 0.85rem; color: var(--cinza-medio);">
-                                <i class="fas fa-calendar"></i> ${rdc.dataBR}
-                            </div>
-                        </div>
-                        <div class="rdc-status ${statusConfig.classe}">
-                            <i class="fas fa-${statusConfig.icone}"></i>
-                            <span>${statusConfig.texto}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function filtrarRDCs(tipo, btn) {
-            filtroAtual = tipo;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderRDCList();
-        }
-
-        function criarNovoRDC() {
-            const hoje = new Date();
-            const dataKey = formatarDataKey(hoje);
-            const existe = rdcsList.find(r => r.dataKey === dataKey);
-            
-            if (existe?.status === 'enviado') {
-                showToast('rdc de hoje já enviado');
-                return;
-            }
-            
-            abrirRDC(dataKey, null);
-        }
-
-        // ABRIR FORMULÁRIO RDC
-        async function abrirRDC(dataKey, numeroStr) {
-            document.getElementById('rdcPanel').style.display = 'none';
-            document.getElementById('formPanel').style.display = 'block';
-            document.getElementById('actionBar').style.display = 'flex';
-            
-            document.getElementById('rdcNumero').textContent = numeroStr ? `rdc ${numeroStr}` : 'novo rdc';
-            document.getElementById('rdcData').textContent = formatarDataBR(dataKey);
-            document.getElementById('rdcFiscal').textContent = currentFiscalNome.toLowerCase();
-            
-            currentRDC = {
-                obraId: currentObra.id,
-                obraNome: currentObra.nome,
-                dataKey: dataKey,
-                data: formatarDataBR(dataKey),
-                numero: numeroStr,
-                fiscal: currentFiscal,
-                fiscalNome: currentFiscalNome,
-                dados: { clima: {}, atividades: {}, equipamentos: {} }
-            };
-
-            // Carregar dados existentes
-            const rascunhos = JSON.parse(localStorage.getItem('rascunhosRDC') || '{}');
-            const chave = `${currentObra.id}_${dataKey}`;
-            if (rascunhos[chave]) {
-                currentRDC.dados = rascunhos[chave];
-                preencherFormulario();
-            }
-
-            await carregarEquipamentos(dataKey);
-            switchTab('clima', document.querySelector('.tab-btn'));
-        }
-
-        function preencherFormulario() {
-            const d = currentRDC.dados;
-            if (d.clima) {
-                document.getElementById('climaCondicao').value = d.clima.condicao || '';
-                document.getElementById('pluviometro').value = d.clima.pluviometro || '';
-            }
-            if (d.atividades) {
-                document.getElementById('atividadesDesc').value = d.atividades.descricao || '';
-                document.getElementById('comentariosExtras').value = d.atividades.comentarios || '';
-            }
-        }
-
-        // EQUIPAMENTOS
-        async function carregarEquipamentos(dataKey) {
-            const container = document.getElementById('equipamentosContainer');
-            container.innerHTML = '<div class="loading-container"><div class="spinner"></div><p>carregando...</p></div>';
-
-            try {
-                const [ano, mes, dia] = dataKey.split('-');
-                const mesContrato = `${mes}-${ano}`;
-                
-                const contratoRef = window.dbRef(window.db, `obras/${currentObra.id}/contrato/${mesContrato}`);
-                const snap = await window.dbGet(contratoRef);
-                
-                if (!snap.exists()) {
-                    container.innerHTML = `
-                        <div class="card">
-                            <div class="empty-state">
-                                <i class="fas fa-clipboard-list"></i>
-                                <p>nenhum equipamento para ${mesContrato}</p>
-                            </div>
-                        </div>`;
-                    return;
-                }
-
-                const equipamentos = snap.val();
-                equipamentosContrato = Object.keys(equipamentos).map(key => ({
-                    id: key, ...equipamentos[key]
-                }));
-
-                renderEquipamentos();
-
-            } catch (error) {
-                container.innerHTML = `<div class="card"><div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>erro ao carregar</p></div></div>`;
-            }
-        }
-
-        function renderEquipamentos() {
-            const container = document.getElementById('equipamentosContainer');
-            
-            let html = '<div class="equip-list">';
-            equipamentosContrato.forEach((eq, index) => {
-                const dados = currentRDC.dados.equipamentos?.[eq.id] || {};
-                const real = dados.real !== undefined ? dados.real : eq.previsto;
-                const manut = dados.manutencao || 0;
-                
-                let statusIcon = dados.real !== undefined ? 
-                    (real == eq.previsto && manut == 0 ? '<i class="fas fa-check-circle" style="color: var(--verde-vale);"></i>' : '<i class="fas fa-exclamation-circle" style="color: var(--laranja);"></i>') 
-                    : '<i class="fas fa-minus-circle" style="color: var(--cinza-claro);"></i>';
-
-                html += `
-                    <div class="equip-item" onclick="toggleEquip(${index})">
-                        <div class="equip-header">
-                            <span class="equip-nome">${eq.nome.toLowerCase()}</span>
-                            <span class="equip-previsto">previsto: ${eq.previsto}</span>
-                        </div>
-                        <div style="font-size: 0.85rem; color: var(--cinza-medio);">
-                            ${statusIcon} ${dados.real !== undefined ? `real: ${real}` : 'não verificado'}
-                            ${manut > 0 ? ` | manut: ${manut}` : ''}
-                        </div>
-                        
-                        <div class="equip-detail" id="equip-detail-${index}">
-                            <div class="detail-grid">
-                                <div class="detail-box">
-                                    <div style="font-size: 0.75rem; color: var(--cinza-medio); margin-bottom: 0.3rem;">previsto</div>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--cinza-medio);">${eq.previsto}</div>
-                                </div>
-                                <div class="detail-box">
-                                    <div style="font-size: 0.75rem; color: var(--cinza-medio); margin-bottom: 0.3rem;">real</div>
-                                    <input type="number" class="input-real" id="equip-real-${index}" value="${real}" min="0">
-                                </div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                                <span style="font-size: 0.9rem;">em manutenção</span>
-                                <input type="number" id="equip-manut-${index}" value="${manut}" min="0" style="width: 60px; padding: 0.5rem; border: 2px solid var(--cinza-mais-claro); border-radius: 6px; text-align: center; color: var(--laranja); font-weight: 600;">
-                            </div>
-                            <textarea id="equip-obs-${index}" placeholder="observações..." style="width: 100%; padding: 0.8rem; border: 2px solid var(--cinza-mais-claro); border-radius: 8px; margin-bottom: 1rem;">${dados.obs || ''}</textarea>
-                            <button class="btn-salvar-item" onclick="salvarEquipamento('${eq.id}', ${index}); event.stopPropagation();">
-                                <i class="fas fa-check"></i> confirmar
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        let openEquipIndex = null;
-        function toggleEquip(index) {
-            const detail = document.getElementById(`equip-detail-${index}`);
-            if (openEquipIndex === index) {
-                detail.classList.remove('open');
-                openEquipIndex = null;
-            } else {
-                if (openEquipIndex !== null) {
-                    document.getElementById(`equip-detail-${openEquipIndex}`)?.classList.remove('open');
-                }
-                detail.classList.add('open');
-                openEquipIndex = index;
-                setTimeout(() => detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-            }
-        }
-
-        function salvarEquipamento(equipId, index) {
-            const real = parseInt(document.getElementById(`equip-real-${index}`).value) || 0;
-            const manut = parseInt(document.getElementById(`equip-manut-${index}`).value) || 0;
-            const obs = document.getElementById(`equip-obs-${index}`).value;
-
-            if (manut > real) {
-                showToast('manutenção não pode ser maior que o real');
-                return;
-            }
-
-            if (!currentRDC.dados.equipamentos) currentRDC.dados.equipamentos = {};
-            currentRDC.dados.equipamentos[equipId] = { real, manutencao: manut, obs, timestamp: new Date().toISOString() };
-            
-            toggleEquip(index);
-            renderEquipamentos();
-            showToast('equipamento atualizado!');
-        }
-
-        // NAVEGAÇÃO ABAS
-        function switchTab(tabName, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            btn.classList.add('active');
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-        }
-
-        // SALVAR E ENVIAR
-        function coletarDados() {
-            currentRDC.dados.clima = {
-                condicao: document.getElementById('climaCondicao').value,
-                pluviometro: document.getElementById('pluviometro').value
-            };
-            currentRDC.dados.atividades = {
-                descricao: document.getElementById('atividadesDesc').value,
-                comentarios: document.getElementById('comentariosExtras').value
-            };
-        }
-
-        function salvarRascunho() {
-            coletarDados();
-            const chave = `${currentRDC.obraId}_${currentRDC.dataKey}`;
-            const rascunhos = JSON.parse(localStorage.getItem('rascunhosRDC') || '{}');
-            rascunhos[chave] = currentRDC.dados;
-            localStorage.setItem('rascunhosRDC', JSON.stringify(rascunhos));
-            
-            showToast('rascunho salvo!');
-            setTimeout(() => {
-                voltarParaRDCs();
-            }, 800);
-        }
-
-        async function enviarRDC() {
-            if (!navigator.onLine) {
-                showToast('sem conexão. salve como rascunho.');
-                return;
-            }
-
-            coletarDados();
-            
-            if (!currentRDC.dados.clima.condicao) {
-                showToast('selecione a condição climática');
-                switchTab('clima', document.querySelectorAll('.tab-btn')[0]);
-                return;
-            }
-
-            const btn = event.target;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> enviando...';
-            btn.disabled = true;
-
-            try {
-                if (!currentRDC.numero) {
-                    currentRDC.numero = String(rdcsList.length + 1).padStart(3, '0');
-                }
-
-                const dadosEnvio = {
-                    ...currentRDC,
-                    timestamp: new Date().toISOString(),
-                    status: 'enviado'
-                };
-
-                const relatoriosRef = window.dbRef(window.db, `obras/${currentObra.id}/relatorios`);
-                const novoRelatorio = window.dbPush(relatoriosRef);
-                await window.dbSet(novoRelatorio, dadosEnvio);
-
-                // Limpar rascunho
-                const chave = `${currentRDC.obraId}_${currentRDC.dataKey}`;
-                const rascunhos = JSON.parse(localStorage.getItem('rascunhosRDC') || '{}');
-                delete rascunhos[chave];
-                localStorage.setItem('rascunhosRDC', JSON.stringify(rascunhos));
-
-                showToast('rdc enviado com sucesso!');
-                setTimeout(() => voltarParaRDCs(), 1000);
-
-            } catch (error) {
-                showToast('erro ao enviar');
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> enviar';
-                btn.disabled = false;
-            }
-        }
-
-        function voltarParaRDCs() {
-            document.getElementById('formPanel').style.display = 'none';
-            document.getElementById('actionBar').style.display = 'none';
-            document.getElementById('rdcPanel').style.display = 'block';
-            document.getElementById('headerTitle').textContent = currentObra.nome.toLowerCase();
-            document.getElementById('headerSubtitle').textContent = 'selecione um rdc';
-            carregarRDCs();
-        }
-
-        // UTILITÁRIOS
-        function formatarDataKey(data) {
-            if (typeof data === 'string' && data.includes('-') && data.length === 10) return data;
-            const d = new Date(data);
-            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        }
-
-        function formatarDataBR(dataKey) {
-            if (dataKey.includes('/')) return dataKey;
-            const [a, m, d] = dataKey.split('-');
-            return `${d}/${m}/${a}`;
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-    </script>
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
+<div class="header-content">
+
+<div>
+<h3 id="headerTitle">Minhas Obras</h3>
+<small id="headerSubtitle">Selecione uma obra</small>
+</div>
+
+<button class="btn-sair" onclick="sair()">
+<i class="fas fa-sign-out-alt"></i> Sair
+</button>
+
+</div>
+
+</header>
+
+
+<!-- ================= CONTAINER ================= -->
+
+<div class="container">
+
+
+<!-- ================= PAINEL EQUIP ================= -->
+
+<div id="formPanel">
+
+<div class="card">
+
+<h3 class="card-title">
+<i class="fas fa-truck"></i> Equipamentos
+</h3>
+
+<p style="font-size:.85rem;color:var(--cinza-medio)">
+Clique para informar quantidade real
+</p>
+
+</div>
+
+
+<div id="equipamentosContainer">
+
+<div style="text-align:center;padding:2rem">
+Carregando...
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ================= TOAST ================= -->
+
+<div class="toast" id="toast"></div>
+
+
+<!-- ================= FIREBASE ================= -->
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
+authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
+databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
+projectId: "relatorio-obra-geotecnia"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.db = db;
+window.dbRef = ref;
+window.dbGet = get;
+window.dbSet = set;
+
+</script>
+
+
+<!-- ================= SCRIPT ================= -->
+
+<script>
+
+/* ================= ESTADO ================= */
+
+let equipamentosContrato = [];
+let currentRDC = { dados:{ equipamentos:{} } };
+
+
+/* ================= INIT ================= */
+
+document.addEventListener('DOMContentLoaded',()=>{
+
+carregarEquipamentos("2026-02-16");
+
+});
+
+
+/* ================= CARREGAR ================= */
+
+async function carregarEquipamentos(dataKey){
+
+const container = document.getElementById('equipamentosContainer');
+
+try{
+
+// Simulação — troque pelo seu Firebase
+equipamentosContrato = [
+
+{id:"1",nome:"Escavadeira",previsto:5},
+{id:"2",nome:"Trator",previsto:3},
+{id:"3",nome:"Caminhão",previsto:4}
+
+];
+
+renderEquipamentos();
+
+}
+catch(e){
+
+container.innerHTML="Erro ao carregar";
+
+}
+
+}
+
+
+/* ================= RENDER ================= */
+
+function renderEquipamentos(){
+
+const container = document.getElementById('equipamentosContainer');
+
+let html = '<div class="equip-list">';
+
+equipamentosContrato.forEach((eq,index)=>{
+
+const dados = currentRDC.dados.equipamentos[eq.id] || {};
+
+const real = dados.real!==undefined ? dados.real : '-';
+const manut = dados.manutencao || 0;
+
+let status = '⏳';
+
+if(dados.real!==undefined){
+
+if(manut>0) status='⚠️';
+else if(real==eq.previsto) status='✅';
+else status='✏️';
+
+}
+
+html+=`
+
+<div class="equip-item">
+
+<div onclick="toggleEquip(${index})"
+style="display:flex;justify-content:space-between;align-items:center">
+
+<div>
+
+<strong>${eq.nome}</strong><br>
+
+<small style="color:var(--cinza-medio)">
+Prev: ${eq.previsto} | Real: ${real}
+${manut>0?` | Manut: ${manut}`:''}
+</small>
+
+</div>
+
+<div style="font-size:20px">${status}</div>
+
+</div>
+
+
+<div class="equip-detail" id="equip-detail-${index}">
+
+
+<div class="form-group">
+
+<label class="form-label">Quantidade real</label>
+
+<input type="number"
+id="equip-real-${index}"
+value="${dados.real!==undefined?dados.real:eq.previsto}"
+class="form-input">
+
+</div>
+
+
+<div class="form-group">
+
+<label class="form-label">Em manutenção</label>
+
+<input type="number"
+id="equip-manut-${index}"
+value="${manut}"
+class="form-input">
+
+</div>
+
+
+<div class="form-group">
+
+<label class="form-label">Observações</label>
+
+<textarea id="equip-obs-${index}"
+class="form-textarea">${dados.obs||''}</textarea>
+
+</div>
+
+
+<button class="btn-salvar-item"
+onclick="salvarEquipamento('${eq.id}',${index});event.stopPropagation()">
+
+<i class="fas fa-check"></i> Confirmar
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+html+='</div>';
+
+container.innerHTML = html;
+
+}
+
+
+/* ================= TOGGLE ================= */
+
+function toggleEquip(index){
+
+const detail = document.getElementById(`equip-detail-${index}`);
+
+detail.classList.toggle('open');
+
+}
+
+
+/* ================= SALVAR ================= */
+
+function salvarEquipamento(id,index){
+
+const real = parseInt(document.getElementById(`equip-real-${index}`).value)||0;
+
+const manut = parseInt(document.getElementById(`equip-manut-${index}`).value)||0;
+
+const obs = document.getElementById(`equip-obs-${index}`).value;
+
+
+if(manut>real){
+
+showToast("Manutenção maior que real");
+
+return;
+
+}
+
+
+currentRDC.dados.equipamentos[id]={
+
+real,
+manutencao:manut,
+obs,
+data:new Date().toISOString()
+
+};
+
+
+renderEquipamentos();
+
+showToast("Atualizado!");
+
+}
+
+
+/* ================= TOAST ================= */
+
+function showToast(msg){
+
+const t = document.getElementById('toast');
+
+t.textContent = msg;
+
+t.classList.add('show');
+
+setTimeout(()=>t.classList.remove('show'),2500);
+
+}
+
+
+/* ================= SAIR ================= */
+
+function sair(){
+
+alert("Logout aqui");
+
+}
+
+</script>
+
 </body>
 </html>
