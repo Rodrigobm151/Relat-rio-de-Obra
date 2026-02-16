@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>squad geotecnia</title>
     <style>
-        /* REGISTRO DA FONTE (APENAS ITALIC) */
+        /* --- FONTE VALE (APENAS ITALIC) --- */
         @font-face {
             font-family: 'ValeSans';
             src: url('./assets/fonts/ValeSans-Italic.woff2') format('woff2');
@@ -13,81 +13,120 @@
             font-style: italic !important;
         }
 
-        /* RESET GLOBAL - FORÇANDO MINÚSCULAS E FONTE FINA */
+        /* --- RESET GLOBAL (MINÚSCULAS E SEM NEGRITO) --- */
         * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+            margin: 0; padding: 0; box-sizing: border-box; 
             font-family: 'ValeSans', sans-serif !important; 
             font-style: italic !important;
-            font-weight: 400 !important; /* Remove qualquer negrito */
-            text-transform: lowercase !important; /* Remove qualquer caixa alta */
+            font-weight: 400 !important;
+            text-transform: lowercase !important; 
         }
         
-        body, html { height: 100%; overflow: hidden; background-color: #001a2e; }
-
-        .video-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0, 150, 210, 0.2) 0%, rgba(0, 26, 46, 0.8) 100%); z-index: 0; }
-
-        .main-container { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 50px 20px; text-align: center; }
-
-        .icon-main { width: 110px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
-        
-        .title { 
-            color: white; 
-            font-size: 1.5rem; 
-            margin-top: 10px;
-            letter-spacing: 0px;
-        }
-
-        /* EFEITO GLITCH (AJUSTADO PARA MINÚSCULAS) */
-        .glitch-wrapper { margin: 5px 0 40px 0; }
-        .glitch {
+        body, html { 
+            height: 100%; 
+            background-color: #001220; 
             color: white;
-            font-size: 0.95rem;
-            position: relative;
+            overflow: hidden;
         }
+
+        .main-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* --- CABEÇALHO COM VÍDEO DISCRETO --- */
+        header {
+            position: relative;
+            width: 100%;
+            height: 240px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .header-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            opacity: 0.3; /* BEM DISCRETO */
+            object-fit: cover;
+            /* Efeito HUD: vídeo some suavemente nas bordas */
+            mask-image: radial-gradient(circle, black 30%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle, black 30%, transparent 80%);
+        }
+
+        .icon-main { 
+            width: 130px; /* Logo aumentada conforme pedido */
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); 
+        }
+
+        .title { font-size: 1.5rem; color: #fff; margin-top: 5px; }
+
+        /* --- GLITCH (MINÚSCULO) --- */
+        .glitch-wrapper { margin-top: 5px; }
+        .glitch { font-size: 0.95rem; position: relative; color: rgba(255,255,255,0.7); }
         .glitch::before, .glitch::after { 
             content: attr(data-text); 
-            position: absolute; 
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; 
             text-transform: lowercase !important;
         }
-        .glitch::before { left: 2px; text-shadow: -1px 0 #ff00c1; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 5s infinite linear alternate-reverse; }
+        .glitch::before { left: 1px; text-shadow: -1px 0 #ff00c1; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 5s infinite linear alternate-reverse; }
         .glitch::after { left: -1px; text-shadow: -1px 0 #00fff9; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 3s infinite linear alternate-reverse; }
-        
-        @keyframes glitch-anim { 0%, 15% { clip: rect(10px, 999px, 40px, 0); transform: skew(0.5deg); } 16%, 100% { clip: rect(0,0,0,0); } }
-        @keyframes glitch-anim2 { 0%, 70% { clip: rect(0,0,0,0); } 71%, 100% { clip: rect(40px, 999px, 90px, 0); transform: translateX(-1px); } }
 
-        /* CAMPOS E BOTÕES */
-        .form-area { width: 100%; max-width: 300px; }
+        @keyframes glitch-anim { 0%, 15% { clip: rect(10px, 999px, 40px, 0); } 16%, 100% { clip: rect(0,0,0,0); } }
+        @keyframes glitch-anim2 { 0%, 70% { clip: rect(0,0,0,0); } 71%, 100% { clip: rect(40px, 999px, 90px, 0); } }
+
+        /* --- FORMULÁRIO --- */
+        .form-area { width: 100%; max-width: 300px; margin-top: -20px; }
+        
         select { 
-            width: 100%; height: 48px; background: rgba(255, 255, 255, 0.08); 
-            backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 10px; color: white; padding: 0 15px; font-size: 15px; 
-            margin-bottom: 15px; outline: none; -webkit-appearance: none; 
+            width: 100%; height: 50px; background: rgba(255, 255, 255, 0.08); 
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; 
+            color: white; padding: 0 15px; font-size: 16px; margin-bottom: 20px; 
+            outline: none; -webkit-appearance: none; 
         }
         
         .btn-entrar { 
-            width: 100%; height: 48px; background: #0096d2; color: white; 
-            border: none; border-radius: 10px; font-size: 1rem; 
-            box-shadow: 0 4px 12px rgba(0, 150, 210, 0.2);
+            width: 100%; height: 50px; background: #0096d2; color: white; 
+            border: none; border-radius: 10px; font-size: 1.1rem; 
+            box-shadow: 0 4px 15px rgba(0, 150, 210, 0.3);
         }
 
-        /* LOGOS RODAPÉ */
-        .footer-logos { display: flex; gap: 30px; align-items: center; padding-bottom: 20px; }
-        .footer-logos img { height: 28px; width: auto; opacity: 0.7; }
+        /* --- RODAPÉ (LOGOS MAIORES E JUNTAS) --- */
+        .footer-logos { 
+            display: flex; 
+            gap: 15px; /* Logos bem juntas no centro */
+            align-items: center; 
+            padding: 30px 0;
+            width: 100%; 
+            justify-content: center;
+        }
+        .footer-logos img { 
+            height: 48px; /* Logos maiores */
+            width: auto; 
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
 
-    <video class="video-bg" autoplay muted loop playsinline>
-        <source src="./assets/video/background.mp4" type="video/mp4">
-    </video>
-    <div class="overlay"></div>
-
     <main class="main-container">
         <header>
+            <video class="header-video" autoplay muted loop playsinline>
+                <source src="./assets/video/background.mp4" type="video/mp4">
+            </video>
+            
             <img src="./assets/imagens/squad-logo.png" class="icon-main">
             <h1 class="title">squad geotecnia</h1>
             <div class="glitch-wrapper">
@@ -115,7 +154,7 @@
         
         setInterval(() => {
             count = (count + 1) % phrases.length;
-            const nextText = phrases[count].toLowerCase(); // Garante minúsculas no JS também
+            const nextText = phrases[count].toLowerCase();
             textElement.innerText = nextText;
             textElement.setAttribute("data-text", nextText);
         }, 4000);
