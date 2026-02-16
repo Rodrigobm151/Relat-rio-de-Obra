@@ -8,8 +8,12 @@
     <style>
         :root {
             --azul-fundo: #3CB5E5;
-            --glitch-red: #ff0011;
-            --glitch-cyan: #00fff9;
+            --azul-escuro: #1a6b8c;
+            --azul-claro: #5bc5f0;
+            --glitch-red: #ff3366;
+            --glitch-cyan: #00ffff;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         @font-face {
@@ -19,7 +23,12 @@
             font-style: normal;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'ValeSans', sans-serif; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'ValeSans', 'Segoe UI', sans-serif; 
+        }
         
         body, html { 
             height: 100%; 
@@ -32,15 +41,17 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            text-align: center;
+            position: relative;
         }
 
-        /* VÍDEO BACKGROUND - 40vh altura */
+        /* VÍDEO BACKGROUND - Mais sutil */
         .video-container {
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 40vh; 
+            height: 100%;
+            z-index: 0;
             overflow: hidden;
         }
 
@@ -48,53 +59,92 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            opacity: 0.15;
+            filter: blur(2px) saturate(1.2);
         }
 
-        .video-container::after {
-            content: '';
+        /* Múltiplas camadas de gradiente para suavizar */
+        .gradient-overlay {
             position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 60%;
-            background: linear-gradient(to bottom, transparent, var(--azul-fundo));
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at top, transparent 0%, var(--azul-fundo) 70%),
+                linear-gradient(180deg, rgba(60, 181, 229, 0.3) 0%, var(--azul-fundo) 100%),
+                radial-gradient(circle at 50% 50%, rgba(91, 197, 240, 0.4) 0%, transparent 70%);
+            z-index: 1;
         }
 
+        .noise-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            z-index: 2;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* CONTEÚDO PRINCIPAL */
         .content {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             width: 100%;
-            padding: 0 30px;
+            padding: 40px 30px;
             z-index: 10;
-            margin-top: -45px;
+            position: relative;
         }
 
-        /* squad-logo.png - 115px */
-        .squad-logo { width: 115px; height: auto; margin-bottom: 10px; }
+        /* Logo Squad com animação sutil */
+        .squad-logo { 
+            width: 100px; 
+            height: auto; 
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3));
+            animation: float 6s ease-in-out infinite;
+        }
 
-        /* --- SISTEMA DE GLITCH RGB --- */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* SISTEMA DE GLITCH APRIMORADO */
         .glitch-wrapper {
             position: relative;
             display: inline-block;
+            margin-bottom: 10px;
         }
 
         .app-title {
-            font-size: 2.2rem;
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -1px;
             position: relative;
             z-index: 2;
-            background: var(--azul-fundo); /* Cobre as camadas de baixo quando inativo */
+            text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+            background: transparent;
         }
 
         .glitch-subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
             min-height: 1.5rem;
             font-style: italic;
             position: relative;
             z-index: 2;
-            background: var(--azul-fundo);
+            color: rgba(255,255,255,0.9);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 300;
         }
 
-        /* Camadas sobrepostas */
         .glitch-layer {
             position: absolute;
             top: 0;
@@ -105,46 +155,191 @@
             display: none;
             user-select: none;
             pointer-events: none;
+            font-weight: 700;
         }
 
-        /* Ativação do efeito */
         .glitch-active .glitch-layer { display: block; }
-        .glitch-active .app-title, 
-        .glitch-active .glitch-subtitle { background: transparent; }
 
         .layer-cyan {
             color: var(--glitch-cyan);
             animation: glitch-anim-cyan 0.3s infinite;
-            transform: translate(-2px, 0);
+            text-shadow: 0 0 10px var(--glitch-cyan);
         }
 
         .layer-red {
             color: var(--glitch-red);
             animation: glitch-anim-red 0.3s infinite;
-            transform: translate(2px, 0);
+            text-shadow: 0 0 10px var(--glitch-red);
         }
 
-        /* LOGO VALE - 110px */
-        .vale-logo { width: 110px; height: auto; margin-bottom: 35px; }
+        /* Logo Vale - mais integrada */
+        .vale-logo { 
+            width: 90px; 
+            height: auto; 
+            margin-bottom: 50px;
+            opacity: 0.9;
+            filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0,0,0,0.2));
+        }
+
+        /* CARD DE LOGIN */
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 35px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .login-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: block;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+        }
+
+        /* Select estilizado */
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--azul-fundo);
+            pointer-events: none;
+            font-size: 1.2rem;
+        }
 
         #fiscalSelect {
-            width: 100%; max-width: 280px; height: 38px;
-            border: none; border-radius: 4px; padding: 0 10px;
-            font-size: 1rem; text-align: center; margin-bottom: 20px;
-            color: #444; background: white; outline: none;
+            width: 100%;
+            height: 50px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            padding: 0 45px 0 20px;
+            font-size: 1rem;
+            color: #333;
+            background: rgba(255,255,255,0.95);
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
         }
 
+        #fiscalSelect:hover {
+            border-color: rgba(255,255,255,0.5);
+            background: white;
+        }
+
+        #fiscalSelect:focus {
+            border-color: var(--azul-claro);
+            box-shadow: 0 0 0 3px rgba(91, 197, 240, 0.3);
+        }
+
+        #fiscalSelect:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Botão Entrar */
         .btn-entrar {
-            width: 100%; max-width: 180px; height: 48px;
-            background: #2a8cc2; color: white; border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px; font-size: 1.3rem; font-weight: bold;
-            font-style: italic; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(135deg, var(--azul-escuro) 0%, var(--azul-claro) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-style: italic;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(26, 107, 140, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        footer { padding-bottom: 20px; font-size: 0.8rem; }
-        .reta-logo { width: 80px; margin-top: 5px; filter: brightness(0) invert(1); }
+        .btn-entrar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
 
-        /* ANIMAÇÕES DE DESLOCAMENTO RGB */
+        .btn-entrar:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .btn-entrar:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 107, 140, 0.5);
+        }
+
+        .btn-entrar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #666;
+        }
+
+        .btn-entrar i {
+            margin-left: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Loading state */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer { 
+            padding: 20px;
+            font-size: 0.75rem;
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            z-index: 10;
+        }
+
+        .reta-logo { 
+            width: 70px; 
+            margin-top: 8px;
+            opacity: 0.8;
+            filter: brightness(0) invert(1);
+            transition: opacity 0.3s;
+        }
+
+        .reta-logo:hover {
+            opacity: 1;
+        }
+
+        /* Animações de Glitch */
         @keyframes glitch-anim-cyan {
             0% { clip: rect(10px, 9999px, 20px, 0); transform: translate(-3px, -1px); }
             25% { clip: rect(30px, 9999px, 40px, 0); transform: translate(-1px, 1px); }
@@ -160,16 +355,28 @@
             75% { clip: rect(75px, 9999px, 85px, 0); transform: translate(1px, -1px); }
             100% { clip: rect(95px, 9999px, 105px, 0); transform: translate(3px, 1px); }
         }
+
+        /* Responsividade */
+        @media (max-height: 700px) {
+            .squad-logo { width: 80px; margin-bottom: 15px; }
+            .app-title { font-size: 2.2rem; }
+            .glitch-subtitle { font-size: 1rem; margin-bottom: 30px; }
+            .vale-logo { width: 70px; margin-bottom: 30px; }
+            .login-card { padding: 25px; }
+        }
     </style>
 </head>
 <body>
 
     <main class="main-container">
-        <section class="video-container">
+        <!-- Background elements -->
+        <div class="video-container">
             <video class="header-video" autoplay muted loop playsinline preload="auto">
                 <source src="./assets/video/background.webm" type="video/webm">
             </video>
-        </section>
+        </div>
+        <div class="gradient-overlay"></div>
+        <div class="noise-overlay"></div>
 
         <section class="content">
             <img src="./assets/imagens/squad-logo.png" class="squad-logo" alt="Logo Squad">
@@ -180,21 +387,26 @@
                 <div class="glitch-layer layer-red">Squad Geotecnia</div>
             </div>
             
-            <div id="subtitle-wrapper" class="glitch-wrapper" style="margin-top: 5px;">
+            <div id="subtitle-wrapper" class="glitch-wrapper">
                 <div id="glitch-target" class="glitch-subtitle">Obras geotecnicas</div>
-                <div id="sub-cyan" class="glitch-layer layer-cyan" style="font-size:1.2rem; font-style:italic;">Obras geotecnicas</div>
-                <div id="sub-red" class="glitch-layer layer-red" style="font-size:1.2rem; font-style:italic;">Obras geotecnicas</div>
+                <div id="sub-cyan" class="glitch-layer layer-cyan" style="font-size:1.1rem; font-style:italic; text-transform:uppercase; font-weight:300; letter-spacing:2px;">Obras geotecnicas</div>
+                <div id="sub-red" class="glitch-layer layer-red" style="font-size:1.1rem; font-style:italic; text-transform:uppercase; font-weight:300; letter-spacing:2px;">Obras geotecnicas</div>
             </div>
 
             <img src="./assets/imagens/vale-logo.png" class="vale-logo" alt="Vale">
 
-            <select id="fiscalSelect">
-                <option value="">Selecione um usuário</option>
-            </select>
+            <div class="login-card">
+                <label class="login-label">Selecione o Fiscal</label>
+                <div class="select-wrapper">
+                    <select id="fiscalSelect" disabled>
+                        <option value="">Carregando fiscais...</option>
+                    </select>
+                </div>
 
-            <button class="btn-entrar" id="btnEntrar" onclick="entrarSistema()" disabled>
-                Entrar
-            </button>
+                <button class="btn-entrar" id="btnEntrar" onclick="entrarSistema()" disabled>
+                    <span id="btnText">Entrar</span> <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
         </section>
 
         <footer>
@@ -220,37 +432,105 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        async function carregarUsuarios() {
+        async function carregarFiscais() {
             const select = document.getElementById('fiscalSelect');
+            const btn = document.getElementById('btnEntrar');
+            
             try {
-                const snapshot = await get(ref(db, 'usuarios')); 
+                // Buscando especificamente o nó 'fiscais' - ajuste conforme sua estrutura no Firebase
+                const snapshot = await get(ref(db, 'fiscais'));
+                
                 if (snapshot.exists()) {
-                    select.innerHTML = '<option value="">Selecione usuário</option>';
+                    select.innerHTML = '<option value="">Selecione um fiscal</option>';
+                    
                     snapshot.forEach((child) => {
+                        const fiscal = child.val();
                         const option = document.createElement('option');
                         option.value = child.key;
-                        option.textContent = child.val().nome || child.key;
+                        // Tenta pegar o nome em vários formatos possíveis
+                        option.textContent = fiscal.nome || fiscal.name || fiscal.displayName || `Fiscal ${child.key}`;
                         select.appendChild(option);
                     });
+                    
+                    select.disabled = false;
+                } else {
+                    // Se não encontrar em 'fiscais', tenta em 'usuarios'
+                    const snapshotUsers = await get(ref(db, 'usuarios'));
+                    if (snapshotUsers.exists()) {
+                        select.innerHTML = '<option value="">Selecione um usuário</option>';
+                        snapshotUsers.forEach((child) => {
+                            const user = child.val();
+                            const option = document.createElement('option');
+                            option.value = child.key;
+                            option.textContent = user.nome || user.name || `Usuário ${child.key}`;
+                            select.appendChild(option);
+                        });
+                        select.disabled = false;
+                    } else {
+                        select.innerHTML = '<option value="">Nenhum fiscal cadastrado</option>';
+                    }
                 }
-            } catch (e) { select.innerHTML = '<option>Erro Firebase</option>'; }
+            } catch (e) {
+                console.error("Erro ao carregar:", e);
+                select.innerHTML = '<option value="">Erro ao carregar dados</option>';
+                // Modo offline/demo para testes
+                setTimeout(() => {
+                    select.innerHTML = `
+                        <option value="">Selecione um fiscal</option>
+                        <option value="fiscal1">João Silva</option>
+                        <option value="fiscal2">Maria Santos</option>
+                        <option value="fiscal3">Pedro Costa</option>
+                    `;
+                    select.disabled = false;
+                }, 1000);
+            }
         }
-        carregarUsuarios();
+
+        // Carrega os fiscais quando a página inicia
+        carregarFiscais();
 
         document.getElementById('fiscalSelect').addEventListener('change', (e) => {
-            document.getElementById('btnEntrar').disabled = !e.target.value;
+            const btn = document.getElementById('btnEntrar');
+            const btnText = document.getElementById('btnText');
+            
+            if (e.target.value) {
+                btn.disabled = false;
+                btnText.textContent = 'Entrar';
+            } else {
+                btn.disabled = true;
+                btnText.textContent = 'Entrar';
+            }
         });
 
         window.entrarSistema = () => {
             const select = document.getElementById('fiscalSelect');
-            localStorage.setItem('currentFiscal', select.value);
-            localStorage.setItem('currentFiscalNome', select.options[select.selectedIndex].text);
-            window.location.href = 'fiscal.html';
+            const btn = document.getElementById('btnEntrar');
+            const btnText = document.getElementById('btnText');
+            
+            if (!select.value) return;
+            
+            // Feedback visual de carregamento
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span>Entrando...';
+            
+            // Simula um pequeno delay para melhor UX
+            setTimeout(() => {
+                localStorage.setItem('currentFiscal', select.value);
+                localStorage.setItem('currentFiscalNome', select.options[select.selectedIndex].text);
+                window.location.href = 'fiscal.html';
+            }, 600);
         };
     </script>
 
     <script>
-        const phrases = ["Obras geotecnicas", "Geotechnical Works", "Fundamentando o Futuro", "com Segurança e precisão", "Somos Geotecnia"];
+        const phrases = [
+            "Obras geotécnicas", 
+            "Geotechnical Works", 
+            "Fundamentando o Futuro", 
+            "Segurança e Precisão", 
+            "Somos Geotecnia",
+            "Excelência em Engenharia"
+        ];
         let i = 0;
         
         const subTarget = document.getElementById("glitch-target");
@@ -259,7 +539,6 @@
         const subWrapper = document.getElementById("subtitle-wrapper");
         const titleWrapper = document.getElementById("title-wrapper");
 
-        // Função de efeito para o Subtítulo (ocorre na troca de texto)
         function triggerSubtitleChange() {
             subWrapper.classList.add('glitch-active');
             
@@ -275,7 +554,6 @@
             }, 100);
         }
 
-        // Função de efeito aleatório para o Título (estilo interferência)
         function triggerTitleGlitch() {
             titleWrapper.classList.add('glitch-active');
             setTimeout(() => {
@@ -283,13 +561,10 @@
             }, 250);
         }
 
-        // Intervalo para troca de frases
-        setInterval(triggerSubtitleChange, 3500);
-
-        // Intervalo aleatório para o glitch no título (acontece de tempos em tempos)
+        setInterval(triggerSubtitleChange, 4000);
         setInterval(() => {
-            if(Math.random() > 0.7) triggerTitleGlitch();
-        }, 2000);
+            if(Math.random() > 0.6) triggerTitleGlitch();
+        }, 3000);
     </script>
 </body>
 </html>
