@@ -1,386 +1,518 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VER 1.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --azul-vale: #3CB5E5;
-            --azul-escuro: #0096d2;
-            --verde-vale: #007E79;
-            --cinza-texto: #555555;
-            --fundo: #f5f7fa;
-            --laranja: #ff9800;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--fundo); color: var(--cinza-texto); -webkit-font-smoothing: antialiased; padding-bottom: 20px; }
+<title>RDC 1.2</title>
 
-        /* Headers Estilizados */
-        .header-vale { 
-            background: linear-gradient(135deg, var(--azul-vale), var(--azul-escuro)); 
-            color: white; 
-            padding: 20px; 
-            border-bottom-left-radius: 20px; 
-            border-bottom-right-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-        }
-        .header-vale h1 { font-size: 1.3rem; font-style: italic; font-weight: 700; }
-        .header-vale p { font-size: 0.85rem; opacity: 0.9; }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-        .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
+<style>
 
-        /* Botão Estilo PowerPoint */
-        .btn-criar-pp {
-            background: linear-gradient(to bottom, #4fc3f7, #0199d9);
-            color: white;
-            border: none;
-            padding: 10px 40px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-style: italic;
-            font-size: 1rem;
-            box-shadow: 0 4px 0 #0077a8, 0 6px 10px rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: all 0.1s;
-        }
-        .btn-criar-pp:active { transform: translateY(3px); box-shadow: 0 1px 0 #0077a8; }
+:root{
+--azul:#3CB5E5;
+--verde:#007E79;
+--cinza:#777;
+--fundo:#f5f7fa;
+}
 
-        /* Cards */
-        .card-obra { 
-            background: white; 
-            border-radius: 12px; 
-            padding: 15px; 
-            margin-bottom: 12px; 
-            border-left: 6px solid var(--azul-vale);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
+*{box-sizing:border-box;font-family:Inter}
 
-        .status-box {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            border: 1px solid #e0e0e0;
-        }
+body{
+margin:0;
+background:var(--fundo);
+}
 
-        /* Tabs do RDC */
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab-btn { 
-            flex: 1; border: none; padding: 12px; border-radius: 8px; 
-            background: #d1d3d4; color: white; font-weight: bold; font-style: italic; 
-            cursor: pointer;
-        }
-        .tab-btn.active { background: var(--azul-vale); }
+header{
+background:var(--azul);
+color:#fff;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-        /* Accordion de Equipamentos */
-        .equip-card { margin-bottom: 10px; border-radius: 8px; overflow: hidden; }
-        .equip-header { 
-            background: var(--azul-vale); color: white; padding: 12px 15px; 
-            display: flex; justify-content: space-between; align-items: center;
-            font-weight: 600; cursor: pointer;
-        }
-        .equip-body { 
-            background: white; padding: 15px; border: 1px solid var(--azul-vale); 
-            border-top: none; display: none;
-        }
-        .equip-body.active { display: block; }
+.container{
+max-width:900px;
+margin:auto;
+padding:15px;
+}
 
-        .grid-campos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .input-rdc { 
-            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; 
-            text-align: center; font-weight: bold;
-        }
-        .label-peq { font-size: 0.7rem; font-style: italic; display: block; margin-bottom: 4px; }
+/* Cards */
 
-        textarea { width: 100%; height: 60px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 5px; padding: 8px; }
+.card{
+background:#fff;
+border-radius:12px;
+padding:15px;
+margin-bottom:12px;
+box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
 
-        /* Footer */
-        .action-bar { 
-            position: fixed; bottom: 0; left: 0; right: 0; background: white; 
-            padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
-            display: flex; gap: 10px; z-index: 100; 
-        }
-        .btn-acao { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
-        .btn-cancelar { background: #eee; color: #666; }
-        .btn-confirmar { background: var(--verde-vale); color: white; }
+.obra-item{
+padding:15px;
+border-left:4px solid var(--azul);
+margin-bottom:10px;
+cursor:pointer;
+}
 
-        .toast { 
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
-            background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; 
-            border-radius: 20px; z-index: 1000; display: none; 
-        }
-    </style>
+.obra-item:hover{
+background:#f0f9ff;
+}
+
+/* Equip */
+
+.equip-item{
+border:1px solid #ddd;
+border-radius:10px;
+padding:12px;
+margin-bottom:10px;
+}
+
+.equip-header{
+display:flex;
+justify-content:space-between;
+font-weight:600;
+}
+
+.equip-detail{
+display:none;
+margin-top:10px;
+}
+
+.equip-detail.open{
+display:block;
+}
+
+.input{
+width:100%;
+padding:6px;
+font-size:18px;
+text-align:center;
+border:1px solid var(--azul);
+border-radius:6px;
+}
+
+.btn{
+background:var(--azul);
+color:#fff;
+border:none;
+padding:8px 15px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.btn-sec{
+background:#ddd;
+color:#333;
+}
+
+.toast{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:#333;
+color:#fff;
+padding:10px 20px;
+border-radius:20px;
+display:none;
+}
+
+</style>
 </head>
+
 <body>
 
-    <div id="toast" class="toast"></div>
+<header>
+<div>
+<b id="titulo">Minhas Obras</b><br>
+<small id="subtitulo"></small>
+</div>
 
-    <div id="obrasPanel">
-        <header class="header-vale">
-            <h1>Minhas Obras</h1>
-            <p id="userGreeting">Olá, Fiscal</p>
-        </header>
-        <div class="container" id="obrasList">
-            </div>
-    </div>
+<button class="btn-sec btn" onclick="sair()">Sair</button>
+</header>
 
-    <div id="rdcPanel" style="display: none;">
-        <header class="header-vale">
-            <h1 id="headerObraNome">Nome da Obra</h1>
-            <p>Histórico de Relatórios</p>
-        </header>
-        <div class="container">
-            <div class="status-box">
-                <p style="margin-bottom: 15px; font-style: italic;">
-                    Relatório de campo de hoje: <br>
-                    <strong id="dataHojeStr">16/02/2026</strong> – <span style="color: var(--laranja)">Pendente</span>
-                </p>
-                <button class="btn-criar-pp" onclick="criarNovoRDC()">Criar</button>
-            </div>
-            
-            <p style="font-size: 0.8rem; font-style: italic; color: var(--azul-vale); margin-bottom: 10px;">
-                Lista dos relatórios anteriores
-            </p>
-            <div id="rdcList"></div>
-            
-            <button class="btn-acao btn-cancelar" style="width: 100%; margin-top: 20px;" onclick="location.reload()">Voltar para Obras</button>
-        </div>
-    </div>
+<div class="container">
 
-    <div id="formPanel" style="display: none;">
-        <header class="header-vale">
-            <h1 id="formObraNome">Obra</h1>
-            <p id="formFiscalNome">Fiscal</p>
-        </header>
-        
-        <div class="container">
-            <p style="font-size: 0.85rem; font-style: italic; margin-bottom: 15px; color: var(--azul-vale)">
-                RDC <span id="rdcNum">000</span>: <span id="rdcData">00/00/0000</span> – <span style="color: var(--laranja)">Em elaboração</span>
-            </p>
+<!-- OBRAS -->
 
-            <div class="tabs">
-                <button class="tab-btn active">Clima</button>
-                <button class="tab-btn active">Registro</button>
-                <button class="tab-btn">Histograma</button>
-            </div>
+<div id="obrasPanel"></div>
 
-            <div class="status-box" style="text-align: left; padding: 15px;">
-                <label class="label-peq">Condição do Tempo</label>
-                <select id="climaCondicao" class="input-rdc" style="text-align: left;">
-                    <option value="Bom">Bom / Ensolarado</option>
-                    <option value="Nublado">Nublado</option>
-                    <option value="Chuva Leve">Chuva Leve</option>
-                    <option value="Paralisado">Chuva Forte / Paralisado</option>
-                </select>
-            </div>
+<!-- RDCs -->
 
-            <div id="equipamentosContainer">
-                </div>
-        </div>
+<div id="rdcPanel" style="display:none">
 
-        <div class="action-bar">
-            <button class="btn-acao btn-cancelar" onclick="voltarParaRDCs()">CANCELAR</button>
-            <button class="btn-acao btn-confirmar" onclick="enviarRDC()">FINALIZAR E ENVIAR</button>
-        </div>
-    </div>
+<div class="card">
+<button class="btn" onclick="novoRDC()">+ Novo RDC</button>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+<div id="rdcList"></div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
-            authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
-            databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
-            projectId: "relatorio-obra-geotecnia",
-            storageBucket: "relatorio-obra-geotecnia.firebasestorage.app",
-            messagingSenderId: "765646735604",
-            appId: "1:765646735604:web:59424d5353813939e976a1"
-        };
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+<!-- FORM -->
 
-        // Globais para facilitar as chamadas inline do HTML
-        window.db = db;
-        window.dbRef = ref;
-        window.dbGet = get;
-        window.dbSet = set;
-        window.dbPush = push;
+<div id="formPanel" style="display:none">
 
-        // Inicializar aplicação
-        const currentFiscalNome = localStorage.getItem('currentFiscalNome') || 'Fiscal de Campo';
-        document.getElementById('userGreeting').textContent = `Olá, ${currentFiscalNome}`;
-        document.getElementById('dataHojeStr').textContent = new Date().toLocaleDateString('pt-BR');
-        
-        carregarObras();
-    </script>
+<div class="card">
 
-    <script>
-        let currentObraId = null;
-        let currentRDC = null;
+<b id="rdcTitulo"></b><br>
+<small id="rdcData"></small>
 
-        // --- NAVEGAÇÃO E OBRAS ---
-        async function carregarObras() {
-            const list = document.getElementById('obrasList');
-            list.innerHTML = '<p>Carregando obras...</p>';
-            try {
-                const snap = await window.dbGet(window.dbRef(window.db, 'obras'));
-                if (snap.exists()) {
-                    let html = '';
-                    snap.forEach(child => {
-                        const obra = child.val();
-                        html += `
-                            <div class="card-obra" onclick="abrirObra('${child.key}', '${obra.nome}')">
-                                <div>
-                                    <strong style="color: var(--azul-escuro)">${obra.nome}</strong><br>
-                                    <small style="color: #999">Toque para gerenciar relatórios</small>
-                                </div>
-                                <i class="fas fa-chevron-right" style="color: var(--azul-vale)"></i>
-                            </div>`;
-                    });
-                    list.innerHTML = html;
-                }
-            } catch (e) { console.error(e); }
-        }
+</div>
 
-        function abrirObra(id, nome) {
-            currentObraId = id;
-            document.getElementById('headerObraNome').textContent = nome;
-            document.getElementById('formObraNome').textContent = nome;
-            document.getElementById('obrasPanel').style.display = 'none';
-            document.getElementById('rdcPanel').style.display = 'block';
-            carregarHistoricoRDCs();
-        }
+<div class="card">
 
-        async function carregarHistoricoRDCs() {
-            const container = document.getElementById('rdcList');
-            container.innerHTML = '<small>Buscando histórico...</small>';
-            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/relatorios`));
-            let html = '';
-            if (snap.exists()) {
-                snap.forEach(child => {
-                    const rdc = child.val();
-                    html += `
-                        <div class="card-obra" style="border-left-color: var(--verde-vale)">
-                            <div style="font-size: 0.9rem">
-                                <strong>RDC #${rdc.numero}</strong> - ${rdc.data}<br>
-                                <small>Fiscal: ${rdc.fiscal}</small>
-                            </div>
-                            <span style="font-size: 0.7rem; color: var(--verde-vale); font-weight: bold;">ENVIADO</span>
-                        </div>`;
-                });
-            }
-            container.innerHTML = html || '<p style="font-size: 0.8rem; color: #999">Nenhum relatório anterior.</p>';
-        }
+<label>Clima</label>
 
-        // --- LÓGICA DO FORMULÁRIO RDC ---
-        async function criarNovoRDC() {
-            const hoje = new Date();
-            const mesKey = (hoje.getMonth() + 1).toString().padStart(2, '0') + '-' + hoje.getFullYear();
-            
-            currentRDC = {
-                numero: Math.floor(Math.random() * 900) + 100,
-                data: hoje.toLocaleDateString('pt-BR'),
-                mesRef: mesKey,
-                fiscal: localStorage.getItem('currentFiscalNome') || 'Fiscal',
-                dados: { equipamentos: {} }
-            };
+<select id="clima" class="input">
 
-            document.getElementById('rdcNum').textContent = currentRDC.numero;
-            document.getElementById('rdcData').textContent = currentRDC.data;
-            document.getElementById('formFiscalNome').textContent = currentRDC.fiscal;
-            
-            document.getElementById('rdcPanel').style.display = 'none';
-            document.getElementById('formPanel').style.display = 'block';
+<option>Bom</option>
+<option>Nublado</option>
+<option>Chuva Leve</option>
+<option>Chuva Forte</option>
 
-            carregarEquipamentosDoContrato(mesKey);
-        }
+</select>
 
-        async function carregarEquipamentosDoContrato(mesKey) {
-            const container = document.getElementById('equipamentosContainer');
-            container.innerHTML = '<p>Carregando contrato do mês...</p>';
-            
-            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
-            
-            if (!snap.exists()) {
-                container.innerHTML = '<div class="status-box">Nenhum contrato de equipamentos encontrado para este mês.</div>';
-                return;
-            }
+</div>
 
-            let html = '';
-            snap.forEach(child => {
-                const eq = child.val();
-                const id = child.key;
-                html += `
-                    <div class="equip-card">
-                        <div class="equip-header" onclick="this.nextElementSibling.classList.toggle('active')">
-                            <span>${eq.nome}</span>
-                            <span>${String(eq.previsto).padStart(2, '0')} <i class="fas fa-chevron-down"></i></span>
-                        </div>
-                        <div class="equip-body">
-                            <div class="grid-campos">
-                                <div><label class="label-peq">Previsto</label><input type="text" class="input-rdc" value="${eq.previsto}" disabled></div>
-                                <div><label class="label-peq" style="color: var(--azul-vale)">Real</label><input type="number" class="input-rdc in-real" data-id="${id}" data-nome="${eq.nome}" value="${eq.previsto}"></div>
-                                <div><label class="label-peq" style="color: var(--laranja)">Manut.</label><input type="number" class="input-rdc in-manut" data-id="${id}" value="0"></div>
-                            </div>
-                            <label class="label-peq">Observações</label>
-                            <textarea class="in-obs" data-id="${id}" placeholder="Notas sobre este equipamento..."></textarea>
-                        </div>
-                    </div>`;
-            });
-            container.innerHTML = html;
-        }
+<div class="card">
 
-        async function enviarRDC() {
-            if (!confirm("Confirmar fechamento e envio do RDC?")) return;
+<label>Atividades</label>
 
-            // Coleta dados climáticos
-            currentRDC.dados.clima = document.getElementById('climaCondicao').value;
+<textarea id="atividades" class="input"></textarea>
 
-            // Coleta dados de todos os equipamentos do formulário
-            document.querySelectorAll('.in-real').forEach(input => {
-                const id = input.dataset.id;
-                currentRDC.dados.equipamentos[id] = {
-                    nome: input.dataset.nome,
-                    real: parseInt(input.value) || 0,
-                    manutencao: parseInt(document.querySelector(`.in-manut[data-id="${id}"]`).value) || 0,
-                    obs: document.querySelector(`.in-obs[data-id="${id}"]`).value
-                };
-            });
+</div>
 
-            try {
-                const relRef = window.dbRef(window.db, `obras/${currentObraId}/relatorios`);
-                await window.dbPush(relRef, currentRDC);
-                showToast("RDC enviado com sucesso!");
-                voltarParaRDCs();
-            } catch (e) {
-                alert("Erro ao salvar: " + e.message);
-            }
-        }
+<div class="card">
 
-        function voltarParaRDCs() {
-            document.getElementById('formPanel').style.display = 'none';
-            document.getElementById('rdcPanel').style.display = 'block';
-            carregarHistoricoRDCs();
-        }
+<b>Equipamentos (mês atual)</b>
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
-        }
-    </script>
+<div id="equipContainer"></div>
+
+</div>
+
+<div class="card">
+
+<button class="btn" onclick="enviar()">Enviar RDC</button>
+<button class="btn-sec btn" onclick="voltar()">Voltar</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getDatabase, ref, get, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+const config = {
+apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
+authDomain: "relatorio-obra-geotecnia.firebaseapp.com",
+databaseURL: "https://relatorio-obra-geotecnia-default-rtdb.firebaseio.com",
+projectId: "relatorio-obra-geotecnia",
+storageBucket: "relatorio-obra-geotecnia.appspot.com",
+messagingSenderId: "765646735604",
+appId: "1:765646735604:web:59424d5353813939e976a1"
+};
+
+const app = initializeApp(config);
+const db = getDatabase(app);
+
+window.db=db;
+window.ref=ref;
+window.get=get;
+window.push=push;
+
+init();
+
+</script>
+
+<script>
+
+let fiscal = localStorage.getItem("fiscal") || "Fiscal";
+let obraAtual=null;
+let rdcAtual=null;
+let equipamentos=[];
+
+function toast(msg){
+
+const t=document.getElementById("toast");
+t.innerText=msg;
+t.style.display="block";
+
+setTimeout(()=>t.style.display="none",3000);
+
+}
+
+function getMesAtual(){
+
+const d=new Date();
+
+const m=String(d.getMonth()+1).padStart(2,"0");
+const a=d.getFullYear();
+
+return `${m}-${a}`;
+
+}
+
+async function init(){
+
+document.getElementById("subtitulo").innerText="Olá, "+fiscal;
+
+carregarObras();
+
+}
+
+/* OBRAS */
+
+async function carregarObras(){
+
+const div=document.getElementById("obrasPanel");
+div.innerHTML="Carregando...";
+
+const snap=await get(ref(db,"obras"));
+
+let html="";
+
+if(snap.exists()){
+
+snap.forEach(o=>{
+
+html+=`
+
+<div class="obra-item" onclick="abrirObra('${o.key}','${o.val().nome}')">
+
+<b>${o.val().nome}</b><br>
+<small>Abrir relatórios</small>
+
+</div>
+
+`;
+
+});
+
+}
+
+div.innerHTML=html || "Nenhuma obra";
+
+}
+
+function abrirObra(id,nome){
+
+obraAtual={id,nome};
+
+document.getElementById("titulo").innerText=nome;
+
+document.getElementById("obrasPanel").style.display="none";
+document.getElementById("rdcPanel").style.display="block";
+
+carregarRDCs();
+
+}
+
+/* RDC */
+
+async function carregarRDCs(){
+
+const div=document.getElementById("rdcList");
+
+div.innerHTML="Buscando...";
+
+const snap=await get(ref(db,`obras/${obraAtual.id}/relatorios`));
+
+let html="";
+
+if(snap.exists()){
+
+snap.forEach(r=>{
+
+html+=`
+
+<div class="card">
+
+<b>RDC #${r.val().numero}</b><br>
+<small>${r.val().data}</small>
+
+</div>
+
+`;
+
+});
+
+}
+
+div.innerHTML=html||"Nenhum RDC";
+
+}
+
+/* NOVO */
+
+async function novoRDC(){
+
+const d=new Date();
+
+rdcAtual={
+numero:Math.floor(Math.random()*900+100),
+data:d.toLocaleDateString("pt-BR"),
+mes:getMesAtual(),
+dados:{equipamentos:{}}
+};
+
+document.getElementById("rdcTitulo").innerText="RDC #"+rdcAtual.numero;
+document.getElementById("rdcData").innerText=rdcAtual.data+" ("+rdcAtual.mes+")";
+
+document.getElementById("rdcPanel").style.display="none";
+document.getElementById("formPanel").style.display="block";
+
+await carregarEquip();
+
+}
+
+/* EQUIP */
+
+async function carregarEquip(){
+
+const div=document.getElementById("equipContainer");
+
+div.innerHTML="Carregando...";
+
+const mes=rdcAtual.mes;
+
+const snap=await get(ref(db,`obras/${obraAtual.id}/contrato/${mes}`));
+
+equipamentos=[];
+
+if(!snap.exists()){
+
+div.innerHTML="Nenhum planejamento para "+mes;
+return;
+
+}
+
+snap.forEach(e=>{
+
+equipamentos.push({
+id:e.key,
+...e.val()
+});
+
+});
+
+renderEquip();
+
+}
+
+function renderEquip(){
+
+const div=document.getElementById("equipContainer");
+
+let html="";
+
+equipamentos.forEach((e,i)=>{
+
+const edit=rdcAtual.dados.equipamentos[e.id];
+const real=edit?edit.real:e.previsto;
+
+html+=`
+
+<div class="equip-item">
+
+<div class="equip-header" onclick="toggle(${i})">
+
+<span>${e.nome}</span>
+<span>${real} / ${e.previsto}</span>
+
+</div>
+
+<div class="equip-detail" id="det-${i}">
+
+<input class="input" id="inp-${i}" type="number" value="${real}">
+
+<button class="btn" onclick="salvarEquip('${e.id}',${i})">Confirmar</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+div.innerHTML=html;
+
+}
+
+function toggle(i){
+
+document.getElementById("det-"+i).classList.toggle("open");
+
+}
+
+function salvarEquip(id,i){
+
+const v=parseInt(document.getElementById("inp-"+i).value)||0;
+
+rdcAtual.dados.equipamentos[id]={real:v};
+
+toast("Atualizado");
+
+renderEquip();
+
+}
+
+/* ENVIAR */
+
+async function enviar(){
+
+try{
+
+rdcAtual.dados.clima=document.getElementById("clima").value;
+rdcAtual.dados.atividades=document.getElementById("atividades").value;
+rdcAtual.fiscal=fiscal;
+
+await push(ref(db,`obras/${obraAtual.id}/relatorios`),rdcAtual);
+
+toast("RDC enviado");
+
+voltar();
+
+}catch(e){
+
+toast("Erro");
+
+console.error(e);
+
+}
+
+}
+
+/* VOLTAR */
+
+function voltar(){
+
+document.getElementById("formPanel").style.display="none";
+document.getElementById("rdcPanel").style.display="block";
+
+carregarRDCs();
+
+}
+
+function sair(){
+
+localStorage.clear();
+location.reload();
+
+}
+
+</script>
+
 </body>
 </html>
