@@ -27,6 +27,7 @@
             --cinza-texto: #555555;
             --fundo: #f5f7fa;
             --laranja: #ff9800;
+            --vermelho: #e74c3c;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; color: var(--cinza-texto); }
@@ -96,6 +97,13 @@
         }
         
         .btn-criar-pp:active { transform: translateY(3px); box-shadow: 0 1px 0 #0077a8; }
+        
+        .btn-criar-pp:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* Cards */
         .card-obra { 
@@ -287,6 +295,10 @@
             display: none; 
         }
         
+        .toast.error {
+            background: var(--vermelho);
+        }
+        
         /* Status indicators */
         .status-pendente { color: var(--laranja) !important; font-weight: 600; }
         .status-enviado { color: var(--verde-vale) !important; font-weight: 600; }
@@ -296,7 +308,18 @@
             border-left-color: var(--laranja) !important;
             background: #fff8e1;
         }
+        
+        /* Mensagem de erro */
+        .erro-box {
+            background: #ffebee;
+            border-left: 4px solid var(--vermelho);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: var(--vermelho);
+        }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -356,10 +379,10 @@
 
             <!-- Abas Principais -->
             <div class="tabs-principais">
-                <button class="tab-principal active" onclick="switchTab('geral')">
+                <button class="tab-principal active" onclick="switchTab('geral', this)">
                     <i class="fas fa-cloud-sun"></i> Geral
                 </button>
-                <button class="tab-principal" onclick="switchTab('equipamentos')">
+                <button class="tab-principal" onclick="switchTab('equipamentos', this)">
                     <i class="fas fa-truck-monster"></i> Equipamentos
                 </button>
             </div>
@@ -470,7 +493,7 @@
                 }
             } catch (e) { 
                 console.error(e);
-                list.innerHTML = '<p style="color: #777">Erro ao carregar obras.</p>';
+                list.innerHTML = '<div class="erro-box">Erro ao carregar obras. Verifique sua conexão.</div>';
             }
         }
 
@@ -478,17 +501,30 @@
             currentObraId = id;
             
             // Buscar dados completos da obra
-            const snap = await window.dbGet(window.dbRef(window.db, `obras/${id}`));
-            if (!snap.exists()) return;
-            
-            currentObraData = snap.val();
-            
-            document.getElementById('headerObraNome').textContent = currentObraData.nome;
-            document.getElementById('formObraNome').textContent = currentObraData.nome;
-            document.getElementById('obrasPanel').style.display = 'none';
-            document.getElementById('rdcPanel').style.display = 'block';
-            
-            await carregarHistoricoRDCs();
+            try {
+                const snap = await window.dbGet(window.dbRef(window.db, `obras/${id}`));
+                if (!snap.exists()) {
+                    showToast('Obra não encontrada no banco de dados', 'error');
+                    return;
+                }
+                
+                currentObraData = snap.val();
+                
+                if (!currentObraData.dataInicio) {
+                    showToast('Esta obra não possui data de início cadastrada', 'error');
+                    console.warn('Obra sem dataInicio:', currentObraData);
+                }
+                
+                document.getElementById('headerObraNome').textContent = currentObraData.nome;
+                document.getElementById('formObraNome').textContent = currentObraData.nome;
+                document.getElementById('obrasPanel').style.display = 'none';
+                document.getElementById('rdcPanel').style.display = 'block';
+                
+                await carregarHistoricoRDCs();
+            } catch (e) {
+                console.error(e);
+                showToast('Erro ao abrir obra', 'error');
+            }
         }
 
         async function carregarHistoricoRDCs() {
@@ -499,81 +535,99 @@
             
             container.innerHTML = '<small style="color: #777">Buscando histórico...</small>';
             
-            const hoje = new Date().toLocaleDateString('pt-BR');
-            const hojeKey = formatarDataKey(new Date()); // YYYY-MM-DD
+            const hoje = new Date();
+            const hojeStr = hoje.toLocaleDateString('pt-BR');
+            const hojeKey = formatarDataKey(hoje); // YYYY-MM-DD
             let rdcHojeEnviado = false;
             let ultimoNumero = 0;
             
-            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/relatorios`));
-            let html = '';
-            
-            if (snap.exists()) {
-                const rdcList = [];
-                snap.forEach(child => {
-                    const rdc = child.val();
-                    rdcList.push(rdc);
-                    if (parseInt(rdc.numero) > ultimoNumero) {
-                        ultimoNumero = parseInt(rdc.numero);
+            try {
+                const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/relatorios`));
+                let html = '';
+                
+                if (snap && snap.exists()) {
+                    const rdcList = [];
+                    snap.forEach(child => {
+                        const rdc = child.val();
+                        rdcList.push(rdc);
+                        if (parseInt(rdc.numero) > ultimoNumero) {
+                            ultimoNumero = parseInt(rdc.numero);
+                        }
+                        // Verifica se há RDC para hoje (pela data ou dataKey)
+                        if (rdc.data === hojeStr || rdc.dataKey === hojeKey) {
+                            rdcHojeEnviado = true;
+                        }
+                    });
+                    
+                    // Ordenar por número decrescente
+                    rdcList.sort((a, b) => parseInt(b.numero) - parseInt(a.numero));
+                    
+                    rdcList.forEach(rdc => {
+                        const isHoje = (rdc.data === hojeStr || rdc.dataKey === hojeKey);
+                        html += `
+                            <div class="card-obra ${isHoje ? 'rdc-pendente-card' : ''}" style="border-left-color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}">
+                                <div style="font-size: 0.9rem">
+                                    <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
+                                    <small style="color: #777">Fiscal: ${rdc.fiscalNome || rdc.fiscal}</small>
+                                </div>
+                                <span style="font-size: 0.75rem; color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}; font-weight: bold;">
+                                    ${isHoje ? 'HOJE' : 'ENVIADO'}
+                                </span>
+                            </div>`;
+                    });
+                }
+                
+                // Determinar próximo número do RDC baseado na dataInicio da obra
+                if (currentObraData && currentObraData.dataInicio && !rdcHojeEnviado) {
+                    // dataInicio está no formato YYYY-MM-DD (do input type="date")
+                    const [anoInicio, mesInicio, diaInicio] = currentObraData.dataInicio.split('-');
+                    const dataInicio = new Date(anoInicio, mesInicio - 1, diaInicio);
+                    
+                    // Calcular diferença em dias
+                    const diffTime = hoje - dataInicio;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    // RDC 001 = primeiro dia (dataInicio)
+                    proximoRDCNumero = diffDays + 1;
+                    
+                    // Se for negativo, obra ainda não começou
+                    if (proximoRDCNumero < 1) {
+                        proximoRDCNumero = 1;
                     }
-                    // Verifica se há RDC para hoje (pela data ou dataKey)
-                    if (rdc.data === hoje || rdc.dataKey === hojeKey) {
-                        rdcHojeEnviado = true;
-                    }
-                });
+                } else if (ultimoNumero > 0) {
+                    proximoRDCNumero = ultimoNumero + 1;
+                } else {
+                    proximoRDCNumero = 1;
+                }
                 
-                // Ordenar por número decrescente
-                rdcList.sort((a, b) => parseInt(b.numero) - parseInt(a.numero));
+                // Atualizar status de hoje
+                if (rdcHojeEnviado) {
+                    statusEl.textContent = 'Enviado';
+                    statusEl.className = 'status-enviado';
+                    btnCriar.style.display = 'none';
+                    statusBox.style.background = '#e8f5e9';
+                } else {
+                    statusEl.textContent = 'Pendente';
+                    statusEl.className = 'status-pendente';
+                    btnCriar.style.display = 'inline-block';
+                    statusBox.style.background = 'white';
+                }
                 
-                rdcList.forEach(rdc => {
-                    const isHoje = (rdc.data === hoje || rdc.dataKey === hojeKey);
-                    html += `
-                        <div class="card-obra ${isHoje ? 'rdc-pendente-card' : ''}" style="border-left-color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}">
-                            <div style="font-size: 0.9rem">
-                                <strong style="color: var(--azul-escuro)">RDC #${String(rdc.numero).padStart(3, '0')}</strong> - ${rdc.data}<br>
-                                <small style="color: #777">Fiscal: ${rdc.fiscalNome || rdc.fiscal}</small>
-                            </div>
-                            <span style="font-size: 0.75rem; color: ${isHoje ? 'var(--laranja)' : 'var(--verde-vale)'}; font-weight: bold;">
-                                ${isHoje ? 'HOJE' : 'ENVIADO'}
-                            </span>
-                        </div>`;
-                });
+                container.innerHTML = html || '<p style="font-size: 0.8rem; color: #777">Nenhum relatório anterior.</p>';
+                
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<div class="erro-box">Erro ao carregar histórico.</div>';
             }
-            
-            // Determinar próximo número do RDC baseado na dataInicio da obra
-            if (currentObraData.dataInicio && !rdcHojeEnviado) {
-                // dataInicio está no formato YYYY-MM-DD (do input type="date")
-                const [anoInicio, mesInicio, diaInicio] = currentObraData.dataInicio.split('-');
-                const dataInicio = new Date(anoInicio, mesInicio - 1, diaInicio);
-                const hojeDate = new Date();
-                
-                // Calcular diferença em dias
-                const diffTime = hojeDate - dataInicio;
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                // RDC 001 = primeiro dia (dataInicio)
-                proximoRDCNumero = diffDays + 1;
-            } else if (ultimoNumero > 0) {
-                proximoRDCNumero = ultimoNumero + 1;
-            }
-            
-            // Atualizar status de hoje
-            if (rdcHojeEnviado) {
-                statusEl.textContent = 'Enviado';
-                statusEl.className = 'status-enviado';
-                btnCriar.style.display = 'none';
-                statusBox.style.background = '#e8f5e9';
-            } else {
-                statusEl.textContent = 'Pendente';
-                statusEl.className = 'status-pendente';
-                btnCriar.style.display = 'inline-block';
-                statusBox.style.background = 'white';
-            }
-            
-            container.innerHTML = html || '<p style="font-size: 0.8rem; color: #777">Nenhum relatório anterior.</p>';
         }
 
         // --- LÓGICA DO FORMULÁRIO RDC ---
         async function criarNovoRDC() {
+            if (!currentObraData) {
+                showToast('Erro: dados da obra não carregados', 'error');
+                return;
+            }
+
             const hoje = new Date();
             const mesKey = formatarMesKey(hoje); // MM-YYYY para o contrato
             
@@ -601,23 +655,42 @@
             document.getElementById('descAtividades').value = '';
             document.getElementById('comentarios').value = '';
             
-            // Voltar para aba geral
-            switchTab('geral');
+            // Ativar aba geral programaticamente (sem depender do event)
+            ativarAbaGeral();
             
             document.getElementById('rdcPanel').style.display = 'none';
             document.getElementById('formPanel').style.display = 'block';
 
-            carregarEquipamentosDoContrato(mesKey);
+            // Carregar equipamentos
+            try {
+                await carregarEquipamentosDoContrato(mesKey);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('equipamentosContainer').innerHTML = 
+                    '<div class="erro-box">Erro ao carregar equipamentos. Verifique se há contrato cadastrado para este mês.</div>';
+            }
         }
 
-        function switchTab(tabName) {
+        function ativarAbaGeral() {
+            // Esconder todos os conteúdos
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-principal').forEach(el => el.classList.remove('active'));
+            
+            // Mostrar a aba geral
+            document.getElementById('tab-geral').classList.add('active');
+            // Pegar o primeiro botão (Geral) e ativar
+            const btnGeral = document.querySelector('.tab-principal');
+            if (btnGeral) btnGeral.classList.add('active');
+        }
+
+        function switchTab(tabName, btnElement) {
             // Esconder todos os conteúdos
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-principal').forEach(el => el.classList.remove('active'));
             
             // Mostrar o selecionado
             document.getElementById(`tab-${tabName}`).classList.add('active');
-            event.target.closest('.tab-principal').classList.add('active');
+            if (btnElement) btnElement.classList.add('active');
         }
 
         async function carregarEquipamentosDoContrato(mesKey) {
@@ -626,8 +699,12 @@
             
             const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
             
-            if (!snap.exists()) {
-                container.innerHTML = '<div class="status-box" style="color: #777">Nenhum contrato de equipamentos encontrado para este mês (' + mesKey + ').</div>';
+            if (!snap || !snap.exists()) {
+                container.innerHTML = `
+                    <div class="erro-box">
+                        <strong>Nenhum contrato encontrado para ${mesKey}</strong><br>
+                        <small>Peça ao administrador para importar o contrato de equipamentos deste mês.</small>
+                    </div>`;
                 return;
             }
 
@@ -705,9 +782,10 @@
             carregarHistoricoRDCs();
         }
 
-        function showToast(msg) {
+        function showToast(msg, type = 'success') {
             const t = document.getElementById('toast');
             t.textContent = msg;
+            t.className = 'toast' + (type === 'error' ? ' error' : '');
             t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 3000);
         }
