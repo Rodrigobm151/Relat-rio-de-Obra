@@ -128,6 +128,99 @@
         .modal-title { color: var(--azul-vale); font-size: 1.3rem; font-weight: 600; margin-bottom: 1.5rem; font-style: italic; }
         .modal-footer { display: flex; gap: 1rem; margin-top: 1.5rem; }
         .modal-footer .btn { flex: 1; justify-content: center; }
+
+        /* NOVOS ESTILOS PARA VINCULAÇÃO DE FISCAIS */
+        .fiscais-selecao {
+            background: var(--fundo);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .fiscal-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .fiscal-checkbox:hover {
+            border-color: var(--azul-vale);
+            transform: translateX(3px);
+        }
+        
+        .fiscal-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: var(--azul-vale);
+        }
+        
+        .fiscal-checkbox label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .fiscal-checkbox .fiscal-avatar-small {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--azul-vale);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .fiscal-checkbox.inativo {
+            opacity: 0.5;
+        }
+        
+        .fiscais-vinculados-lista {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .fiscal-tag {
+            background: var(--azul-vale);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .fiscal-tag i {
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        
+        .fiscal-tag i:hover {
+            color: var(--vermelho);
+        }
+        
+        .secao-fiscais {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--cinza-mais-claro);
+        }
     </style>
 </head>
 <body>
@@ -166,7 +259,21 @@
                         <input type="text" class="form-input" id="novaObraLocal" placeholder="Ex: Carajás - PA">
                     </div>
                 </div>
-                <button class="btn btn-success" onclick="criarObra()"><i class="fas fa-save"></i> Criar Obra</button>
+                
+                <!-- SELEÇÃO DE FISCAIS PARA NOVA OBRA -->
+                <div class="secao-fiscais">
+                    <label class="form-label"><i class="fas fa-users-cog"></i> Vincular Fiscais à Obra (opcional)</label>
+                    <div class="dica-box" style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-info-circle"></i>
+                        Selecione 1 a 4 fiscais que terão acesso a esta obra. Apenas fiscais ativos são exibidos.
+                    </div>
+                    <div id="fiscaisSelecaoNovaObra" class="fiscais-selecao">
+                        <p style="color: var(--cinza-medio); text-align: center; padding: 1rem;">Carregando fiscais...</p>
+                    </div>
+                    <div id="fiscaisSelecionadosNovaObra" class="fiscais-vinculados-lista"></div>
+                </div>
+                
+                <button class="btn btn-success" onclick="criarObra()" style="margin-top: 1rem;"><i class="fas fa-save"></i> Criar Obra</button>
             </div>
 
             <div id="obrasList">
@@ -177,12 +284,32 @@
                 <div class="card">
                     <div class="equip-header">
                         <div>
-                            <h3 class="card-title"><i class="fas fa-file-excel"></i> Importar Equipamentos</h3>
+                            <h3 class="card-title"><i class="fas fa-edit"></i> Gerenciar Obra</h3>
                         </div>
                     </div>
 
                     <div class="equip-info">
                         <p><strong>Obra:</strong> <span id="equipObraNome">-</span></p>
+                    </div>
+
+                    <!-- SEÇÃO FISCAIS VINCULADOS -->
+                    <div class="secao-fiscais" style="margin-top: 0; border-top: none; padding-top: 0;">
+                        <h4 class="card-title" style="font-size: 1rem;"><i class="fas fa-users"></i> Fiscais Vinculados</h4>
+                        <div class="dica-box" style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-info-circle"></i>
+                            Selecione os fiscais que terão acesso a esta obra. Máximo 4 fiscais.
+                        </div>
+                        <div id="fiscaisSelecaoObra" class="fiscais-selecao">
+                            <p style="color: var(--cinza-medio); text-align: center; padding: 1rem;">Carregando fiscais...</p>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            <button class="btn btn-success" onclick="salvarFiscaisObra()"><i class="fas fa-save"></i> Salvar Fiscais</button>
+                        </div>
+                        <div id="fiscaisVinculadosObra" class="fiscais-vinculados-lista" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid var(--cinza-mais-claro);">
+                        <h4 class="card-title"><i class="fas fa-file-excel"></i> Importar Equipamentos</h4>
                     </div>
 
                     <div class="dica-box">
@@ -317,7 +444,7 @@
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, get, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDm7jQbxnJ2aq6Hf-e3ufkoMi2yc6PjIgE",
@@ -338,6 +465,7 @@
         window.dbSet = set;
         window.dbPush = push;
         window.dbRemove = remove;
+        window.dbUpdate = update;
     </script>
 
     <script>
@@ -348,11 +476,14 @@
         let dadosExcel = {};
         let rdcsParaExportar = [];
         let obraExportacao = null;
+        let fiscaisSelecionadosNovaObra = [];
+        let fiscaisSelecionadosObra = [];
 
         // ==================== INICIALIZAÇÃO ====================
         document.addEventListener('DOMContentLoaded', () => {
             carregarObras();
             carregarFiscais();
+            carregarFiscaisParaNovaObra();
             
             // Drag and drop
             const dropZone = document.getElementById('dropZone');
@@ -388,6 +519,107 @@
             return `${dia}/${mes}/${ano}`;
         }
 
+        // ==================== FISCAIS - CARREGAR PARA SELEÇÃO ====================
+        async function carregarFiscaisParaNovaObra() {
+            try {
+                const snapshot = await window.dbGet(window.dbRef(window.db, 'fiscais'));
+                const container = document.getElementById('fiscaisSelecaoNovaObra');
+                
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<p style="color: var(--cinza-medio); text-align: center; padding: 1rem;">Nenhum fiscal cadastrado. Cadastre fiscais primeiro.</p>';
+                    return;
+                }
+                
+                fiscais = snapshot.val();
+                renderFiscaisCheckbox(container, 'nova');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function renderFiscaisCheckbox(container, tipo) {
+            let html = '';
+            const selecionados = tipo === 'nova' ? fiscaisSelecionadosNovaObra : fiscaisSelecionadosObra;
+            
+            Object.keys(fiscais).forEach(key => {
+                const fiscal = fiscais[key];
+                const isAtivo = fiscal.ativo !== false;
+                const isSelecionado = selecionados.includes(key);
+                const iniciais = fiscal.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                
+                html += `
+                    <div class="fiscal-checkbox ${!isAtivo ? 'inativo' : ''}" onclick="toggleFiscalCheckbox('${key}', '${tipo}')">
+                        <input type="checkbox" ${isSelecionado ? 'checked' : ''} ${!isAtivo ? 'disabled' : ''} 
+                               onchange="toggleFiscalCheckbox('${key}', '${tipo}')" 
+                               onclick="event.stopPropagation()">
+                        <label>
+                            <div class="fiscal-avatar-small">${iniciais}</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.95rem;">${fiscal.nome}</div>
+                                <div style="font-size: 0.8rem; color: var(--cinza-medio);">
+                                    ${!isAtivo ? '<span style="color: var(--vermelho);">Inativo</span>' : (fiscal.email || 'Sem e-mail')}
+                                </div>
+                            </div>
+                        </label>
+                    </div>`;
+            });
+            
+            container.innerHTML = html;
+            atualizarTagsFiscais(tipo);
+        }
+
+        function toggleFiscalCheckbox(fiscalId, tipo) {
+            const selecionados = tipo === 'nova' ? fiscaisSelecionadosNovaObra : fiscaisSelecionadosObra;
+            const maxFiscais = 4;
+            
+            const index = selecionados.indexOf(fiscalId);
+            
+            if (index > -1) {
+                // Desmarcar
+                selecionados.splice(index, 1);
+            } else {
+                // Marcar (se não atingiu o limite)
+                if (selecionados.length >= maxFiscais) {
+                    showToast(`Máximo de ${maxFiscais} fiscais permitidos`, 'error');
+                    return;
+                }
+                selecionados.push(fiscalId);
+            }
+            
+            const container = tipo === 'nova' ? document.getElementById('fiscaisSelecaoNovaObra') : document.getElementById('fiscaisSelecaoObra');
+            renderFiscaisCheckbox(container, tipo);
+        }
+
+        function atualizarTagsFiscais(tipo) {
+            const container = tipo === 'nova' ? document.getElementById('fiscaisSelecionadosNovaObra') : document.getElementById('fiscaisVinculadosObra');
+            const selecionados = tipo === 'nova' ? fiscaisSelecionadosNovaObra : fiscaisSelecionadosObra;
+            
+            let html = '';
+            selecionados.forEach(fiscalId => {
+                const fiscal = fiscais[fiscalId];
+                if (fiscal) {
+                    html += `
+                        <div class="fiscal-tag">
+                            ${fiscal.nome}
+                            <i class="fas fa-times" onclick="removerFiscal('${fiscalId}', '${tipo}')"></i>
+                        </div>`;
+                }
+            });
+            
+            container.innerHTML = html || '<span style="color: var(--cinza-claro); font-size: 0.9rem;">Nenhum fiscal selecionado</span>';
+        }
+
+        function removerFiscal(fiscalId, tipo) {
+            const selecionados = tipo === 'nova' ? fiscaisSelecionadosNovaObra : fiscaisSelecionadosObra;
+            const index = selecionados.indexOf(fiscalId);
+            
+            if (index > -1) {
+                selecionados.splice(index, 1);
+                const container = tipo === 'nova' ? document.getElementById('fiscaisSelecaoNovaObra') : document.getElementById('fiscaisSelecaoObra');
+                renderFiscaisCheckbox(container, tipo);
+            }
+        }
+
         // ==================== OBRAS ====================
         async function carregarObras() {
             try {
@@ -404,16 +636,19 @@
 
         function renderObrasList() {
             const container = document.getElementById('obrasList');
-            let html = '<div style="margin-bottom: 1rem; font-weight: 600; color: var(--cinza-medio);">Clique em uma obra para gerenciar equipamentos:</div>';
+            let html = '<div style="margin-bottom: 1rem; font-weight: 600; color: var(--cinza-medio);">Clique em uma obra para gerenciar:</div>';
             
             Object.keys(obras).forEach(key => {
                 const obra = obras[key];
                 const dataInicio = obra.dataInicio ? formatarDataBR(obra.dataInicio) : 'Não definido';
+                const qtdFiscais = obra.fiscais ? obra.fiscais.length : 0;
+                
                 html += `
                     <div class="obra-item" onclick="selecionarObra('${key}')">
                         <div class="obra-info">
                             <h3>${obra.nome}</h3>
                             <p><i class="fas fa-calendar-alt"></i> Início: ${dataInicio} ${obra.local ? `| <i class="fas fa-map-marker-alt"></i> ${obra.local}` : ''}</p>
+                            <p style="margin-top: 0.2rem;"><i class="fas fa-users" style="color: var(--azul-vale);"></i> ${qtdFiscais} fiscal(is) vinculado(s)</p>
                         </div>
                         <div class="obra-actions" onclick="event.stopPropagation();">
                             <button class="btn-icon btn-success" onclick="editarObra('${key}')" title="Editar"><i class="fas fa-edit"></i></button>
@@ -441,21 +676,91 @@
 
             try {
                 const obraId = nome.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                await window.dbSet(window.dbRef(window.db, `obras/${obraId}`), { nome, dataInicio, local, criadaEm: new Date().toISOString() });
+                
+                const obraData = { 
+                    nome, 
+                    dataInicio, 
+                    local, 
+                    criadaEm: new Date().toISOString() 
+                };
+                
+                // Adicionar fiscais selecionados
+                if (fiscaisSelecionadosNovaObra.length > 0) {
+                    obraData.fiscais = fiscaisSelecionadosNovaObra;
+                }
+                
+                await window.dbSet(window.dbRef(window.db, `obras/${obraId}`), obraData);
+                
                 showToast('Obra criada com sucesso!', 'success');
+                
+                // Limpar formulário
                 document.getElementById('novaObraNome').value = '';
                 document.getElementById('novaObraData').value = '';
                 document.getElementById('novaObraLocal').value = '';
+                fiscaisSelecionadosNovaObra = [];
+                atualizarTagsFiscais('nova');
+                
                 carregarObras();
-            } catch (error) { showToast('Erro ao criar obra', 'error'); }
+            } catch (error) { 
+                showToast('Erro ao criar obra', 'error'); 
+                console.error(error);
+            }
         }
 
-        function selecionarObra(obraId) {
+        async function selecionarObra(obraId) {
             obraSelecionada = obraId;
+            const obra = obras[obraId];
+            
             document.getElementById('equipamentosEditor').style.display = 'block';
-            document.getElementById('equipObraNome').textContent = obras[obraId].nome;
+            document.getElementById('equipObraNome').textContent = obra.nome;
+            
+            // Carregar fiscais selecionados da obra
+            fiscaisSelecionadosObra = obra.fiscais || [];
+            
+            // Renderizar lista de fiscais
+            await carregarFiscaisParaObra();
+            
             setTimeout(() => document.getElementById('equipamentosEditor').scrollIntoView({ behavior: 'smooth' }), 100);
             carregarEquipamentosExistentes();
+        }
+
+        async function carregarFiscaisParaObra() {
+            try {
+                const snapshot = await window.dbGet(window.dbRef(window.db, 'fiscais'));
+                const container = document.getElementById('fiscaisSelecaoObra');
+                
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<p style="color: var(--cinza-medio); text-align: center; padding: 1rem;">Nenhum fiscal cadastrado.</p>';
+                    return;
+                }
+                
+                fiscais = snapshot.val();
+                renderFiscaisCheckbox(container, 'obra');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function salvarFiscaisObra() {
+            if (!obraSelecionada) {
+                showToast('Nenhuma obra selecionada', 'error');
+                return;
+            }
+
+            try {
+                await window.dbUpdate(window.dbRef(window.db, `obras/${obraSelecionada}`), {
+                    fiscais: fiscaisSelecionadosObra
+                });
+                
+                // Atualizar objeto local
+                obras[obraSelecionada].fiscais = fiscaisSelecionadosObra;
+                
+                showToast('Fiscais vinculados com sucesso!', 'success');
+                renderObrasList();
+            } catch (error) {
+                showToast('Erro ao salvar fiscais', 'error');
+                console.error(error);
+            }
         }
 
         // ==================== EQUIPAMENTOS - UPLOAD EXCEL ====================
@@ -771,6 +1076,7 @@ function converterMesParaKey(mesStr) {
                 document.getElementById('novoFiscalNome').value = '';
                 document.getElementById('novoFiscalEmail').value = '';
                 carregarFiscais();
+                carregarFiscaisParaNovaObra(); // Atualizar lista na criação de obra
             } catch (error) { showToast('Erro ao cadastrar', 'error'); }
         }
 
@@ -780,12 +1086,13 @@ function converterMesParaKey(mesStr) {
                 await window.dbSet(window.dbRef(window.db, `fiscais/${fiscalId}/ativo`), novoStatus);
                 showToast(`Fiscal ${novoStatus ? 'ativado' : 'desativado'}`, 'success');
                 carregarFiscais();
+                carregarFiscaisParaNovaObra(); // Atualizar lista na criação de obra
             } catch (error) { showToast('Erro', 'error'); }
         }
 
         function excluirFiscal(fiscalId) {
             if (!confirm('Deseja excluir?')) return;
-            window.dbRemove(window.dbRef(window.db, `fiscais/${fiscalId}`)).then(() => { showToast('Excluído', 'success'); carregarFiscais(); }).catch(() => showToast('Erro', 'error'));
+            window.dbRemove(window.dbRef(window.db, `fiscais/${fiscalId}`)).then(() => { showToast('Excluído', 'success'); carregarFiscais(); carregarFiscaisParaNovaObra(); }).catch(() => showToast('Erro', 'error'));
         }
 
         // ==================== RDCs ====================
@@ -871,100 +1178,4 @@ function converterMesParaKey(mesStr) {
 
         function abrirModalExportar() {
             const obra = obras[obraExportacao];
-            const periodo = document.getElementById('filtroPeriodoRDC').value;
-            const periodoNomes = { 'todos': 'Todos os RDCs', 'mes-atual': 'Mês atual', 'ultimos-30': 'Últimos 30 dias', 'ultimos-7': 'Últimos 7 dias' };
-
-            document.getElementById('exportObraNome').value = obra.nome;
-            document.getElementById('exportPeriodoNome').value = periodoNomes[periodo];
-            document.getElementById('exportQuantidade').value = `${rdcsParaExportar.length} RDC(s)`;
-            document.getElementById('modalExportar').classList.add('active');
-        }
-
-        function fecharModalExportar() { document.getElementById('modalExportar').classList.remove('active'); }
-
-        async function confirmarExportacao() {
-            const btn = event.target;
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
-            btn.disabled = true;
-
-            try {
-                const wb = XLSX.utils.book_new();
-                
-                // ABA GERAL
-                const geralData = rdcsParaExportar.map(rdc => ({
-                    'RDC': rdc.numero || '-',
-                    'Data': formatarDataBR(rdc.dataKey || rdc.data),
-                    'Fiscal': rdc.fiscalNome || rdc.fiscal,
-                    'Status': rdc.status || 'enviado',
-                    'Condição Climática': rdc.dados?.clima?.condicao || '-',
-                    'Pluviômetro (mm)': rdc.dados?.clima?.pluviometro || 0,
-                    'Qtd Equipamentos': rdc.dados?.equipamentos ? Object.keys(rdc.dados.equipamentos).length : 0,
-                    'Atividades': rdc.dados?.atividades?.descricao || '-',
-                    'Comentários': rdc.dados?.atividades?.comentarios || '-'
-                }));
-                
-                const wsGeral = XLSX.utils.json_to_sheet(geralData);
-                wsGeral['!cols'] = [{wch:10}, {wch:12}, {wch:20}, {wch:12}, {wch:18}, {wch:15}, {wch:18}, {wch:40}, {wch:40}];
-                XLSX.utils.book_append_sheet(wb, wsGeral, "Geral");
-
-                // ABA EQUIPAMENTOS
-                const equipData = [];
-                rdcsParaExportar.forEach(rdc => {
-                    if (rdc.dados?.equipamentos) {
-                        Object.entries(rdc.dados.equipamentos).forEach(([id, eq]) => {
-                            equipData.push({
-                                'RDC': rdc.numero || '-',
-                                'Data': formatarDataBR(rdc.dataKey || rdc.data),
-                                'Fiscal': rdc.fiscalNome || rdc.fiscal,
-                                'Equipamento': eq.nome || id,
-                                'Previsto': eq.previsto || '-',
-                                'Real': eq.real !== undefined ? eq.real : '-',
-                                'Manutenção': eq.manutencao || 0,
-                                'Observações': eq.obs || '-'
-                            });
-                        });
-                    }
-                });
-                
-                if (equipData.length > 0) {
-                    const wsEquip = XLSX.utils.json_to_sheet(equipData);
-                    wsEquip['!cols'] = [{wch:10}, {wch:12}, {wch:20}, {wch:25}, {wch:12}, {wch:10}, {wch:12}, {wch:30}];
-                    XLSX.utils.book_append_sheet(wb, wsEquip, "Equipamentos");
-                }
-
-                XLSX.writeFile(wb, `RDCs_${obras[obraExportacao].nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
-                showToast('Excel gerado com sucesso!', 'success');
-                fecharModalExportar();
-            } catch (error) {
-                showToast('Erro ao gerar Excel', 'error');
-            } finally {
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-            }
-        }
-
-        function verDetalhesRDC(rdcId) {
-            const rdc = rdcsParaExportar.find(r => r.id === rdcId);
-            if (!rdc) return;
-            let detalhes = `RDC ${rdc.numero || '-'}\nData: ${formatarDataBR(rdc.dataKey || rdc.data)}\nFiscal: ${rdc.fiscalNome || rdc.fiscal}\n\n`;
-            if (rdc.dados?.clima) detalhes += `CLIMA:\nCondição: ${rdc.dados.clima.condicao || '-'}\nPluviômetro: ${rdc.dados.clima.pluviometro || 0}mm\n\n`;
-            if (rdc.dados?.equipamentos) {
-                detalhes += `EQUIPAMENTOS:\n`;
-                Object.entries(rdc.dados.equipamentos).forEach(([id, eq]) => {
-                    detalhes += `- ${eq.nome || id}: Real ${eq.real || '-'}, Manut ${eq.manutencao || 0}\n`;
-                });
-            }
-            alert(detalhes);
-        }
-
-        function editarObra(id) { showToast('Função em desenvolvimento', 'error'); }
-        function excluirObra(id) {
-            if (!confirm(`Excluir ${obras[id].nome}?`)) return;
-            window.dbRemove(window.dbRef(window.db, `obras/${id}`)).then(() => { showToast('Obra excluída', 'success'); carregarObras(); document.getElementById('equipamentosEditor').style.display = 'none'; }).catch(() => showToast('Erro', 'error'));
-        }
-
-        document.getElementById('modalExportar').addEventListener('click', (e) => { if (e.target.id === 'modalExportar') fecharModalExportar(); });
-    </script>
-</body>
-</html>
+            const periodo = document.getElementById('filtroPeriodoRDC
