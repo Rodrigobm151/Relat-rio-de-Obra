@@ -481,12 +481,10 @@
         let rdcsPendentesAnteriores = [];
 
         // --- FUNÇÃO SAIR ---
-        function sair() {
-            if (confirm('Deseja realmente sair?')) {
-                localStorage.removeItem('currentFiscalNome');
-                localStorage.removeItem('currentFiscalId');
-                window.location.href = 'index.html';
-            }
+       function sair() {
+            localStorage.removeItem('currentFiscalNome');
+            localStorage.removeItem('currentFiscalId');
+            window.location.href = 'index.html';
         }
 
         // --- NAVEGAÇÃO E OBRAS ---
