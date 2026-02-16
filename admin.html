@@ -1127,7 +1127,12 @@ function baixarModelo() {
 // Ler Excel
 function processarArquivo(file) {
 
-    if(!file) return;
+    if (!file) return;
+
+    if (!mesSelecionado) {
+        showToast('Selecione o mês primeiro', 'error');
+        return;
+    }
 
     const reader = new FileReader();
 
@@ -1137,30 +1142,69 @@ function processarArquivo(file) {
 
             const data = new Uint8Array(e.target.result);
 
-            const wb = XLSX.read(data,{type:'array'});
+            const wb = XLSX.read(data, { type: 'array' });
 
             const ws = wb.Sheets[wb.SheetNames[0]];
 
-            const json =
-                XLSX.utils.sheet_to_json(ws,{header:1});
+            const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
             dadosExcel = [];
 
-            for(let i=1;i<json.length;i++){
+            if (json.length < 2) {
+                showToast('Planilha inválida', 'error');
+                return;
+            }
 
-                const l = json[i];
+            // Cabeçalho (linha dos meses)
+            const header = json[0];
 
-                if(l[0] && l[1]){
+            // Mês selecionado no sistema (MM-AAAA)
+            const mesSistema = mesSelecionado.replace('-', '/');
+
+            let colunaMes = -1;
+
+            // Buscar coluna do mês
+            header.forEach((col, i) => {
+
+                if (!col) return;
+
+                const valor = col.toString().trim();
+
+                if (valor === mesSistema) {
+                    colunaMes = i;
+                }
+
+            });
+
+            if (colunaMes === -1) {
+
+                showToast(
+                    `Mês ${mesSistema} não encontrado no Excel`,
+                    'error'
+                );
+
+                return;
+            }
+
+            // Ler dados
+            for (let i = 1; i < json.length; i++) {
+
+                const linha = json[i];
+
+                const nome = linha[0];
+                const valor = linha[colunaMes];
+
+                if (nome && valor !== undefined && valor !== '') {
 
                     dadosExcel.push({
-                        nome: String(l[0]).trim(),
-                        previsto: parseInt(l[1])||0
+                        nome: String(nome).trim(),
+                        previsto: parseInt(valor) || 0
                     });
                 }
             }
 
-            if(dadosExcel.length===0){
-                showToast('Arquivo sem dados','error');
+            if (dadosExcel.length === 0) {
+                showToast('Nenhum dado encontrado', 'error');
                 return;
             }
 
@@ -1171,16 +1215,17 @@ function processarArquivo(file) {
                 'success'
             );
 
-        } catch(err){
+        } catch (err) {
 
             console.error(err);
 
-            showToast('Erro ao ler Excel','error');
+            showToast('Erro ao ler Excel', 'error');
         }
     };
 
     reader.readAsArrayBuffer(file);
 }
+
 
 
 // Mostrar preview
