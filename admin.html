@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geotecnia-1.5</title>
+    <title>Geotecnia-1.6</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.0.0/dist/handsontable.full.min.css">
@@ -1124,15 +1124,10 @@ function baixarModelo() {
 }
 
 
-// Ler Excel
+// Ler Excel (Histograma completo)
 function processarArquivo(file) {
 
     if (!file) return;
-
-    if (!mesSelecionado) {
-        showToast('Selecione o mês primeiro', 'error');
-        return;
-    }
 
     const reader = new FileReader();
 
@@ -1155,56 +1150,86 @@ function processarArquivo(file) {
                 return;
             }
 
-            // Cabeçalho (linha dos meses)
+            // Mapa meses PT-BR
+            const mesesMap = {
+                jan: '01',
+                fev: '02',
+                mar: '03',
+                abr: '04',
+                mai: '05',
+                jun: '06',
+                jul: '07',
+                ago: '08',
+                set: '09',
+                out: '10',
+                nov: '11',
+                dez: '12'
+            };
+
+            // Cabeçalho
             const header = json[0];
 
-            // Mês selecionado no sistema (MM-AAAA)
-            const mesSistema = mesSelecionado.replace('-', '/');
+            // Detectar colunas de meses
+            const colunasMeses = [];
 
-            let colunaMes = -1;
-
-            // Buscar coluna do mês
             header.forEach((col, i) => {
 
                 if (!col) return;
 
-                const valor = col.toString().trim();
+                const valor = col.toString().toLowerCase().trim();
 
-                if (valor === mesSistema) {
-                    colunaMes = i;
+                const match = valor.match(/^([a-z]{3})\/(\d{2})$/);
+
+                if (match) {
+
+                    const mes = mesesMap[match[1]];
+                    const ano = '20' + match[2];
+
+                    if (mes) {
+
+                        colunasMeses.push({
+                            index: i,
+                            chave: `${mes}-${ano}`
+                        });
+
+                    }
                 }
-
             });
 
-            if (colunaMes === -1) {
+            if (colunasMeses.length === 0) {
 
-                showToast(
-                    `Mês ${mesSistema} não encontrado no Excel`,
-                    'error'
-                );
-
+                showToast('Nenhum mês válido encontrado no Excel', 'error');
                 return;
             }
 
-            // Ler dados
+            // Ler equipamentos
             for (let i = 1; i < json.length; i++) {
 
                 const linha = json[i];
 
                 const nome = linha[0];
-                const valor = linha[colunaMes];
 
-                if (nome && valor !== undefined && valor !== '') {
+                if (!nome) continue;
 
-                    dadosExcel.push({
-                        nome: String(nome).trim(),
-                        previsto: parseInt(valor) || 0
-                    });
-                }
+                const meses = {};
+
+                colunasMeses.forEach(col => {
+
+                    const valor = linha[col.index];
+
+                    meses[col.chave] = parseInt(valor) || 0;
+
+                });
+
+                dadosExcel.push({
+                    nome: String(nome).trim(),
+                    meses
+                });
             }
 
             if (dadosExcel.length === 0) {
-                showToast('Nenhum dado encontrado', 'error');
+
+                showToast('Nenhum equipamento encontrado', 'error');
                 return;
             }
 
@@ -1228,6 +1253,7 @@ function processarArquivo(file) {
 
 
 
+
 // Mostrar preview
 function mostrarPreview(){
 
@@ -1246,19 +1272,18 @@ function mostrarPreview(){
 }
 
 
-// Salvar Firebase
+// Salvar Firebase (Histograma completo)
 async function salvarEquipamentosExcel(){
 
-    if(!obraSelecionada || !mesSelecionado || dadosExcel.length===0){
+    if(!obraSelecionada || dadosExcel.length===0){
 
-        showToast('Selecione obra, mês e arquivo','error');
-
+        showToast('Selecione a obra e envie o arquivo','error');
         return;
     }
 
     try {
 
-        const equipamentos = {};
+        const updates = {};
 
         dadosExcel.forEach(e=>{
 
@@ -1267,19 +1292,44 @@ async function salvarEquipamentosExcel(){
                 .replace(/\s+/g,'-')
                 .replace(/[^a-z0-9-]/g,'');
 
-            equipamentos[id]={
-                nome:e.nome,
-                previsto:e.previsto
-            };
+            // Para cada mês do equipamento
+            Object.entries(e.meses).forEach(([mes, valor])=>{
+
+                if(!updates[mes]){
+                    updates[mes] = {};
+                }
+
+                updates[mes][id] = {
+                    nome: e.nome,
+                    previsto: valor
+                };
+
+            });
+
         });
 
-        await window.dbSet(
-            window.dbRef(window.db,
-            `obras/${obraSelecionada}/contrato/${mesSelecionado}`),
-            equipamentos
-        );
+        // Salvar todos os meses
+        const promises = [];
 
-        showToast('Equipamentos salvos','success');
+        Object.entries(updates).forEach(([mes, dados])=>{
+
+            promises.push(
+
+                window.dbSet(
+                    window.dbRef(
+                        window.db,
+                        `obras/${obraSelecionada}/contrato/${mes}`
+                    ),
+                    dados
+                )
+
+            );
+
+        });
+
+        await Promise.all(promises);
+
+        showToast('Planejamento salvo com sucesso','success');
 
         limparUpload();
 
@@ -1292,6 +1342,7 @@ async function salvarEquipamentosExcel(){
         showToast('Erro ao salvar','error');
     }
 }
+
 
 
 // Limpar
