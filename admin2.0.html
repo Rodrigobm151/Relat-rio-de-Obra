@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - RDC</title>
+    
+    <!-- Fonte Vale Sans -->
+    <link rel="preload" href="assets/fonts/ValeSans-Italic.woff2" as="font" type="font/woff2" crossorigin>
+    <style>
+        @font-face {
+            font-family: 'Vale Sans';
+            src: url('assets/fonts/ValeSans-Italic.woff2') format('woff2');
+            font-weight: 400;
+            font-style: italic;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Vale Sans';
+            src: url('assets/fonts/ValeSans-BoldItalic.woff2') format('woff2');
+            font-weight: 700;
+            font-style: italic;
+            font-display: swap;
+        }
+    </style>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Paleta Principal VBM */
+            --azul-vale: #3CB5E5;
+            --azul-escuro: #0096d2;
+            --verde-vale: #007E79;
+            --cinza-texto: #555555;
+            --cinza-medio: #747678;
+            --cinza-claro: #BCBEC0;
+            --cinza-fundo: #E6E7E8;
+            --branco: #FFFFFF;
+            
+            /* Gradientes */
+            --gradiente-header: linear-gradient(135deg, #3CB5E5 0%, #007E79 100%);
+            --gradiente-card: linear-gradient(145deg, #ffffff 0%, #f0f4f8 100%);
+            --gradiente-hover: linear-gradient(145deg, #3CB5E5 0%, #0096d2 100%);
+            --gradiente-sidebar: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+            
+            /* Sombras */
+            --sombra-suave: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --sombra-card: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --sombra-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: 'Vale Sans', 'Inter', sans-serif;
+            font-style: italic;
+            background: var(--gradiente-sidebar);
+            color: var(--cinza-texto); 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* SCROLLBAR PERSONALIZADA - OCULTA A BARRA LATERAL MANTENDO FUNCIONALIDADE */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--cinza-claro);
+            border-radius: 4px;
+            opacity: 0;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--azul-vale);
+            opacity: 1;
+        }
+        
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent;
+        }
+        
+        *:hover {
+            scrollbar-color: var(--cinza-claro) transparent;
+        }
+
+        /* HEADER COM GRADIENTE */
+        .header {
+            background: var(--gradiente-header);
+            padding: 0 40px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--sombra-suave);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></svg>');
+            background-size: 50px 50px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-brand i {
+            font-size: 1.6rem;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-sair {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-family: 'Vale Sans', sans-serif;
+            font-style: italic;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-sair:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* NAVEGAÇÃO POR ABAS ESTILIZADA */
+        .nav-container {
+            background: white;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--cinza-fundo);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            list-style: none;
+        }
+
+        .nav-tab {
+            position: relative;
+        }
+
+        .nav-tab a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 30px;
+            color: var(--cinza-medio);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tab a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(60, 181, 229, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-tab a:hover::before {
+            left: 100%;
+        }
+
+        .nav-tab a:hover {
+            color: var(--azul-vale);
+            background: linear-gradient(180deg, transparent 0%, rgba(60, 181, 229, 0.05) 100%);
+        }
+
+        .nav-tab.active a {
+            color: var(--azul-vale);
+            border-bottom-color: var(--azul-vale);
+            background: linear-gradient(180deg, transparent 0%, rgba(60, 181, 229, 0.08) 100%);
+        }
+
+        .nav-tab i {
+            font-size: 1.1rem;
+        }
+
+        /* BADGE DE NOTIFICAÇÃO */
+        .badge {
+            background: var(--verde-vale);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+            font-weight: 700;
+        }
+
+        /* CONTEÚDO PRINCIPAL */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+        }
+
+        /* DASHBOARD CARDS */
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+            color: var(--cinza-texto);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .dashboard-subtitle {
+            color: var(--cinza-medio);
+            font-size: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--gradiente-card);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--sombra-card);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gradiente-header);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-hover);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background: var(--gradiente-header);
+            box-shadow: 0 4px 6px rgba(60, 181, 229, 0.3);
+        }
+
+        .stat-trend {
+            font-size: 0.85rem;
+            color: var(--verde-vale);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-trend.down {
+            color: #e74c3c;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--cinza-texto);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--cinza-medio);
+            font-size: 0.9rem;
+        }
+
+        /* SEÇÃO DE CONTEÚDO */
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--sombra-card);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--cinza-fundo);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--cinza-texto);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--azul-vale);
+        }
+
+        /* TABELA ESTILIZADA */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95rem;
+        }
+
+        .data-table th {
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--cinza-medio);
+            font-weight: 600;
+            text-align: left;
+            padding: 16px;
+            border-bottom: 2px solid var(--cinza-fundo);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--cinza-fundo);
+            color: var(--cinza-texto);
+        }
+
+        .data-table tr {
+            transition: all 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: linear-gradient(90deg, rgba(60, 181, 229, 0.03) 0%, rgba(0, 126, 121, 0.03) 100%);
+            transform: scale(1.002);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(0, 126, 121, 0.1);
+            color: var(--verde-vale);
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #f39c12;
+        }
+
+        .status-inactive {
+            background: rgba(189, 195, 199, 0.2);
+            color: var(--cinza-medio);
+        }
+
+        /* BOTÕES DE AÇÃO */
+        .btn-primary {
+            background: var(--gradiente-header);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Vale Sans', sans-serif;
+            font-style: italic;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(60, 181, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(60, 181, 229, 0.4);
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: var(--cinza-fundo);
+            color: var(--cinza-medio);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--azul-vale);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* RODAPÉ DISCRETO */
+        .footer {
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.02) 100%);
+            padding: 20px 40px;
+            border-top: 1px solid var(--cinza-fundo);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--cinza-claro);
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .footer-brand:hover {
+            opacity: 1;
+        }
+
+        .footer-logo {
+            height: 20px;
+            width: auto;
+            filter: grayscale(100%);
+            transition: filter 0.3s;
+        }
+
+        .footer-brand:hover .footer-logo {
+            filter: grayscale(0%);
+        }
+
+        .footer-text {
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-link {
+            color: var(--cinza-claro);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: var(--azul-vale);
+        }
+
+        /* ANIMAÇÕES */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-card {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* RESPONSIVO */
+        @media (max-width: 768px) {
+            .header, .nav-container, .main-content, .footer {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            
+            .nav-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-brand">
+            <i class="fas fa-cog fa-spin" style="animation-duration: 10s;"></i>
+            <span>Painel Administrativo</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn-sair" onclick="sair()">
+                <i class="fas fa-sign-out-alt"></i>
+                Sair
+            </button>
+        </div>
+    </header>
+
+    <!-- NAVEGAÇÃO -->
+    <nav class="nav-container">
+        <ul class="nav-tabs">
+            <li class="nav-tab">
+                <a href="#obras">
+                    <i class="fas fa-building"></i>
+                    Obras e Equipamentos
+                </a>
+            </li>
+            <li class="nav-tab">
+                <a href="#fiscais">
+                    <i class="fas fa-users"></i>
+                    Fiscais
+                </a>
+            </li>
+            <li class="nav-tab active">
+                <a href="#rdcs">
+                    <i class="fas fa-file-alt"></i>
+                    RDCs
+                    <span class="badge">12</span>
+                </a>
+            </li>
+            <li class="nav-tab">
+                <a href="#relatorios">
+                    <i class="fas fa-chart-bar"></i>
+                    Relatórios
+                </a>
+            </li>
+            <li class="nav-tab">
+                <a href="#config">
+                    <i class="fas fa-cog"></i>
+                    Configurações
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+        
+        <!-- DASHBOARD STATS -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Visão Geral</h1>
+            <p class="dashboard-subtitle">Acompanhe os indicadores principais do sistema</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <span class="stat-trend">
+                        <i class="fas fa-arrow-up"></i> +15%
+                    </span>
+                </div>
+                <div class="stat-value">48</div>
+                <div class="stat-label">RDCs Este Mês</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #007E79 0%, #005955 100%);">
+                        <i class="fas fa-hard-hat"></i>
+                    </div>
+                    <span class="stat-trend">
+                        <i class="fas fa-arrow-up"></i> +3
+                    </span>
+                </div>
+                <div class="stat-value">12</div>
+                <div class="stat-label">Obras Ativas</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #747678 0%, #555555 100%);">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <span class="stat-trend down">
+                        <i class="fas fa-arrow-down"></i> -1
+                    </span>
+                </div>
+                <div class="stat-value">8</div>
+                <div class="stat-label">Fiscais em Campo</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <span class="stat-trend">
+                        <i class="fas fa-check"></i> 100%
+                    </span>
+                </div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Pendentes de Revisão</div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO DE RDCs -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    Últimos RDCs
+                </h2>
+                <button class="btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Novo RDC
+                </button>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Obra</th>
+                        <th>Data</th>
+                        <th>Fiscal</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>#048</strong></td>
+                        <td>Mina do Salobo - Fase 2</td>
+                        <td>17/02/2026</td>
+                        <td>Carlos Silva</td>
+                        <td><span class="status-badge status-active"><i class="fas fa-check-circle"></i> Aprovado</span></td>
+                        <td style="text-align: right;">
+                            <button class="btn-icon" title="Visualizar"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon" title="PDF"><i class="fas fa-file-pdf"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>#047</strong></td>
+                        <td>Mina do Salobo - Fase 2</td>
+                        <td>16/02/2026</td>
+                        <td>Ana Paula</td>
+                        <td><span class="status-badge status-active"><i class="fas fa-check-circle"></i> Aprovado</span></td>
+                        <td style="text-align: right;">
+                            <button class="btn-icon" title="Visualizar"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon" title="PDF"><i class="fas fa-file-pdf"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>#046</strong></td>
+                        <td>Projeto IGB - Trecho A</td>
+                        <td>15/02/2026</td>
+                        <td>Roberto Lima</td>
+                        <td><span class="status-badge status-pending"><i class="fas fa-clock"></i> Em Revisão</span></td>
+                        <td style="text-align: right;">
+                            <button class="btn-icon" title="Visualizar"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon" title="PDF"><i class="fas fa-file-pdf"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>#045</strong></td>
+                        <td>Projeto IGB - Trecho B</td>
+                        <td>14/02/2026</td>
+                        <td>Mariana Costa</td>
+                        <td><span class="status-badge status-inactive"><i class="fas fa-archive"></i> Arquivado</span></td>
+                        <td style="text-align: right;">
+                            <button class="btn-icon" title="Visualizar"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon" title="PDF"><i class="fas fa-file-pdf"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer">
+        <div class="footer-left">
+            <span>© 2026 Vale Base Metals - Sistema RDC</span>
+            <span style="color: var(--cinza-claro);">|</span>
+            <div class="footer-brand">
+                <span class="footer-text">developed by</span>
+                <img src="assets/imagens/reta-logo.png" alt="RETA" class="footer-logo" onerror="this.style.display='none'">
+            </div>
+        </div>
+        <div class="footer-right">
+            <a href="#" class="footer-link">Suporte</a>
+            <a href="#" class="footer-link">Documentação</a>
+            <a href="#" class="footer-link">Versão 2.0</a>
+        </div>
+    </footer>
+
+    <script>
+        // Função de logout
+        function sair() {
+            if(confirm('Deseja realmente sair do sistema?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Animação de entrada suave
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+
+        // Interatividade nas abas
+        document.querySelectorAll('.nav-tab a').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.parentElement.classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+</html>
