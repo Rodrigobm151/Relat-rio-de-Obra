@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geotecnia-1.6</title>
+    <title>Geotecnia-1.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.0.0/dist/handsontable.full.min.css">
@@ -1109,18 +1109,40 @@ function baixarModelo() {
 
     const wb = XLSX.utils.book_new();
 
+    const hoje = new Date();
+    const meses = [];
+
+    const mesesTxt = [
+        'jan','fev','mar','abr','mai','jun',
+        'jul','ago','set','out','nov','dez'
+    ];
+
+    // Gerar 12 meses a partir de agora
+    for(let i=0;i<12;i++){
+
+        const d = new Date(hoje.getFullYear(), hoje.getMonth()+i, 1);
+
+        const mes = mesesTxt[d.getMonth()];
+        const ano = String(d.getFullYear()).slice(2);
+
+        meses.push(`${mes}/${ano}`);
+    }
+
+    const header = ['Equipamento', ...meses];
+
+    const exemplo = [
+        'Escavadeira',
+        ...Array(meses.length).fill(0)
+    ];
+
     const ws = XLSX.utils.aoa_to_sheet([
-        ['Nome do Equipamento','Quantidade Prevista'],
-        ['Escavadeira',5],
-        ['Caminhão',10],
-        ['Trator',3],
-        ['Retroescavadeira',2],
-        ['Rolo Compactador',4]
+        header,
+        exemplo
     ]);
 
-    XLSX.utils.book_append_sheet(wb,ws,'Equipamentos');
+    XLSX.utils.book_append_sheet(wb, ws, 'Histograma');
 
-    XLSX.writeFile(wb,'modelo_equipamentos.xlsx');
+    XLSX.writeFile(wb, 'modelo_histograma.xlsx');
 }
 
 
