@@ -918,56 +918,64 @@
         }
 
         async function carregarEquipamentosDoContrato(mesKey) {
-            const container = document.getElementById('equipamentosContainer');
-            container.innerHTML = '<p style="color: #777">Carregando contrato do mês...</p>';
-            
-            const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
-            
-            if (!snap || !snap.exists()) {
-                container.innerHTML = `
-                    <div class="erro-box">
-                        <strong>Nenhum contrato encontrado para ${mesKey}</strong><br>
-                        <small>Peça ao administrador para importar o contrato de equipamentos deste mês.</small>
-                    </div>`;
-                return;
-            }
+    const container = document.getElementById('equipamentosContainer');
+    container.innerHTML = '<p style="color: #777">Carregando contrato do mês...</p>';
+    
+    const snap = await window.dbGet(window.dbRef(window.db, `obras/${currentObraId}/contrato/${mesKey}`));
+    
+    if (!snap || !snap.exists()) {
+        container.innerHTML = `
+            <div class="erro-box">
+                <strong>Nenhum contrato encontrado para ${mesKey}</strong><br>
+                <small>Peça ao administrador para importar o contrato de equipamentos deste mês.</small>
+            </div>`;
+        return;
+    }
 
-            let html = '';
-            snap.forEach(child => {
-                const eq = child.val();
-                const id = child.key;
-                html += `
-                    <div class="equip-card">
-                        <div class="equip-header" onclick="this.nextElementSibling.classList.toggle('active')">
-                            <span style="color: white">${eq.nome}</span>
-                            <span style="color: white">${String(eq.previsto).padStart(2, '0')} <i class="fas fa-chevron-down"></i></span>
+    let html = '';
+    snap.forEach(child => {
+        const eq = child.val();
+        const id = child.key;
+        html += `
+            <div class="equip-card">
+                <div class="equip-header" onclick="this.nextElementSibling.classList.toggle('active')">
+                    <span style="color: white">${eq.nome}</span>
+                    <span style="color: white"><span class="header-qtd" data-id="${id}">${String(eq.previsto).padStart(2, '0')}</span> <i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="equip-body">
+                    <div class="grid-campos">
+                        <div>
+                            <label class="label-peq">Previsto</label>
+                            <input type="text" class="input-rdc" value="${eq.previsto}" disabled style="background: #f0f0f0;">
                         </div>
-                        <div class="equip-body">
-                            <div class="grid-campos">
-                                <div>
-                                    <label class="label-peq">Previsto</label>
-                                    <input type="text" class="input-rdc" value="${eq.previsto}" disabled style="background: #f0f0f0;">
-                                </div>
-                                <div>
-                                    <label class="label-peq" style="color: var(--azul-vale)">Real</label>
-                                    <input type="number" class="input-rdc in-real" 
-                                        data-id="${id}" 
-                                        data-nome="${eq.nome}" 
-                                        data-previsto="${eq.previsto}"
-                                        value="${eq.previsto}">
-                                </div>
-                                <div>
-                                    <label class="label-peq" style="color: var(--laranja)">Manut.</label>
-                                    <input type="number" class="input-rdc in-manut" data-id="${id}" value="0">
-                                </div>
-                            </div>
-                            <label class="label-peq">Observações</label>
-                            <textarea class="in-obs" data-id="${id}" placeholder="Notas sobre este equipamento..."></textarea>
+                        <div>
+                            <label class="label-peq" style="color: var(--azul-vale)">Real</label>
+                            <input type="number" class="input-rdc in-real" 
+                                data-id="${id}" 
+                                data-nome="${eq.nome}" 
+                                data-previsto="${eq.previsto}"
+                                value="${eq.previsto}"
+                                oninput="atualizarHeaderQtd('${id}', this.value)">
                         </div>
-                    </div>`;
-            });
-            container.innerHTML = html;
-        }
+                        <div>
+                            <label class="label-peq" style="color: var(--laranja)">Manut.</label>
+                            <input type="number" class="input-rdc in-manut" data-id="${id}" value="0">
+                        </div>
+                    </div>
+                    <label class="label-peq">Observações</label>
+                    <textarea class="in-obs" data-id="${id}" placeholder="Notas sobre este equipamento..."></textarea>
+                </div>
+            </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function atualizarHeaderQtd(id, valor) {
+    const headerSpan = document.querySelector(`.header-qtd[data-id="${id}"]`);
+    if (headerSpan) {
+        headerSpan.textContent = String(valor || 0).padStart(2, '0');
+    }
+}
 
         async function enviarRDC() {
             if (!confirm("Confirmar fechamento e envio do RDC?")) return;
