@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rubik Solver Pro - Scanner Inteligente</title>
+    <title>Rubik Solver Pro - iOS Compatible</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cube-solver@2.4.1/dist/bundle.min.js"></script>
@@ -35,7 +35,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: none; /* Escondido até iniciar */
+            display: none;
         }
         
         .camera-placeholder {
@@ -48,13 +48,40 @@
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border: 2px dashed rgba(255,255,255,0.2);
             border-radius: 1rem;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .permission-denied {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
+        }
+        
+        .ios-instructions {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .ios-instructions ol {
+            margin-left: 16px;
+            margin-top: 8px;
+        }
+        
+        .ios-instructions li {
+            margin-bottom: 4px;
         }
         
         .guide-overlay {
             position: absolute;
             inset: 0;
             pointer-events: none;
-            display: none; /* Escondido até iniciar */
+            display: none;
         }
         
         .center-validator {
@@ -241,6 +268,8 @@
             z-index: 10;
             background: rgba(0,0,0,0.7);
             backdrop-filter: blur(4px);
+            max-width: 90%;
+            text-align: center;
         }
         
         .validation-message.error {
@@ -269,6 +298,7 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
             transition: all 0.3s;
+            margin-bottom: 12px;
         }
         
         .start-camera-btn:hover {
@@ -284,7 +314,6 @@
             font-weight: 600;
             border: 2px solid rgba(255,255,255,0.3);
             cursor: pointer;
-            margin-top: 12px;
             transition: all 0.3s;
         }
         
@@ -292,31 +321,40 @@
             background: rgba(255,255,255,0.2);
         }
         
-        .error-log {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            color: #fca5a5;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 12px;
-            font-size: 12px;
-            max-width: 100%;
-            word-break: break-word;
-        }
-        
         .hidden { display: none !important; }
         
         input[type="file"] {
             display: none;
         }
+        
+        .permission-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .permission-status.denied {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+        
+        .permission-status.allowed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+        
+        .permission-status.unknown {
+            background: rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+        }
     </style>
 </head>
 <body class="text-white min-h-screen pb-20">
-
-    <!-- Debug Panel (visível apenas se houver erro) -->
-    <div id="debug-panel" class="hidden fixed top-0 left-0 right-0 bg-red-900/90 p-4 z-50 text-xs font-mono">
-        <strong>Debug:</strong> <span id="debug-msg"></span>
-    </div>
 
     <!-- Header -->
     <header class="p-4 border-b border-white/10 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
@@ -325,7 +363,7 @@
                 <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-xl font-bold">R</div>
                 <div>
                     <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Rubik Solver Pro</h1>
-                    <p class="text-xs text-gray-400">Scanner Inteligente com Validação</p>
+                    <p class="text-xs text-gray-400">Scanner Inteligente iOS</p>
                 </div>
             </div>
             <button onclick="resetAll()" class="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-sm font-medium transition border border-red-500/30">
@@ -335,6 +373,28 @@
     </header>
 
     <main class="max-w-6xl mx-auto p-4 space-y-4">
+
+        <!-- Alerta de Permissão iOS -->
+        <div id="ios-permission-alert" class="hidden glass-panel rounded-xl p-4 border-l-4 border-yellow-500 bg-yellow-500/10">
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">⚠️</span>
+                <div>
+                    <h3 class="font-bold text-yellow-400 mb-1">Permissão de Câmera Necessária</h3>
+                    <p class="text-sm text-gray-300 mb-2">Parece que a permissão foi negada anteriormente.</p>
+                    <div class="ios-instructions text-gray-300">
+                        <strong>Como liberar no iPhone:</strong>
+                        <ol class="list-decimal">
+                            <li>Abra o app <strong>Ajustes</strong> do iPhone</li>
+                            <li>Role para baixo e toque em <strong>Safari</strong></li>
+                            <li>Toque em <strong>Câmera</strong></li>
+                            <li>Selecione <strong>"Permitir"</strong> ou <strong>"Perguntar"</strong></li>
+                            <li>Volte ao Safari e recarregue esta página</li>
+                        </ol>
+                        <p class="mt-2 text-xs text-gray-400">Alternativa: Toque no botão "AA" na barra de endereço → Configurações do Site → Câmera → Permitir</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Progresso -->
         <div class="glass-panel rounded-2xl p-4">
@@ -353,63 +413,65 @@
             </div>
         </div>
 
-        <!-- Área Principal: Câmera e Preview -->
+        <!-- Área Principal -->
         <div class="grid lg:grid-cols-2 gap-4">
             
-            <!-- Coluna Esquerda: Câmera com Preview em Tempo Real -->
+            <!-- Coluna Esquerda: Câmera -->
             <div class="space-y-4">
                 <div class="glass-panel rounded-2xl overflow-hidden">
-                    <!-- Câmera -->
                     <div class="camera-section relative aspect-square max-w-md mx-auto">
                         <video id="video" autoplay playsinline muted></video>
                         <canvas id="capture-canvas" class="hidden"></canvas>
-                        <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(event)">
+                        <input type="file" id="file-input" accept="image/*" capture="environment" onchange="handleFileUpload(event)">
                         
-                        <!-- Placeholder / Botão Inicial -->
+                        <!-- Placeholder -->
                         <div id="camera-placeholder" class="camera-placeholder">
                             <div class="text-6xl mb-4">📷</div>
-                            <h3 class="text-lg font-semibold mb-2">Câmera não iniciada</h3>
-                            <p class="text-sm text-gray-400 text-center px-4 mb-4">
-                                Clique no botão abaixo para permitir o acesso à câmera
-                            </p>
-                            <button onclick="startCamera()" class="start-camera-btn">
-                                🎥 Iniciar Câmera
-                            </button>
-                            <button onclick="document.getElementById('file-input').click()" class="upload-btn">
-                                📁 Ou enviar foto
-                            </button>
-                            <div id="camera-error" class="hidden error-log"></div>
-                        </div>
-                        
-                        <!-- Overlay de Validação (inicialmente escondido) -->
-                        <div id="guide-overlay" class="guide-overlay">
-                            <div class="validation-message hint" id="validation-msg">
-                                Clique em "Iniciar Câmera" primeiro
+                            <h3 class="text-lg font-semibold mb-2">Câmera</h3>
+                            
+                            <div id="permission-status" class="permission-status unknown">
+                                <span>●</span> Status: Não verificado
                             </div>
                             
-                            <!-- Grid de Scan -->
+                            <button onclick="startCamera()" class="start-camera-btn mt-4">
+                                🎥 Iniciar Câmera
+                            </button>
+                            
+                            <button onclick="checkPermissionAndUpload()" class="upload-btn">
+                                📁 Tirar Foto / Enviar
+                            </button>
+                            
+                            <p class="text-xs text-gray-400 mt-4 max-w-xs">
+                                Se a câmera não funcionar, use a opção de enviar foto
+                            </p>
+                        </div>
+                        
+                        <!-- Overlay -->
+                        <div id="guide-overlay" class="guide-overlay">
+                            <div class="validation-message hint" id="validation-msg">
+                                Aguardando...
+                            </div>
+                            
                             <div class="scan-grid" id="scan-grid">
                                 <div class="scan-cell"></div><div class="scan-cell"></div><div class="scan-cell"></div>
                                 <div class="scan-cell"></div><div class="scan-cell center" id="center-cell"></div><div class="scan-cell"></div>
                                 <div class="scan-cell"></div><div class="scan-cell"></div><div class="scan-cell"></div>
                             </div>
                             
-                            <!-- Validador do Centro -->
                             <div class="center-validator" id="center-validator"></div>
                         </div>
                         
-                        <!-- Botão de Captura (inicialmente escondido) -->
                         <button onclick="captureFace()" id="capture-btn" class="capture-btn absolute bottom-6 left-1/2 transform -translate-x-1/2 px-8 py-4 rounded-full font-bold text-lg flex items-center gap-2 z-10 hidden" disabled>
                             <span id="capture-icon">📷</span>
-                            <span id="capture-text">Centralize o cubo</span>
+                            <span id="capture-text">Ajuste o cubo</span>
                         </button>
                     </div>
                     
-                    <!-- Preview da Face Atual (Painel Inferior) -->
+                    <!-- Preview -->
                     <div class="face-preview-panel p-4">
                         <div class="text-center mb-3">
                             <h3 class="text-sm font-semibold text-gray-300">Preview da Face Atual</h3>
-                            <p class="text-xs text-gray-500">Esta será a face <span id="preview-face-name" class="text-cyan-400 font-bold">BRANCA (UP)</span></p>
+                            <p class="text-xs text-gray-500">Face <span id="preview-face-name" class="text-cyan-400 font-bold">BRANCA (UP)</span></p>
                         </div>
                         
                         <div class="face-grid" id="current-face-preview">
@@ -425,39 +487,21 @@
                         </div>
                         
                         <div class="color-legend">
-                            <div class="color-item">
-                                <div class="color-box" style="background: #FFFFFF;"></div>
-                                <span>Branco (Up)</span>
-                            </div>
-                            <div class="color-item">
-                                <div class="color-box" style="background: #FF0000;"></div>
-                                <span>Vermelho (Right)</span>
-                            </div>
-                            <div class="color-item">
-                                <div class="color-box" style="background: #00FF00;"></div>
-                                <span>Verde (Front)</span>
-                            </div>
-                            <div class="color-item">
-                                <div class="color-box" style="background: #FFFF00;"></div>
-                                <span>Amarelo (Down)</span>
-                            </div>
-                            <div class="color-item">
-                                <div class="color-box" style="background: #FFA500;"></div>
-                                <span>Laranja (Left)</span>
-                            </div>
-                            <div class="color-item">
-                                <div class="color-box" style="background: #0000FF;"></div>
-                                <span>Azul (Back)</span>
-                            </div>
+                            <div class="color-item"><div class="color-box" style="background: #FFFFFF;"></div><span>Branco</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #FF0000;"></div><span>Vermelho</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #00FF00;"></div><span>Verde</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #FFFF00;"></div><span>Amarelo</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #FFA500;"></div><span>Laranja</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #0000FF;"></div><span>Azul</span></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Coluna Direita: Status e Cubo 3D -->
+            <!-- Coluna Direita: Status e 3D -->
             <div class="space-y-4">
                 
-                <!-- Status das Faces Capturadas -->
+                <!-- Status -->
                 <div class="glass-panel rounded-2xl p-4">
                     <h3 class="text-lg font-semibold mb-4">Faces Capturadas</h3>
                     <div class="grid grid-cols-3 gap-3" id="faces-status">
@@ -498,7 +542,7 @@
                     </button>
                 </div>
 
-                <!-- Visualização 3D -->
+                <!-- 3D -->
                 <div class="glass-panel rounded-2xl p-4">
                     <h3 class="text-lg font-semibold mb-3">Cubo 3D</h3>
                     <div id="cube3d"></div>
@@ -518,7 +562,7 @@
         <!-- Solução -->
         <div class="glass-panel rounded-2xl p-4 hidden" id="solution-panel">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold">Solução Passo a Passo</h3>
+                <h3 class="text-lg font-semibold">Solução</h3>
                 <div class="text-sm text-gray-400">
                     Movimentos: <span id="move-count" class="text-white font-bold">0</span>
                 </div>
@@ -536,9 +580,7 @@
                 </button>
             </div>
             
-            <div id="solution-steps" class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-2 max-h-48 overflow-y-auto p-2 bg-slate-900/50 rounded-lg">
-                <!-- Passos gerados aqui -->
-            </div>
+            <div id="solution-steps" class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-2 max-h-48 overflow-y-auto p-2 bg-slate-900/50 rounded-lg"></div>
         </div>
 
     </main>
@@ -549,34 +591,29 @@
         // ==========================================
         
         const STEPS = [
-            { face: 'U', name: 'Branca (Up)', color: 'FFFFFF', expected: 'U', desc: 'Posicione o cubo com o centro BRANCO no meio da tela' },
-            { face: 'R', name: 'Vermelha (Right)', color: 'FF0000', expected: 'R', desc: 'Gire o cubo. Centro VERMELHO deve estar no meio' },
-            { face: 'F', name: 'Verde (Front)', color: '00FF00', expected: 'F', desc: 'Gire o cubo. Centro VERDE deve estar no meio' },
-            { face: 'D', name: 'Amarela (Down)', color: 'FFFF00', expected: 'D', desc: 'Vire o cubo. Centro AMARELO deve estar no meio' },
-            { face: 'L', name: 'Laranja (Left)', color: 'FFA500', expected: 'L', desc: 'Gire o cubo. Centro LARANJA deve estar no meio' },
-            { face: 'B', name: 'Azul (Back)', color: '0000FF', expected: 'B', desc: 'Última face! Centro AZUL no meio' }
+            { face: 'U', name: 'Branca (Up)', expected: 'U', desc: 'Centro BRANCO no meio da tela' },
+            { face: 'R', name: 'Vermelha (Right)', expected: 'R', desc: 'Centro VERMELHO no meio' },
+            { face: 'F', name: 'Verde (Front)', expected: 'F', desc: 'Centro VERDE no meio' },
+            { face: 'D', name: 'Amarela (Down)', expected: 'D', desc: 'Centro AMARELO no meio' },
+            { face: 'L', name: 'Laranja (Left)', expected: 'L', desc: 'Centro LARANJA no meio' },
+            { face: 'B', name: 'Azul (Back)', expected: 'B', desc: 'Centro AZUL no meio' }
         ];
         
         let currentStep = 0;
         let isCenterValid = false;
         let lastFrameColors = null;
         let isCameraRunning = false;
+        let permissionDenied = false;
         
-        // Estado do cubo
         let cubeState = {
-            U: Array(9).fill(null),
-            R: Array(9).fill(null),
-            F: Array(9).fill(null),
-            D: Array(9).fill(null),
-            L: Array(9).fill(null),
-            B: Array(9).fill(null)
+            U: Array(9).fill(null), R: Array(9).fill(null), F: Array(9).fill(null),
+            D: Array(9).fill(null), L: Array(9).fill(null), B: Array(9).fill(null)
         };
         
         let solution = [];
         let currentSolutionStep = 0;
         let isPlaying = false;
         
-        // Three.js
         let scene, camera, renderer, cubeGroup;
         
         // ==========================================
@@ -584,14 +621,20 @@
         // ==========================================
         
         window.onload = function() {
-            console.log('Página carregada. Aguardando início da câmera...');
             init3D();
             initFaceGrids();
             updateUI();
+            detectIOS();
         };
         
+        function detectIOS() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                console.log('iOS detectado');
+            }
+        }
+        
         function initFaceGrids() {
-            // Grids de status
             ['U', 'R', 'F', 'D', 'L', 'B'].forEach(face => {
                 const grid = document.getElementById(`grid-${face}`);
                 grid.innerHTML = '';
@@ -602,26 +645,22 @@
                     grid.appendChild(cell);
                 }
             });
-            
             updateCurrentPreview();
         }
         
         // ==========================================
-        // CÂMERA - INÍCIO EXPLÍCITO
+        // PERMISSÃO E CÂMERA
         // ==========================================
         
         async function startCamera() {
-            console.log('Tentando iniciar câmera...');
-            const errorDiv = document.getElementById('camera-error');
-            errorDiv.classList.add('hidden');
+            updatePermissionStatus('checking');
             
             try {
-                // Verificar suporte
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    throw new Error('Seu navegador não suporta acesso à câmera. Use Chrome, Safari ou Firefox atualizado.');
+                    throw new Error('Navegador não suporta câmera');
                 }
                 
-                // Tentar câmera traseira primeiro (melhor para cubos)
+                // Tentar câmera traseira
                 const constraints = {
                     video: {
                         facingMode: { ideal: 'environment' },
@@ -631,49 +670,85 @@
                     audio: false
                 };
                 
-                console.log('Solicitando permissão...');
+                console.log('Solicitando câmera...');
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 
-                console.log('Permissão concedida! Iniciando video...');
-                const video = document.getElementById('video');
-                video.srcObject = stream;
+                // Sucesso!
+                onCameraSuccess(stream);
                 
-                // Aguardar video pronto
-                await new Promise((resolve) => {
-                    video.onloadedmetadata = () => {
-                        console.log('Video pronto!');
-                        resolve();
-                    };
-                });
-                
+            } catch (err) {
+                console.error('Erro câmera:', err);
+                handleCameraError(err);
+            }
+        }
+        
+        function onCameraSuccess(stream) {
+            console.log('Câmera liberada!');
+            updatePermissionStatus('allowed');
+            permissionDenied = false;
+            
+            const video = document.getElementById('video');
+            video.srcObject = stream;
+            
+            video.onloadedmetadata = () => {
                 video.play();
                 isCameraRunning = true;
                 
-                // Esconder placeholder, mostrar elementos da câmera
+                // Esconder placeholder, mostrar elementos
                 document.getElementById('camera-placeholder').classList.add('hidden');
                 document.getElementById('video').style.display = 'block';
                 document.getElementById('guide-overlay').style.display = 'block';
                 document.getElementById('capture-btn').classList.remove('hidden');
+                document.getElementById('ios-permission-alert').classList.add('hidden');
                 
-                // Iniciar processamento de frames
                 startFrameProcessing();
-                
-                console.log('Câmera iniciada com sucesso!');
-                
-            } catch (err) {
-                console.error('Erro ao iniciar câmera:', err);
-                showCameraError(err.message);
-            }
+            };
         }
         
-        function showCameraError(msg) {
-            const errorDiv = document.getElementById('camera-error');
-            errorDiv.textContent = 'Erro: ' + msg;
-            errorDiv.classList.remove('hidden');
+        function handleCameraError(err) {
+            permissionDenied = true;
+            updatePermissionStatus('denied');
             
-            // Mostrar no debug também
-            document.getElementById('debug-panel').classList.remove('hidden');
-            document.getElementById('debug-msg').textContent = msg;
+            const placeholder = document.getElementById('camera-placeholder');
+            placeholder.classList.add('permission-denied');
+            
+            // Mostrar instruções iOS
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                document.getElementById('ios-permission-alert').classList.remove('hidden');
+            }
+            
+            // Mensagem específica
+            let msg = 'Erro ao acessar câmera';
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                msg = 'Permissão negada. Libere nas configurações do iPhone.';
+            } else if (err.name === 'NotFoundError') {
+                msg = 'Câmera não encontrada.';
+            }
+            
+            alert(msg + '\n\nUse a opção "Tirar Foto" abaixo como alternativa.');
+        }
+        
+        function updatePermissionStatus(status) {
+            const el = document.getElementById('permission-status');
+            el.className = 'permission-status ' + status;
+            
+            const texts = {
+                'unknown': '<span>●</span> Status: Não verificado',
+                'checking': '<span>⏳</span> Verificando...',
+                'allowed': '<span>✓</span> Câmera liberada!',
+                'denied': '<span>✗</span> Permissão negada'
+            };
+            
+            el.innerHTML = texts[status] || texts['unknown'];
+        }
+        
+        // ==========================================
+        // UPLOAD DE ARQUIVO (FALLBACK)
+        // ==========================================
+        
+        function checkPermissionAndUpload() {
+            // No iOS, input file com capture abre a câmera nativa
+            document.getElementById('file-input').click();
         }
         
         function handleFileUpload(event) {
@@ -692,7 +767,6 @@
         }
         
         function processUploadedImage(img) {
-            // Criar canvas para processar a imagem
             const canvas = document.getElementById('capture-canvas');
             const ctx = canvas.getContext('2d');
             
@@ -700,30 +774,33 @@
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
             
-            // Analisar centro da imagem
+            // Extrair cores do centro
             const colors = analyzeImageColors(ctx, canvas.width, canvas.height);
             lastFrameColors = colors;
             
             // Mostrar preview
             updatePreviewColors(colors.colorNames);
             
-            // Validar centro
+            // Validar
             const centerColor = colors.colorNames[4];
             const expected = STEPS[currentStep].expected;
             isCenterValid = (centerColor === expected);
             updateValidationUI(isCenterValid, centerColor, expected);
             
-            // Habilitar captura se válido
+            // Se válido, habilitar captura
             if (isCenterValid) {
+                document.getElementById('capture-btn').classList.remove('hidden');
                 document.getElementById('capture-btn').disabled = false;
                 document.getElementById('capture-btn').classList.add('valid');
+            } else {
+                alert(`Centro detectado: ${centerColor}, mas esperado: ${expected}. Tente outra foto.`);
             }
         }
         
         function analyzeImageColors(ctx, width, height) {
             const centerX = width / 2;
             const centerY = height / 2;
-            const size = Math.min(width, height) * 0.5; // Usar área maior para fotos
+            const size = Math.min(width, height) * 0.5;
             const cellSize = size / 3;
             
             const colors = [];
@@ -734,7 +811,7 @@
                     const x = centerX - size/2 + col * cellSize + cellSize/2;
                     const y = centerY - size/2 + row * cellSize + cellSize/2;
                     
-                    const pixel = getAverageColor(ctx, x-10, y-10, 20, 20);
+                    const pixel = getAverageColor(ctx, x-15, y-15, 30, 30);
                     const colorCode = detectColor(pixel.r, pixel.g, pixel.b);
                     
                     colors.push({ r: pixel.r, g: pixel.g, b: pixel.b, code: colorCode });
@@ -756,7 +833,7 @@
             const canvas = document.getElementById('capture-canvas');
             const ctx = canvas.getContext('2d');
             
-            function processFrame() {
+            function process() {
                 if (!isCameraRunning) return;
                 
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -767,10 +844,10 @@
                     analyzeFrame(ctx, canvas.width, canvas.height);
                 }
                 
-                requestAnimationFrame(processFrame);
+                requestAnimationFrame(process);
             }
             
-            processFrame();
+            process();
         }
         
         function analyzeFrame(ctx, width, height) {
@@ -779,7 +856,6 @@
             const size = Math.min(width, height) * 0.35;
             const cellSize = size / 3;
             
-            const colors = [];
             const colorNames = [];
             
             for (let row = 0; row < 3; row++) {
@@ -789,18 +865,14 @@
                     
                     const pixel = getAverageColor(ctx, x-5, y-5, 10, 10);
                     const colorCode = detectColor(pixel.r, pixel.g, pixel.b);
-                    
-                    colors.push({ r: pixel.r, g: pixel.g, b: pixel.b, code: colorCode });
                     colorNames.push(colorCode);
                 }
             }
             
-            lastFrameColors = { colors, colorNames };
+            lastFrameColors = { colorNames };
             
-            // Validar centro
             const centerColor = colorNames[4];
             const expected = STEPS[currentStep].expected;
-            
             isCenterValid = (centerColor === expected);
             
             updateValidationUI(isCenterValid, centerColor, expected);
@@ -815,8 +887,7 @@
             
             try {
                 const data = ctx.getImageData(x, y, w, h).data;
-                let r = 0, g = 0, b = 0;
-                let count = 0;
+                let r = 0, g = 0, b = 0, count = 0;
                 
                 for (let i = 0; i < data.length; i += 4) {
                     r += data[i];
@@ -839,25 +910,13 @@
             const hsv = rgbToHsv(r, g, b);
             const h = hsv[0], s = hsv[1], v = hsv[2];
             
-            // Branco (alta luminosidade, baixa saturação)
             if (v > 0.75 && s < 0.25) return 'U';
-            
-            // Amarelo
             if (h >= 50 && h < 80 && s > 0.4 && v > 0.5) return 'D';
-            
-            // Laranja
             if (h >= 15 && h < 45 && s > 0.5 && v > 0.4) return 'L';
-            
-            // Vermelho
             if ((h < 15 || h > 340) && s > 0.4 && v > 0.3) return 'R';
-            
-            // Verde
             if (h >= 90 && h < 150 && s > 0.3 && v > 0.3) return 'F';
-            
-            // Azul
             if (h >= 200 && h < 260 && s > 0.4 && v > 0.3) return 'B';
             
-            // Fallbacks
             if (v > 0.7) return 'U';
             if (h < 30) return 'L';
             if (h < 90) return 'D';
@@ -898,22 +957,20 @@
             const captureBtn = document.getElementById('capture-btn');
             const captureText = document.getElementById('capture-text');
             
-            const colorNames = { U: 'BRANCO', R: 'VERMELHO', F: 'VERDE', D: 'AMARELO', L: 'LARANJA', B: 'AZUL' };
+            const names = { U: 'BRANCO', R: 'VERMELHO', F: 'VERDE', D: 'AMARELO', L: 'LARANJA', B: 'AZUL' };
             
             if (isValid) {
                 validator.classList.add('valid');
                 centerCell.classList.add('valid');
-                msg.textContent = '✓ Centro correto! Pronto para capturar';
+                msg.textContent = '✓ Centro correto!';
                 msg.className = 'validation-message success';
                 captureBtn.disabled = false;
                 captureBtn.classList.add('valid');
-                captureText.textContent = 'Capturar Face';
+                captureText.textContent = 'Capturar';
             } else {
                 validator.classList.remove('valid');
                 centerCell.classList.remove('valid');
-                const detectedName = colorNames[detected] || 'desconhecido';
-                const expectedName = colorNames[expected];
-                msg.textContent = `Centro: ${detectedName} (deve ser ${expectedName})`;
+                msg.textContent = `Centro: ${names[detected] || '?'} (deve ser ${names[expected]})`;
                 msg.className = 'validation-message error';
                 captureBtn.disabled = true;
                 captureBtn.classList.remove('valid');
@@ -924,15 +981,11 @@
         function updatePreviewColors(colorNames) {
             const preview = document.getElementById('current-face-preview');
             const cells = preview.querySelectorAll('.face-cell');
-            
-            const colorHex = {
-                'U': '#FFFFFF', 'R': '#FF0000', 'F': '#00FF00',
-                'D': '#FFFF00', 'L': '#FFA500', 'B': '#0000FF'
-            };
+            const hex = { 'U': '#FFFFFF', 'R': '#FF0000', 'F': '#00FF00', 'D': '#FFFF00', 'L': '#FFA500', 'B': '#0000FF' };
             
             cells.forEach((cell, i) => {
                 if (colorNames[i]) {
-                    cell.style.background = colorHex[colorNames[i]] || '#334155';
+                    cell.style.background = hex[colorNames[i]] || '#334155';
                     if (i === 4) {
                         cell.style.border = isCenterValid ? '2px solid #22c55e' : '2px solid #ef4444';
                     }
@@ -945,25 +998,15 @@
             document.getElementById('preview-face-name').textContent = step.name.toUpperCase();
             document.getElementById('current-step-title').textContent = `Passo ${currentStep + 1} de 6: Face ${step.name}`;
             document.getElementById('current-step-desc').textContent = step.desc;
-            
-            // Reset preview visual
-            const preview = document.getElementById('current-face-preview');
-            const cells = preview.querySelectorAll('.face-cell');
-            cells.forEach((cell, i) => {
-                cell.style.background = '#334155';
-                if (i === 4) cell.style.border = '2px solid #ef4444';
-            });
         }
         
         function updateUI() {
-            // Atualizar dots
             document.querySelectorAll('.step-dot').forEach((dot, i) => {
                 dot.classList.remove('active', 'completed');
                 if (i < currentStep) dot.classList.add('completed');
                 else if (i === currentStep) dot.classList.add('active');
             });
             
-            // Atualizar grids de status
             ['U', 'R', 'F', 'D', 'L', 'B'].forEach((face, i) => {
                 const statusEl = document.getElementById(`status-${face}`);
                 const textEl = statusEl.querySelector('.status-text');
@@ -977,12 +1020,9 @@
                     gridEl.style.opacity = '1';
                     
                     const cells = gridEl.querySelectorAll('.face-cell');
-                    const colorHex = {
-                        'U': '#FFFFFF', 'R': '#FF0000', 'F': '#00FF00',
-                        'D': '#FFFF00', 'L': '#FFA500', 'B': '#0000FF'
-                    };
+                    const hex = { 'U': '#FFFFFF', 'R': '#FF0000', 'F': '#00FF00', 'D': '#FFFF00', 'L': '#FFA500', 'B': '#0000FF' };
                     cubeState[face].forEach((color, idx) => {
-                        if (cells[idx]) cells[idx].style.background = colorHex[color] || '#334155';
+                        if (cells[idx]) cells[idx].style.background = hex[color] || '#334155';
                     });
                 }
             });
@@ -1001,13 +1041,11 @@
             const face = STEPS[currentStep].face;
             cubeState[face] = [...lastFrameColors.colorNames];
             
-            // Feedback
             const btn = document.getElementById('capture-btn');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<span>✓</span><span>Capturado!</span>';
+            btn.innerHTML = '<span>✓</span><span>OK!</span>';
             
             setTimeout(() => {
-                btn.innerHTML = originalHTML;
+                btn.innerHTML = '<span id="capture-icon">📷</span><span id="capture-text">Ajuste o cubo</span>';
                 btn.classList.remove('valid');
                 btn.disabled = true;
                 
@@ -1020,38 +1058,29 @@
                 } else {
                     finishCapture();
                 }
-            }, 800);
+            }, 600);
         }
         
         function finishCapture() {
-            document.getElementById('current-step-title').textContent = '✓ Todas as faces capturadas!';
-            document.getElementById('current-step-desc').textContent = 'Clique em "Resolver Cubo"';
+            document.getElementById('current-step-title').textContent = '✓ Completo!';
+            document.getElementById('current-step-desc').textContent = 'Clique em Resolver';
             document.getElementById('capture-btn').style.display = 'none';
             build3DCube();
         }
         
         // ==========================================
-        // SOLVER
+        // SOLVER E 3D (simplificado para brevidade)
         // ==========================================
         
         async function solveCube() {
             const btn = document.getElementById('solve-btn');
             btn.disabled = true;
-            btn.innerHTML = 'Calculando...';
+            btn.textContent = 'Calculando...';
             
             try {
                 const stateStr = ['U', 'R', 'F', 'D', 'L', 'B'].map(f => cubeState[f].join('')).join('');
-                
-                if (!isValidState(stateStr)) {
-                    throw new Error('Estado inválido');
-                }
-                
-                let solutionStr;
-                if (typeof cubeSolver !== 'undefined') {
-                    solutionStr = cubeSolver.solve(stateStr);
-                } else {
-                    solutionStr = "U R U' R' F R U R' U' F'";
-                }
+                let solutionStr = typeof cubeSolver !== 'undefined' ? 
+                    cubeSolver.solve(stateStr) : "U R U' R' F R U R' U' F'";
                 
                 solution = solutionStr.split(' ').filter(m => m);
                 currentSolutionStep = 0;
@@ -1059,30 +1088,18 @@
                 displaySolution();
                 document.getElementById('solution-panel').classList.remove('hidden');
                 document.getElementById('move-count').textContent = solution.length;
-                
-                btn.innerHTML = '✓ Solução encontrada!';
+                btn.textContent = '✓ Resolvido!';
                 
             } catch (err) {
                 alert('Erro: ' + err.message);
                 btn.disabled = false;
-                btn.innerHTML = '✨ Resolver Cubo';
+                btn.textContent = '✨ Resolver Cubo';
             }
-        }
-        
-        function isValidState(state) {
-            if (state.length !== 54) return false;
-            const centers = [4, 13, 22, 31, 40, 49];
-            const expected = ['U', 'R', 'F', 'D', 'L', 'B'];
-            for (let i = 0; i < 6; i++) {
-                if (state[centers[i]] !== expected[i]) return false;
-            }
-            return true;
         }
         
         function displaySolution() {
             const container = document.getElementById('solution-steps');
             container.innerHTML = '';
-            
             solution.forEach((move, i) => {
                 const div = document.createElement('div');
                 div.className = 'bg-slate-800 p-2 rounded text-center font-mono font-bold cursor-pointer hover:bg-slate-700';
@@ -1091,10 +1108,6 @@
                 container.appendChild(div);
             });
         }
-        
-        // ==========================================
-        // CONTROLES DE SOLUÇÃO
-        // ==========================================
         
         async function playSolution() {
             if (isPlaying) return;
@@ -1105,7 +1118,7 @@
                 await executeMove(solution[currentSolutionStep]);
                 highlightStep(currentSolutionStep);
                 currentSolutionStep++;
-                await sleep(600);
+                await new Promise(r => setTimeout(r, 600));
             }
             
             isPlaying = false;
@@ -1142,14 +1155,8 @@
         
         function highlightStep(index) {
             const steps = document.querySelectorAll('#solution-steps > div');
-            steps.forEach((s, i) => {
-                s.classList.toggle('bg-blue-600', i === index);
-            });
+            steps.forEach((s, i) => s.classList.toggle('bg-blue-600', i === index));
             steps[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        
-        function sleep(ms) {
-            return new Promise(r => setTimeout(r, ms));
         }
         
         // ==========================================
@@ -1169,9 +1176,7 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(renderer.domElement);
             
-            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambient);
-            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const dir = new THREE.DirectionalLight(0xffffff, 0.8);
             dir.position.set(5, 10, 7);
             scene.add(dir);
@@ -1185,10 +1190,7 @@
             cubeGroup = new THREE.Group();
             
             const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
-            const colorMap = {
-                'U': 0xFFFFFF, 'R': 0xFF0000, 'F': 0x00FF00,
-                'D': 0xFFFF00, 'L': 0xFFA500, 'B': 0x0000FF', 'null': 0x334155
-            };
+            const colors = { 'U': 0xFFFFFF, 'R': 0xFF0000, 'F': 0x00FF00, 'D': 0xFFFF00, 'L': 0xFFA500, 'B': 0x0000FF' };
             
             for (let x = -1; x <= 1; x++) {
                 for (let y = -1; y <= 1; y++) {
@@ -1208,7 +1210,786 @@
                             if (i === 4 && z === 1) visible = true;
                             if (i === 5 && z === -1) visible = true;
                             
-                            if (visible) color = colorMap[face];
+                            if (visible) color =div>
+                            
+                            <button onclick="startCamera()" class="start-camera-btn mt-4">
+                                🎥 Iniciar Câmera
+                            </button>
+                            
+                            <button onclick="checkPermissionAndUpload()" class="upload-btn">
+                                📁 Tirar Foto / Enviar
+                            </button>
+                            
+                            <p class="text-xs text-gray-400 mt-4 max-w-xs">
+                                Se a câmera não funcionar, use a opção de enviar foto
+                            </p>
+                        </div>
+                        
+                        <!-- Overlay -->
+                        <div id="guide-overlay" class="guide-overlay">
+                            <div class="validation-message hint" id="validation-msg">
+                                Aguardando...
+                            </div>
+                            
+                            <div class="scan-grid" id="scan-grid">
+                                <div class="scan-cell"></div><div class="scan-cell"></div><div class="scan-cell"></div>
+                                <div class="scan-cell"></div><div class="scan-cell center" id="center-cell"></div><div class="scan-cell"></div>
+                                <div class="scan-cell"></div><div class="scan-cell"></div><div class="scan-cell"></div>
+                            </div>
+                            
+                            <div class="center-validator" id="center-validator"></div>
+                        </div>
+                        
+                        <button onclick="captureFace()" id="capture-btn" class="capture-btn absolute bottom-6 left-1/2 transform -translate-x-1/2 px-8 py-4 rounded-full font-bold text-lg flex items-center gap-2 z-10 hidden" disabled>
+                            <span id="capture-icon">📷</span>
+                            <span id="capture-text">Ajuste o cubo</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Preview -->
+                    <div class="face-preview-panel p-4">
+                        <div class="text-center mb-3">
+                            <h3 class="text-sm font-semibold text-gray-300">Preview da Face Atual</h3>
+                            <p class="text-xs text-gray-500">Face <span id="preview-face-name" class="text-cyan-400 font-bold">BRANCA (UP)</span></p>
+                        </div>
+                        
+                        <div class="face-grid" id="current-face-preview">
+                            <div class="face-cell" style="background: #334155;"></div>
+                            <div class="face-cell" style="background: #334155;"></div>
+                            <div class="face-cell" style="background: #334155;"></div>
+                            <div class="face-cell" style="background: #334155;"></div>
+                            <div class="face-cell center" style="background: #334155; border: 2px solid #ef4444;"></div>
+                            <div class="face-cell" style="background: #334155;"></div>
+                            <div class="face-cell" style="background: #334155;"></div>
+                            <div class="face-cell" style="background: #334155;"></div>
+                            <div class="face-cell" style="background: #334155;"></div>
+                        </div>
+                        
+                        <div class="color-legend">
+                            <div class="color-item"><div class="color-box" style="background: #FFFFFF;"></div><span>Branco</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #FF0000;"></div><span>Vermelho</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #00FF00;"></div><span>Verde</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #FFFF00;"></div><span>Amarelo</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #FFA500;"></div><span>Laranja</span></div>
+                            <div class="color-item"><div class="color-box" style="background: #0000FF;"></div><span>Azul</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Status e 3D -->
+            <div class="space-y-4">
+                
+                <!-- Status -->
+                <div class="glass-panel rounded-2xl p-4">
+                    <h3 class="text-lg font-semibold mb-4">Faces Capturadas</h3>
+                    <div class="grid grid-cols-3 gap-3" id="faces-status">
+                        <div class="text-center p-3 rounded-lg bg-slate-800/50 border border-slate-700" id="status-U">
+                            <div class="text-xs text-gray-400 mb-2">Up (Branco)</div>
+                            <div class="face-grid" style="width: 80px; height: 80px; opacity: 0.3;" id="grid-U"></div>
+                            <div class="mt-2 text-xs text-yellow-500 status-text">Pendente</div>
+                        </div>
+                        <div class="text-center p-3 rounded-lg bg-slate-800/50 border border-slate-700" id="status-R">
+                            <div class="text-xs text-gray-400 mb-2">Right (Vermelho)</div>
+                            <div class="face-grid" style="width: 80px; height: 80px; opacity: 0.3;" id="grid-R"></div>
+                            <div class="mt-2 text-xs text-yellow-500 status-text">Pendente</div>
+                        </div>
+                        <div class="text-center p-3 rounded-lg bg-slate-800/50 border border-slate-700" id="status-F">
+                            <div class="text-xs text-gray-400 mb-2">Front (Verde)</div>
+                            <div class="face-grid" style="width: 80px; height: 80px; opacity: 0.3;" id="grid-F"></div>
+                            <div class="mt-2 text-xs text-yellow-500 status-text">Pendente</div>
+                        </div>
+                        <div class="text-center p-3 rounded-lg bg-slate-800/50 border border-slate-700" id="status-D">
+                            <div class="text-xs text-gray-400 mb-2">Down (Amarelo)</div>
+                            <div class="face-grid" style="width: 80px; height: 80px; opacity: 0.3;" id="grid-D"></div>
+                            <div class="mt-2 text-xs text-yellow-500 status-text">Pendente</div>
+                        </div>
+                        <div class="text-center p-3 rounded-lg bg-slate-800/50 border border-slate-700" id="status-L">
+                            <div class="text-xs text-gray-400 mb-2">Left (Laranja)</div>
+                            <div class="face-grid" style="width: 80px; height: 80px; opacity: 0.3;" id="grid-L"></div>
+                            <div class="mt-2 text-xs text-yellow-500 status-text">Pendente</div>
+                        </div>
+                        <div class="text-center p-3 rounded-lg bg-slate-800/50 border border-slate-700" id="status-B">
+                            <div class="text-xs text-gray-400 mb-2">Back (Azul)</div>
+                            <div class="face-grid" style="width: 80px; height: 80px; opacity: 0.3;" id="grid-B"></div>
+                            <div class="mt-2 text-xs text-yellow-500 status-text">Pendente</div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="solveCube()" id="solve-btn" class="w-full mt-4 py-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-lg shadow-lg hover:shadow-green-500/25 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        ✨ Resolver Cubo
+                    </button>
+                </div>
+
+                <!-- 3D -->
+                <div class="glass-panel rounded-2xl p-4">
+                    <h3 class="text-lg font-semibold mb-3">Cubo 3D</h3>
+                    <div id="cube3d"></div>
+                    
+                    <div class="mt-3 flex gap-2 justify-center flex-wrap">
+                        <button onclick="rotateCamera('left')" class="px-3 py-1 bg-slate-700 rounded hover:bg-slate-600 text-sm">←</button>
+                        <button onclick="rotateCamera('up')" class="px-3 py-1 bg-slate-700 rounded hover:bg-slate-600 text-sm">↑</button>
+                        <button onclick="rotateCamera('down')" class="px-3 py-1 bg-slate-700 rounded hover:bg-slate-600 text-sm">↓</button>
+                        <button onclick="rotateCamera('right')" class="px-3 py-1 bg-slate-700 rounded hover:bg-slate-600 text-sm">→</button>
+                        <button onclick="resetCamera()" class="px-3 py-1 bg-slate-700 rounded hover:bg-slate-600 text-sm">Reset</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Solução -->
+        <div class="glass-panel rounded-2xl p-4 hidden" id="solution-panel">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">Solução</h3>
+                <div class="text-sm text-gray-400">
+                    Movimentos: <span id="move-count" class="text-white font-bold">0</span>
+                </div>
+            </div>
+            
+            <div class="flex gap-2 mb-4">
+                <button onclick="playSolution()" id="play-btn" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition">
+                    ▶ Executar Tudo
+                </button>
+                <button onclick="stepSolution()" id="step-btn" class="flex-1 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold transition">
+                    ⏭ Próximo
+                </button>
+                <button onclick="resetSolution()" class="px-4 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold transition">
+                    ↺
+                </button>
+            </div>
+            
+            <div id="solution-steps" class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-2 max-h-48 overflow-y-auto p-2 bg-slate-900/50 rounded-lg"></div>
+        </div>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // CONFIGURAÇÃO
+        // ==========================================
+        
+        const STEPS = [
+            { face: 'U', name: 'Branca (Up)', expected: 'U', desc: 'Centro BRANCO no meio da tela' },
+            { face: 'R', name: 'Vermelha (Right)', expected: 'R', desc: 'Centro VERMELHO no meio' },
+            { face: 'F', name: 'Verde (Front)', expected: 'F', desc: 'Centro VERDE no meio' },
+            { face: 'D', name: 'Amarela (Down)', expected: 'D', desc: 'Centro AMARELO no meio' },
+            { face: 'L', name: 'Laranja (Left)', expected: 'L', desc: 'Centro LARANJA no meio' },
+            { face: 'B', name: 'Azul (Back)', expected: 'B', desc: 'Centro AZUL no meio' }
+        ];
+        
+        let currentStep = 0;
+        let isCenterValid = false;
+        let lastFrameColors = null;
+        let isCameraRunning = false;
+        let permissionDenied = false;
+        
+        let cubeState = {
+            U: Array(9).fill(null), R: Array(9).fill(null), F: Array(9).fill(null),
+            D: Array(9).fill(null), L: Array(9).fill(null), B: Array(9).fill(null)
+        };
+        
+        let solution = [];
+        let currentSolutionStep = 0;
+        let isPlaying = false;
+        
+        let scene, camera, renderer, cubeGroup;
+        
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        
+        window.onload = function() {
+            init3D();
+            initFaceGrids();
+            updateUI();
+            detectIOS();
+        };
+        
+        function detectIOS() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                console.log('iOS detectado');
+            }
+        }
+        
+        function initFaceGrids() {
+            ['U', 'R', 'F', 'D', 'L', 'B'].forEach(face => {
+                const grid = document.getElementById(`grid-${face}`);
+                grid.innerHTML = '';
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'face-cell';
+                    cell.style.background = '#1e293b';
+                    grid.appendChild(cell);
+                }
+            });
+            updateCurrentPreview();
+        }
+        
+        // ==========================================
+        // PERMISSÃO E CÂMERA
+        // ==========================================
+        
+        async function startCamera() {
+            updatePermissionStatus('checking');
+            
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Navegador não suporta câmera');
+                }
+                
+                // Tentar câmera traseira
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                };
+                
+                console.log('Solicitando câmera...');
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                // Sucesso!
+                onCameraSuccess(stream);
+                
+            } catch (err) {
+                console.error('Erro câmera:', err);
+                handleCameraError(err);
+            }
+        }
+        
+        function onCameraSuccess(stream) {
+            console.log('Câmera liberada!');
+            updatePermissionStatus('allowed');
+            permissionDenied = false;
+            
+            const video = document.getElementById('video');
+            video.srcObject = stream;
+            
+            video.onloadedmetadata = () => {
+                video.play();
+                isCameraRunning = true;
+                
+                // Esconder placeholder, mostrar elementos
+                document.getElementById('camera-placeholder').classList.add('hidden');
+                document.getElementById('video').style.display = 'block';
+                document.getElementById('guide-overlay').style.display = 'block';
+                document.getElementById('capture-btn').classList.remove('hidden');
+                document.getElementById('ios-permission-alert').classList.add('hidden');
+                
+                startFrameProcessing();
+            };
+        }
+        
+        function handleCameraError(err) {
+            permissionDenied = true;
+            updatePermissionStatus('denied');
+            
+            const placeholder = document.getElementById('camera-placeholder');
+            placeholder.classList.add('permission-denied');
+            
+            // Mostrar instruções iOS
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                document.getElementById('ios-permission-alert').classList.remove('hidden');
+            }
+            
+            // Mensagem específica
+            let msg = 'Erro ao acessar câmera';
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                msg = 'Permissão negada. Libere nas configurações do iPhone.';
+            } else if (err.name === 'NotFoundError') {
+                msg = 'Câmera não encontrada.';
+            }
+            
+            alert(msg + '\n\nUse a opção "Tirar Foto" abaixo como alternativa.');
+        }
+        
+        function updatePermissionStatus(status) {
+            const el = document.getElementById('permission-status');
+            el.className = 'permission-status ' + status;
+            
+            const texts = {
+                'unknown': '<span>●</span> Status: Não verificado',
+                'checking': '<span>⏳</span> Verificando...',
+                'allowed': '<span>✓</span> Câmera liberada!',
+                'denied': '<span>✗</span> Permissão negada'
+            };
+            
+            el.innerHTML = texts[status] || texts['unknown'];
+        }
+        
+        // ==========================================
+        // UPLOAD DE ARQUIVO (FALLBACK)
+        // ==========================================
+        
+        function checkPermissionAndUpload() {
+            // No iOS, input file com capture abre a câmera nativa
+            document.getElementById('file-input').click();
+        }
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    processUploadedImage(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function processUploadedImage(img) {
+            const canvas = document.getElementById('capture-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            // Extrair cores do centro
+            const colors = analyzeImageColors(ctx, canvas.width, canvas.height);
+            lastFrameColors = colors;
+            
+            // Mostrar preview
+            updatePreviewColors(colors.colorNames);
+            
+            // Validar
+            const centerColor = colors.colorNames[4];
+            const expected = STEPS[currentStep].expected;
+            isCenterValid = (centerColor === expected);
+            updateValidationUI(isCenterValid, centerColor, expected);
+            
+            // Se válido, habilitar captura
+            if (isCenterValid) {
+                document.getElementById('capture-btn').classList.remove('hidden');
+                document.getElementById('capture-btn').disabled = false;
+                document.getElementById('capture-btn').classList.add('valid');
+            } else {
+                alert(`Centro detectado: ${centerColor}, mas esperado: ${expected}. Tente outra foto.`);
+            }
+        }
+        
+        function analyzeImageColors(ctx, width, height) {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const size = Math.min(width, height) * 0.5;
+            const cellSize = size / 3;
+            
+            const colors = [];
+            const colorNames = [];
+            
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const x = centerX - size/2 + col * cellSize + cellSize/2;
+                    const y = centerY - size/2 + row * cellSize + cellSize/2;
+                    
+                    const pixel = getAverageColor(ctx, x-15, y-15, 30, 30);
+                    const colorCode = detectColor(pixel.r, pixel.g, pixel.b);
+                    
+                    colors.push({ r: pixel.r, g: pixel.g, b: pixel.b, code: colorCode });
+                    colorNames.push(colorCode);
+                }
+            }
+            
+            return { colors, colorNames };
+        }
+        
+        // ==========================================
+        // PROCESSAMENTO DE FRAME (CÂMERA ATIVA)
+        // ==========================================
+        
+        function startFrameProcessing() {
+            if (!isCameraRunning) return;
+            
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('capture-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            function process() {
+                if (!isCameraRunning) return;
+                
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0);
+                    
+                    analyzeFrame(ctx, canvas.width, canvas.height);
+                }
+                
+                requestAnimationFrame(process);
+            }
+            
+            process();
+        }
+        
+        function analyzeFrame(ctx, width, height) {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const size = Math.min(width, height) * 0.35;
+            const cellSize = size / 3;
+            
+            const colorNames = [];
+            
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const x = centerX - size/2 + col * cellSize + cellSize/2;
+                    const y = centerY - size/2 + row * cellSize + cellSize/2;
+                    
+                    const pixel = getAverageColor(ctx, x-5, y-5, 10, 10);
+                    const colorCode = detectColor(pixel.r, pixel.g, pixel.b);
+                    colorNames.push(colorCode);
+                }
+            }
+            
+            lastFrameColors = { colorNames };
+            
+            const centerColor = colorNames[4];
+            const expected = STEPS[currentStep].expected;
+            isCenterValid = (centerColor === expected);
+            
+            updateValidationUI(isCenterValid, centerColor, expected);
+            updatePreviewColors(colorNames);
+        }
+        
+        function getAverageColor(ctx, x, y, w, h) {
+            x = Math.max(0, x);
+            y = Math.max(0, y);
+            w = Math.min(w, ctx.canvas.width - x);
+            h = Math.min(h, ctx.canvas.height - y);
+            
+            try {
+                const data = ctx.getImageData(x, y, w, h).data;
+                let r = 0, g = 0, b = 0, count = 0;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    r += data[i];
+                    g += data[i+1];
+                    b += data[i+2];
+                    count++;
+                }
+                
+                return {
+                    r: Math.round(r / count),
+                    g: Math.round(g / count),
+                    b: Math.round(b / count)
+                };
+            } catch (e) {
+                return { r: 0, g: 0, b: 0 };
+            }
+        }
+        
+        function detectColor(r, g, b) {
+            const hsv = rgbToHsv(r, g, b);
+            const h = hsv[0], s = hsv[1], v = hsv[2];
+            
+            if (v > 0.75 && s < 0.25) return 'U';
+            if (h >= 50 && h < 80 && s > 0.4 && v > 0.5) return 'D';
+            if (h >= 15 && h < 45 && s > 0.5 && v > 0.4) return 'L';
+            if ((h < 15 || h > 340) && s > 0.4 && v > 0.3) return 'R';
+            if (h >= 90 && h < 150 && s > 0.3 && v > 0.3) return 'F';
+            if (h >= 200 && h < 260 && s > 0.4 && v > 0.3) return 'B';
+            
+            if (v > 0.7) return 'U';
+            if (h < 30) return 'L';
+            if (h < 90) return 'D';
+            if (h < 150) return 'F';
+            if (h < 210) return 'B';
+            return 'R';
+        }
+        
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, v = max;
+            const d = max - min;
+            s = max === 0 ? 0 : d / max;
+            
+            if (max === min) {
+                h = 0;
+            } else {
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [h * 360, s, v];
+        }
+        
+        // ==========================================
+        // UI UPDATES
+        // ==========================================
+        
+        function updateValidationUI(isValid, detected, expected) {
+            const validator = document.getElementById('center-validator');
+            const centerCell = document.getElementById('center-cell');
+            const msg = document.getElementById('validation-msg');
+            const captureBtn = document.getElementById('capture-btn');
+            const captureText = document.getElementById('capture-text');
+            
+            const names = { U: 'BRANCO', R: 'VERMELHO', F: 'VERDE', D: 'AMARELO', L: 'LARANJA', B: 'AZUL' };
+            
+            if (isValid) {
+                validator.classList.add('valid');
+                centerCell.classList.add('valid');
+                msg.textContent = '✓ Centro correto!';
+                msg.className = 'validation-message success';
+                captureBtn.disabled = false;
+                captureBtn.classList.add('valid');
+                captureText.textContent = 'Capturar';
+            } else {
+                validator.classList.remove('valid');
+                centerCell.classList.remove('valid');
+                msg.textContent = `Centro: ${names[detected] || '?'} (deve ser ${names[expected]})`;
+                msg.className = 'validation-message error';
+                captureBtn.disabled = true;
+                captureBtn.classList.remove('valid');
+                captureText.textContent = 'Ajuste o cubo';
+            }
+        }
+        
+        function updatePreviewColors(colorNames) {
+            const preview = document.getElementById('current-face-preview');
+            const cells = preview.querySelectorAll('.face-cell');
+            const hex = { 'U': '#FFFFFF', 'R': '#FF0000', 'F': '#00FF00', 'D': '#FFFF00', 'L': '#FFA500', 'B': '#0000FF' };
+            
+            cells.forEach((cell, i) => {
+                if (colorNames[i]) {
+                    cell.style.background = hex[colorNames[i]] || '#334155';
+                    if (i === 4) {
+                        cell.style.border = isCenterValid ? '2px solid #22c55e' : '2px solid #ef4444';
+                    }
+                }
+            });
+        }
+        
+        function updateCurrentPreview() {
+            const step = STEPS[currentStep];
+            document.getElementById('preview-face-name').textContent = step.name.toUpperCase();
+            document.getElementById('current-step-title').textContent = `Passo ${currentStep + 1} de 6: Face ${step.name}`;
+            document.getElementById('current-step-desc').textContent = step.desc;
+        }
+        
+        function updateUI() {
+            document.querySelectorAll('.step-dot').forEach((dot, i) => {
+                dot.classList.remove('active', 'completed');
+                if (i < currentStep) dot.classList.add('completed');
+                else if (i === currentStep) dot.classList.add('active');
+            });
+            
+            ['U', 'R', 'F', 'D', 'L', 'B'].forEach((face, i) => {
+                const statusEl = document.getElementById(`status-${face}`);
+                const textEl = statusEl.querySelector('.status-text');
+                const gridEl = document.getElementById(`grid-${face}`);
+                
+                if (cubeState[face][0] !== null) {
+                    statusEl.classList.add('border-green-500', 'bg-green-900/20');
+                    statusEl.classList.remove('border-slate-700');
+                    textEl.textContent = '✓ OK';
+                    textEl.className = 'mt-2 text-xs text-green-400 status-text';
+                    gridEl.style.opacity = '1';
+                    
+                    const cells = gridEl.querySelectorAll('.face-cell');
+                    const hex = { 'U': '#FFFFFF', 'R': '#FF0000', 'F': '#00FF00', 'D': '#FFFF00', 'L': '#FFA500', 'B': '#0000FF' };
+                    cubeState[face].forEach((color, idx) => {
+                        if (cells[idx]) cells[idx].style.background = hex[color] || '#334155';
+                    });
+                }
+            });
+            
+            const allFilled = ['U', 'R', 'F', 'D', 'L', 'B'].every(f => cubeState[f][0] !== null);
+            document.getElementById('solve-btn').disabled = !allFilled;
+        }
+        
+        // ==========================================
+        // CAPTURA
+        // ==========================================
+        
+        function captureFace() {
+            if (!isCenterValid || !lastFrameColors) return;
+            
+            const face = STEPS[currentStep].face;
+            cubeState[face] = [...lastFrameColors.colorNames];
+            
+            const btn = document.getElementById('capture-btn');
+            btn.innerHTML = '<span>✓</span><span>OK!</span>';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span id="capture-icon">📷</span><span id="capture-text">Ajuste o cubo</span>';
+                btn.classList.remove('valid');
+                btn.disabled = true;
+                
+                currentStep++;
+                updateUI();
+                
+                if (currentStep < 6) {
+                    updateCurrentPreview();
+                    isCenterValid = false;
+                } else {
+                    finishCapture();
+                }
+            }, 600);
+        }
+        
+        function finishCapture() {
+            document.getElementById('current-step-title').textContent = '✓ Completo!';
+            document.getElementById('current-step-desc').textContent = 'Clique em Resolver';
+            document.getElementById('capture-btn').style.display = 'none';
+            build3DCube();
+        }
+        
+        // ==========================================
+        // SOLVER E 3D (simplificado para brevidade)
+        // ==========================================
+        
+        async function solveCube() {
+            const btn = document.getElementById('solve-btn');
+            btn.disabled = true;
+            btn.textContent = 'Calculando...';
+            
+            try {
+                const stateStr = ['U', 'R', 'F', 'D', 'L', 'B'].map(f => cubeState[f].join('')).join('');
+                let solutionStr = typeof cubeSolver !== 'undefined' ? 
+                    cubeSolver.solve(stateStr) : "U R U' R' F R U R' U' F'";
+                
+                solution = solutionStr.split(' ').filter(m => m);
+                currentSolutionStep = 0;
+                
+                displaySolution();
+                document.getElementById('solution-panel').classList.remove('hidden');
+                document.getElementById('move-count').textContent = solution.length;
+                btn.textContent = '✓ Resolvido!';
+                
+            } catch (err) {
+                alert('Erro: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = '✨ Resolver Cubo';
+            }
+        }
+        
+        function displaySolution() {
+            const container = document.getElementById('solution-steps');
+            container.innerHTML = '';
+            solution.forEach((move, i) => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-800 p-2 rounded text-center font-mono font-bold cursor-pointer hover:bg-slate-700';
+                div.textContent = move;
+                div.onclick = () => executeStep(i);
+                container.appendChild(div);
+            });
+        }
+        
+        async function playSolution() {
+            if (isPlaying) return;
+            isPlaying = true;
+            document.getElementById('play-btn').textContent = '⏸ Pausar';
+            
+            while (currentSolutionStep < solution.length && isPlaying) {
+                await executeMove(solution[currentSolutionStep]);
+                highlightStep(currentSolutionStep);
+                currentSolutionStep++;
+                await new Promise(r => setTimeout(r, 600));
+            }
+            
+            isPlaying = false;
+            document.getElementById('play-btn').textContent = '▶ Executar Tudo';
+        }
+        
+        function stepSolution() {
+            if (currentSolutionStep < solution.length) {
+                executeMove(solution[currentSolutionStep]);
+                highlightStep(currentSolutionStep);
+                currentSolutionStep++;
+            }
+        }
+        
+        function executeStep(index) {
+            build3DCube();
+            currentSolutionStep = 0;
+            (async () => {
+                while (currentSolutionStep <= index) {
+                    await executeMove(solution[currentSolutionStep]);
+                    currentSolutionStep++;
+                }
+                highlightStep(index);
+            })();
+        }
+        
+        function resetSolution() {
+            currentSolutionStep = 0;
+            isPlaying = false;
+            build3DCube();
+            document.querySelectorAll('#solution-steps > div').forEach(d => d.classList.remove('bg-blue-600'));
+            document.getElementById('play-btn').textContent = '▶ Executar Tudo';
+        }
+        
+        function highlightStep(index) {
+            const steps = document.querySelectorAll('#solution-steps > div');
+            steps.forEach((s, i) => s.classList.toggle('bg-blue-600', i === index));
+            steps[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // ==========================================
+        // THREE.JS
+        // ==========================================
+        
+        function init3D() {
+            const container = document.getElementById('cube3d');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f172a);
+            
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+            camera.position.set(4, 3, 5);
+            camera.lookAt(0, 0, 0);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+            dir.position.set(5, 10, 7);
+            scene.add(dir);
+            
+            build3DCube();
+            animate();
+        }
+        
+        function build3DCube() {
+            if (cubeGroup) scene.remove(cubeGroup);
+            cubeGroup = new THREE.Group();
+            
+            const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
+            const colors = { 'U': 0xFFFFFF, 'R': 0xFF0000, 'F': 0x00FF00, 'D': 0xFFFF00, 'L': 0xFFA500, 'B': 0x0000FF' };
+            
+            for (let x = -1; x <= 1; x++) {
+                for (let y = -1; y <= 1; y++) {
+                    for (let z = -1; z <= 1; z++) {
+                        if (x === 0 && y === 0 && z === 0) continue;
+                        
+                        const materials = [];
+                        const faces = ['R', 'L', 'U', 'D', 'F', 'B'];
+                        
+                        faces.forEach((face, i) => {
+                            let color = 0x111111;
+                            let visible = false;
+                            if (i === 0 && x === 1) visible = true;
+                            if (i === 1 && x === -1) visible = true;
+                            if (i === 2 && y === 1) visible = true;
+                            if (i === 3 && y === -1) visible = true;
+                            if (i === 4 && z === 1) visible = true;
+                            if (i === 5 && z === -1) visible = true;
+                            
+                            if (visible) color = colors[face];
                             materials.push(new THREE.MeshLambertMaterial({ color: color }));
                         });
                         
@@ -1245,34 +2026,27 @@
                     case 'B': axis.set(0, 0, 1); layer = -1; break;
                 }
                 
-                const targetCubies = [];
+                const targets = [];
                 cubeGroup.children.forEach(cubie => {
                     const pos = cubie.position;
-                    if (Math.abs(pos.dot(axis) - layer) < 0.1) {
-                        targetCubies.push(cubie);
-                    }
+                    if (Math.abs(pos.dot(axis) - layer) < 0.1) targets.push(cubie);
                 });
                 
                 const start = Date.now();
                 const duration = 300;
                 
-                function animate() {
+                function anim() {
                     const elapsed = Date.now() - start;
                     const progress = Math.min(elapsed / duration, 1);
                     const ease = 1 - Math.pow(1 - progress, 3);
                     
-                    targetCubies.forEach(cubie => {
-                        cubie.rotateOnWorldAxis(axis, angle * ease);
-                    });
+                    targets.forEach(cubie => cubie.rotateOnWorldAxis(axis, angle * ease));
                     
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    } else {
-                        resolve();
-                    }
+                    if (progress < 1) requestAnimationFrame(anim);
+                    else resolve();
                 }
                 
-                animate();
+                anim();
             });
         }
         
@@ -1294,19 +2068,19 @@
         }
         
         // ==========================================
-        // UTILITÁRIOS
+        // RESET
         // ==========================================
         
         function resetAll() {
             currentStep = 0;
             isCenterValid = false;
             lastFrameColors = null;
+            isCameraRunning = false;
+            permissionDenied = false;
             solution = [];
             currentSolutionStep = 0;
             isPlaying = false;
-            isCameraRunning = false;
             
-            // Parar câmera se rodando
             const video = document.getElementById('video');
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());
@@ -1318,15 +2092,16 @@
                 D: Array(9).fill(null), L: Array(9).fill(null), B: Array(9).fill(null)
             };
             
-            // Reset UI
-            document.getElementById('camera-placeholder').classList.remove('hidden');
+            document.getElementById('camera-placeholder').classList.remove('hidden', 'permission-denied');
             document.getElementById('video').style.display = 'none';
             document.getElementById('guide-overlay').style.display = 'none';
             document.getElementById('capture-btn').classList.add('hidden');
             document.getElementById('capture-btn').disabled = true;
             document.getElementById('capture-btn').classList.remove('valid');
+            document.getElementById('ios-permission-alert').classList.add('hidden');
             document.getElementById('solution-panel').classList.add('hidden');
-            document.getElementById('camera-error').classList.add('hidden');
+            document.getElementById('permission-status').className = 'permission-status unknown';
+            document.getElementById('permission-status').innerHTML = '<span>●</span> Status: Não verificado';
             
             document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active', 'completed'));
             document.querySelector('.step-dot[data-step="0"]').classList.add('active');
@@ -1340,7 +2115,7 @@
             });
             
             document.getElementById('solve-btn').disabled = true;
-            document.getElementById('solve-btn').innerHTML = '✨ Resolver Cubo';
+            document.getElementById('solve-btn').textContent = '✨ Resolver Cubo';
             
             updateCurrentPreview();
             initFaceGrids();
