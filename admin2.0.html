@@ -29,7 +29,7 @@
     
     <style>
         :root {
-            /* Paleta Principal VBM */
+            /* Paleta Principal VBM - SEM PRETO */
             --azul-vale: #3CB5E5;
             --azul-escuro: #0096d2;
             --verde-vale: #007E79;
@@ -319,6 +319,7 @@
             font-family: 'Vale Sans', sans-serif;
             font-style: italic;
             background: white;
+            color: var(--cinza-texto);
         }
         
         .form-input:focus, .form-select:focus { 
@@ -547,6 +548,30 @@
             margin-right: 8px; 
         }
 
+        /* LINK PARA BAIXAR MODELO - SEM BOTÃO */
+        .modelo-download {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--azul-vale);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(60, 181, 229, 0.1);
+            width: fit-content;
+        }
+        
+        .modelo-download:hover {
+            background: rgba(60, 181, 229, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .modelo-download i {
+            font-size: 2rem;
+        }
+
         #dropZone { 
             border: 3px dashed var(--cinza-claro); 
             border-radius: 16px; 
@@ -569,14 +594,15 @@
             background: white;
         }
         
+        /* TABELA COMPACTA */
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 0.95rem; 
+            font-size: 0.8rem; 
         }
         
         th, td { 
-            padding: 16px; 
+            padding: 8px 10px; 
             text-align: left; 
             border-bottom: 1px solid var(--cinza-fundo); 
         }
@@ -586,7 +612,7 @@
             font-weight: 700; 
             color: var(--cinza-texto);
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             letter-spacing: 0.5px;
         }
         
@@ -897,30 +923,22 @@
             border-top: 2px solid var(--cinza-fundo);
         }
 
-        /* RODAPÉ DISCRETO */
+        /* RODAPÉ MINIMALISTA - APENAS LOGO RETA */
         .footer {
             background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.02) 100%);
             padding: 20px 40px;
             border-top: 1px solid var(--cinza-fundo);
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            font-size: 0.8rem;
-            color: var(--cinza-claro);
             margin-top: auto;
-        }
-
-        .footer-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
         }
 
         .footer-brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            opacity: 0.6;
+            opacity: 0.7;
             transition: all 0.3s ease;
         }
 
@@ -929,36 +947,22 @@
         }
 
         .footer-logo {
-            height: 22px;
+            height: 24px;
             width: auto;
-            filter: grayscale(100%);
+            /* Filtro cinza para não sumir no fundo branco */
+            filter: grayscale(100%) brightness(0.6) contrast(1.2);
             transition: filter 0.3s;
         }
 
         .footer-brand:hover .footer-logo {
-            filter: grayscale(0%);
+            filter: grayscale(0%) brightness(1) contrast(1);
         }
 
         .footer-text {
             font-size: 0.75rem;
             letter-spacing: 0.5px;
             font-weight: 500;
-        }
-
-        .footer-right {
-            display: flex;
-            gap: 25px;
-        }
-
-        .footer-link {
-            color: var(--cinza-claro);
-            text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .footer-link:hover {
-            color: var(--azul-vale);
+            color: var(--cinza-medio);
         }
     </style>
 </head>
@@ -1074,21 +1078,21 @@
                         <strong>Como importar:</strong> Baixe o modelo, preencha com os meses no formato <strong>Jan/2026, Fev/2026...</strong> e faça o upload. O sistema salvará todos os meses automaticamente.
                     </div>
 
+                    <!-- DOWNLOAD DO MODELO - ÍCONE CLICÁVEL -->
                     <div style="background: var(--gradiente-sidebar); padding: 1.5rem; border-radius: 16px; margin-bottom: 1rem;">
-                        <h4 style="margin-bottom: 1rem; color: var(--cinza-texto); font-weight: 600;">
-                            <i class="fas fa-download" style="color: var(--azul-vale); margin-right: 8px;"></i> 
-                            Passo 1: Baixar modelo
-                        </h4>
-                        <button class="btn btn-secondary" onclick="baixarModelo()">
-                            <i class="fas fa-file-excel"></i> 
-                            Baixar modelo Excel
-                        </button>
+                        <div class="modelo-download" onclick="baixarModelo()">
+                            <i class="fas fa-file-excel"></i>
+                            <div>
+                                <div style="font-weight: 700; font-size: 1.1rem;">Baixar modelo Excel</div>
+                                <div style="font-size: 0.85rem; color: var(--cinza-medio); margin-top: 2px;">Clique para fazer o download</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div style="background: var(--gradiente-sidebar); padding: 1.5rem; border-radius: 16px; margin-bottom: 1rem;">
                         <h4 style="margin-bottom: 1rem; color: var(--cinza-texto); font-weight: 600;">
                             <i class="fas fa-upload" style="color: var(--verde-vale); margin-right: 8px;"></i> 
-                            Passo 2: Enviar arquivo preenchido
+                            Enviar arquivo preenchido
                         </h4>
                         
                         <div id="dropZone">
@@ -1105,7 +1109,7 @@
                     <div id="previewContainer" style="display: none;">
                         <h4 style="margin-bottom: 1.5rem; font-weight: 600;">
                             <i class="fas fa-eye" style="color: var(--azul-vale); margin-right: 8px;"></i> 
-                            Passo 3: Revisar e salvar
+                            Revisar e salvar
                         </h4>
                         
                         <div class="table-container" style="max-height: 400px; overflow-y: auto;">
@@ -1232,22 +1236,32 @@
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
-
-    <!-- RODAPÉ -->
-    <footer class="footer">
-        <div class="footer-left">
-            <span>© 2026 Vale Base Metals - Sistema RDC</span>
-            <span style="color: var(--cinza-claro);">|</span>
-            <div class="footer-brand">
-                <span class="footer-text">developed by</span>
-                <img src="assets/imagens/reta-logo.png" alt="RETA" class="footer-logo" onerror="this.style.display='none'">
+    <!-- Modal Confirmar Exclusão RDC -->
+    <div class="modal" id="modalExcluirRDC">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-exclamation-triangle" style="color: var(--vermelho);"></i> Confirmar Exclusão</h3>
+            <p style="margin-bottom: 1.5rem; color: var(--cinza-texto);">
+                Tem certeza que deseja excluir o <strong id="excluirRDCInfo">RDC</strong>?
+                <br><br>
+                <span style="color: var(--vermelho); font-size: 0.9rem;"><i class="fas fa-exclamation-circle"></i> Esta ação não pode ser desfeita.</span>
+            </p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModalExcluirRDC()">Cancelar</button>
+                <button class="btn btn-danger" onclick="confirmarExclusaoRDC()">
+                    <i class="fas fa-trash"></i> 
+                    Excluir
+                </button>
             </div>
         </div>
-        <div class="footer-right">
-            <a href="#" class="footer-link">Suporte</a>
-            <a href="#" class="footer-link">Documentação</a>
-            <a href="#" class="footer-link">Versão 2.0</a>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- RODAPÉ MINIMALISTA -->
+    <footer class="footer">
+        <div class="footer-brand">
+            <span class="footer-text">developed by</span>
+            <img src="assets/imagens/reta-logo.png" alt="RETA" class="footer-logo" onerror="this.style.display='none'">
         </div>
     </footer>
 
@@ -1288,6 +1302,7 @@
         let obraExportacao = null;
         let fiscaisSelecionadosNovaObra = [];
         let fiscaisSelecionadosObra = [];
+        let rdcParaExcluir = null;
 
         // ==================== INICIALIZAÇÃO ====================
         document.addEventListener('DOMContentLoaded', () => {
@@ -1716,7 +1731,7 @@
                     displayMes = mes.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
                 }
                 
-                htmlHead += `<th style="text-align:center; min-width: 80px;">${displayMes}</th>`;
+                htmlHead += `<th style="text-align:center; min-width: 60px;">${displayMes}</th>`;
             });
             htmlHead += '</tr>';
             thead.innerHTML = htmlHead;
@@ -1796,7 +1811,16 @@
                         
                         Object.entries(contratos[mesKey]).forEach(([id, eq]) => {
                             total++;
-                            html += `<tr><td>${mesNome}</td><td>${eq.nome}</td><td style="text-align:center">${eq.previsto}</td><td style="text-align:center"><button class="btn-icon btn-danger" style="width:30px;height:30px" onclick="excluirEquipamentoMes('${mesKey}','${id}')" title="Excluir"><i class="fas fa-trash" style="font-size:0.8rem"></i></button></td></tr>`;
+                            html += `<tr>
+                                <td style="font-size: 0.75rem;">${mesNome}</td>
+                                <td style="font-size: 0.75rem;">${eq.nome}</td>
+                                <td style="text-align:center; font-size: 0.75rem;">${eq.previsto}</td>
+                                <td style="text-align:center">
+                                    <button class="btn-icon btn-danger" style="width:28px;height:28px" onclick="excluirEquipamentoMes('${mesKey}','${id}')" title="Excluir">
+                                        <i class="fas fa-trash" style="font-size:0.7rem"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
                         });
                     });
                     
@@ -1964,6 +1988,7 @@
                         <div class="obra-actions">
                             <span class="status-badge status-${rdc.status || 'enviado'}" style="margin-right: 0.5rem;">${rdc.status || 'enviado'}</span>
                             <button class="btn-icon btn-success" onclick="verDetalhesRDC('${rdc.id}')" title="Ver"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon btn-danger" onclick="abrirModalExcluirRDC('${rdc.id}', '${rdc.numero || '---'}')" title="Excluir"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>`;
             });
@@ -1983,6 +2008,39 @@
         }
 
         function fecharModalExportar() { document.getElementById('modalExportar').classList.remove('active'); }
+
+        // ==================== EXCLUIR RDC ====================
+        function abrirModalExcluirRDC(rdcId, rdcNumero) {
+            rdcParaExcluir = rdcId;
+            document.getElementById('excluirRDCInfo').textContent = `RDC ${rdcNumero}`;
+            document.getElementById('modalExcluirRDC').classList.add('active');
+        }
+
+        function fecharModalExcluirRDC() {
+            document.getElementById('modalExcluirRDC').classList.remove('active');
+            rdcParaExcluir = null;
+        }
+
+        async function confirmarExclusaoRDC() {
+            if (!rdcParaExcluir || !obraExportacao) return;
+            
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Excluindo...';
+            btn.disabled = true;
+
+            try {
+                await window.dbRemove(window.dbRef(window.db, `obras/${obraExportacao}/relatorios/${rdcParaExcluir}`));
+                showToast('RDC excluído com sucesso!', 'success');
+                fecharModalExcluirRDC();
+                carregarRDCs();
+            } catch (error) {
+                showToast('Erro ao excluir RDC', 'error');
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
 
         async function confirmarExportacao() {
             const btn = event.target;
@@ -2057,6 +2115,7 @@
         }
 
         document.getElementById('modalExportar').addEventListener('click', (e) => { if (e.target.id === 'modalExportar') fecharModalExportar(); });
+        document.getElementById('modalExcluirRDC').addEventListener('click', (e) => { if (e.target.id === 'modalExcluirRDC') fecharModalExcluirRDC(); });
     </script>
 </body>
 </html>
