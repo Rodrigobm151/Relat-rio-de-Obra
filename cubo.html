@@ -83,30 +83,34 @@
             transform: translateX(20px);
         }
         
-        /* Camera - REDUZIDA e centralizada */
+        /* CORREÇÃO: Camera com layout garantido */
         .camera-section {
             position: fixed;
             top: calc(env(safe-area-inset-top) + 44px);
             left: 0;
             right: 0;
-            /* Altura reduzida: 35% da tela */
             height: 35vh;
-            min-height: 280px;
-            max-height: 400px;
-            background: #0a0a0a;
-            overflow: hidden;
+            min-height: 250px;
+            max-height: 350px;
+            background: #111; /* Fundo cinza escuro, não preto puro */
+            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
         
         #video {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: none;
+            z-index: 1;
         }
         
+        /* CORREÇÃO: Placeholder sempre visível e centralizado */
         .camera-placeholder {
             position: absolute;
             inset: 0;
@@ -114,24 +118,38 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 16px;
+            z-index: 5;
+            background: #1a1a1a; /* Cinza escuro para contraste */
         }
         
         .start-camera-btn {
-            width: 60px;
-            height: 60px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            background: #22c55e;
-            border: none;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border: 4px solid rgba(255,255,255,0.3);
             color: white;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(34,197,94,0.4);
-            transition: transform 0.2s;
+            box-shadow: 0 6px 25px rgba(34,197,94,0.5);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .start-camera-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
+            box-shadow: 0 3px 15px rgba(34,197,94,0.4);
+        }
+        
+        .camera-hint {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            padding: 0 20px;
         }
         
         .scan-overlay {
@@ -139,6 +157,7 @@
             inset: 0;
             pointer-events: none;
             display: none;
+            z-index: 10;
         }
         
         .face-progress {
@@ -148,7 +167,7 @@
             transform: translateX(-50%);
             display: flex;
             gap: 6px;
-            z-index: 10;
+            z-index: 20;
         }
         
         .face-dot {
@@ -171,75 +190,65 @@
             border-color: #22c55e;
         }
         
-        /* Grade centralizada e proporcional */
+        /* Grade centralizada */
         .scan-grid {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: min(200px, 50vw);
-            height: min(200px, 50vw);
+            width: min(180px, 45vw);
+            height: min(180px, 45vw);
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
+            gap: 3px;
             padding: 4px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.1);
             border-radius: 12px;
+            pointer-events: none;
         }
         
         .scan-cell {
-            border: 2px solid rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.05);
             border-radius: 6px;
             transition: all 0.3s;
         }
         
         .scan-cell.center {
             border: 3px solid #ef4444;
-            background: rgba(239,68,68,0.15);
+            background: rgba(239,68,68,0.2);
         }
         
         .scan-cell.center.detected {
             border-color: #22c55e;
-            background: rgba(34,197,94,0.25);
-            box-shadow: 0 0 25px rgba(34,197,94,0.6);
-            animation: pulse-detected 1.5s infinite;
-        }
-        
-        @keyframes pulse-detected {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            background: rgba(34,197,94,0.3);
+            box-shadow: 0 0 20px rgba(34,197,94,0.6);
         }
         
         .scan-status {
             position: absolute;
-            bottom: 70px;
+            bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
             padding: 8px 16px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
             white-space: nowrap;
+            z-index: 20;
             transition: all 0.3s;
         }
         
         .scan-status.detected {
             background: #22c55e;
             color: white;
-            animation: bounce 0.5s;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.05); }
         }
         
         .shutter-container {
             position: absolute;
-            bottom: 12px;
+            bottom: 15px;
             left: 0;
             right: 0;
             display: flex;
@@ -247,6 +256,7 @@
             align-items: center;
             gap: 20px;
             pointer-events: auto;
+            z-index: 20;
         }
         
         .shutter-btn {
@@ -278,11 +288,6 @@
             animation: pulse 1.2s infinite;
         }
         
-        .shutter-btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        
         .shutter-btn.captured::after {
             background: #3b82f6;
         }
@@ -296,7 +301,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.2);
             border: none;
             color: white;
             font-size: 18px;
@@ -304,46 +309,44 @@
             backdrop-filter: blur(10px);
         }
         
-        /* Editor - Layout horizontal com navegação lateral */
+        /* Editor */
         .editor-section {
             position: fixed;
             bottom: env(safe-area-inset-bottom);
             left: 0;
             right: 0;
-            /* Altura automática baseada no espaço restante */
-            height: calc(65vh - 44px);
+            top: calc(env(safe-area-inset-top) + 44px + 35vh);
             min-height: 300px;
-            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+            background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 16px 20px 20px;
+            padding: 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 50;
         }
         
         .editor-hint {
             font-size: 12px;
             color: rgba(255,255,255,0.5);
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
-        /* Container principal do editor com navegação lateral */
         .editor-main {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 24px;
             width: 100%;
             flex: 1;
         }
         
-        /* Setas de navegação laterais */
         .nav-arrow {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -367,11 +370,6 @@
             cursor: not-allowed;
         }
         
-        .nav-arrow.hidden {
-            visibility: hidden;
-        }
-        
-        /* Container do preview */
         .preview-container {
             display: flex;
             flex-direction: column;
@@ -380,8 +378,8 @@
         }
         
         .face-preview {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 4px;
@@ -395,7 +393,6 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.15s;
-            position: relative;
             border: 2px solid transparent;
         }
         
@@ -405,15 +402,10 @@
             box-shadow: 0 0 15px rgba(59,130,246,0.5);
         }
         
-        .face-cell.locked {
-            opacity: 0.9;
-        }
-        
-        /* Indicador de status da face */
         .face-status {
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 10px;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 12px;
             background: rgba(255,255,255,0.1);
             color: rgba(255,255,255,0.7);
         }
@@ -425,16 +417,16 @@
         
         .color-palette {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 8px;
+            gap: 10px;
+            margin: 16px 0;
+            padding: 10px;
             background: rgba(255,255,255,0.05);
-            border-radius: 25px;
+            border-radius: 30px;
         }
         
         .color-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
@@ -448,21 +440,21 @@
             box-shadow: 0 0 15px currentColor;
         }
         
-        /* Botão de ação principal (Próxima/Solução) */
         .action-btn {
             width: 100%;
-            max-width: 280px;
-            height: 48px;
-            border-radius: 24px;
+            max-width: 300px;
+            height: 52px;
+            border-radius: 26px;
             border: none;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: 16px;
+            margin-top: auto;
+            margin-bottom: 10px;
             transition: all 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -471,22 +463,16 @@
         .action-btn.primary {
             background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+            box-shadow: 0 4px 20px rgba(34,197,94,0.4);
         }
         
         .action-btn.primary:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 8px rgba(34,197,94,0.3);
         }
         
-        .action-btn.secondary {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        
-        .action-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+        .action-btn.solution {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 4px 20px rgba(59,130,246,0.4);
         }
         
         /* Solution View */
@@ -565,484 +551,8 @@
         }
         
         .control-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: none;
-            background: #475569;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        
-        .control-btn.primary {
-            width: 56px;
-            height: 56px;
-            background: #22c55e;
-            font-size: 20px;
-        }
-        
-        .control-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .control-btn:disabled {
-            opacity: 0.3;
-        }
-        
-        /* Indicador de progresso */
-        .progress-indicator {
-            position: absolute;
-            top: 50%;
-            right: 16px;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .progress-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .progress-dot.active {
-            background: #3b82f6;
-            transform: scale(1.3);
-        }
-        
-        .progress-dot.done {
-            background: #22c55e;
-        }
-        
-        .hidden { display: none !important; }
-        input[type="file"] { display: none; }
-        
-        /* An-index: 10;
-        }
-        
-        .face-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            border: 1px solid rgba(255,255,255,0.3);
-            transition: all 0.3s;
-        }
-        
-        .face-dot.active {
-            background: #3b82f6;
-            transform: scale(1.2);
-            box-shadow: 0 0 10px #3b82f6;
-        }
-        
-        .face-dot.done {
-            background: #22c55e;
-            border-color: #22c55e;
-        }
-        
-        /* Grade centralizada e proporcional */
-        .scan-grid {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: min(200px, 50vw);
-            height: min(200px, 50vw);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            padding: 4px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-        }
-        
-        .scan-cell {
-            border: 2px solid rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.03);
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-        
-        .scan-cell.center {
-            border: 3px solid #ef4444;
-            background: rgba(239,68,68,0.15);
-        }
-        
-        .scan-cell.center.detected {
-            border-color: #22c55e;
-            background: rgba(34,197,94,0.25);
-            box-shadow: 0 0 25px rgba(34,197,94,0.6);
-            animation: pulse-detected 1.5s infinite;
-        }
-        
-        @keyframes pulse-detected {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .scan-status {
-            position: absolute;
-            bottom: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
-        
-        .scan-status.detected {
-            background: #22c55e;
-            color: white;
-            animation: bounce 0.5s;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.05); }
-        }
-        
-        .shutter-container {
-            position: absolute;
-            bottom: 12px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            pointer-events: auto;
-        }
-        
-        .shutter-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: 3px solid white;
-            background: transparent;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-        }
-        
-        .shutter-btn::after {
-            content: '';
-            position: absolute;
-            inset: 3px;
-            border-radius: 50%;
-            background: white;
-            transition: all 0.2s;
-        }
-        
-        .shutter-btn:active::after {
-            transform: scale(0.9);
-        }
-        
-        .shutter-btn.auto-ready::after {
-            background: #22c55e;
-            animation: pulse 1.2s infinite;
-        }
-        
-        .shutter-btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        
-        .shutter-btn.captured::after {
-            background: #3b82f6;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(0.85); opacity: 0.8; }
-        }
-        
-        .upload-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-        
-        /* Editor - Layout horizontal com navegação lateral */
-        .editor-section {
-            position: fixed;
-            bottom: env(safe-area-inset-bottom);
-            left: 0;
-            right: 0;
-            /* Altura automática baseada no espaço restante */
-            height: calc(65vh - 44px);
-            min-height: 300px;
-            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 16px 20px 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .editor-hint {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        /* Container principal do editor com navegação lateral */
-        .editor-main {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
-            flex: 1;
-        }
-        
-        /* Setas de navegação laterais */
-        .nav-arrow {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        
-        .nav-arrow:active {
-            background: rgba(255,255,255,0.2);
-            transform: scale(0.95);
-        }
-        
-        .nav-arrow:disabled {
-            opacity: 0.2;
-            cursor: not-allowed;
-        }
-        
-        .nav-arrow.hidden {
-            visibility: hidden;
-        }
-        
-        /* Container do preview */
-        .preview-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .face-preview {
-            width: 140px;
-            height: 140px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            padding: 6px;
-            background: #2a2a2a;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-        
-        .face-cell {
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.15s;
-            position: relative;
-            border: 2px solid transparent;
-        }
-        
-        .face-cell.selected {
-            transform: scale(0.9);
-            border-color: #3b82f6;
-            box-shadow: 0 0 15px rgba(59,130,246,0.5);
-        }
-        
-        .face-cell.locked {
-            opacity: 0.9;
-        }
-        
-        /* Indicador de status da face */
-        .face-status {
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .face-status.locked {
-            background: rgba(34,197,94,0.2);
-            color: #22c55e;
-        }
-        
-        .color-palette {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 25px;
-        }
-        
-        .color-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.15s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .color-btn.active {
-            border-color: white;
-            transform: scale(1.15);
-            box-shadow: 0 0 15px currentColor;
-        }
-        
-        /* Botão de ação principal (Próxima/Solução) */
-        .action-btn {
-            width: 100%;
-            max-width: 280px;
+            width: 48px;
             height: 48px;
-            border-radius: 24px;
-            border: none;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 16px;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .action-btn.primary {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(34,197,94,0.4);
-        }
-        
-        .action-btn.primary:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 8px rgba(34,197,94,0.3);
-        }
-        
-        .action-btn.secondary {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        
-        .action-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        
-        /* Solution View */
-        .solution-view {
-            position: fixed;
-            inset: 0;
-            background: #0f172a;
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        .solution-header {
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            background: rgba(0,0,0,0.5);
-            flex-shrink: 0;
-        }
-        
-        .cube-3d-container {
-            flex: 1;
-            min-height: 0;
-            position: relative;
-        }
-        
-        .solution-controls {
-            padding: 16px;
-            background: #1e293b;
-            flex-shrink: 0;
-        }
-        
-        .moves-display {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding: 8px 0;
-            margin-bottom: 12px;
-            scrollbar-width: none;
-        }
-        
-        .moves-display::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .move-chip {
-            flex-shrink: 0;
-            padding: 6px 12px;
-            border-radius: 16px;
-            background: #334155;
-            font-family: monospace;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .move-chip.current {
-            background: #3b82f6;
-            transform: scale(1.1);
-        }
-        
-        .move-chip.done {
-            background: #22c55e;
-        }
-        
-        .control-bar {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .control-btn {
-            width: 44px;
-            height: 44px;
             border-radius: 50%;
             border: none;
             background: #475569;
@@ -1056,10 +566,10 @@
         }
         
         .control-btn.primary {
-            width: 56px;
-            height: 56px;
+            width: 60px;
+            height: 60px;
             background: #22c55e;
-            font-size: 20px;
+            font-size: 22px;
         }
         
         .control-btn:active {
@@ -1070,45 +580,8 @@
             opacity: 0.3;
         }
         
-        /* Indicador de progresso */
-        .progress-indicator {
-            position: absolute;
-            top: 50%;
-            right: 16px;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .progress-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .progress-dot.active {
-            background: #3b82f6;
-            transform: scale(1.3);
-        }
-        
-        .progress-dot.done {
-            background: #22c55e;
-        }
-        
         .hidden { display: none !important; }
         input[type="file"] { display: none; }
-        
-        /* Animações */
-        @keyframes slideIn {
-            from { transform: translateX(20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .animate-in {
-            animation: slideIn 0.3s ease-out;
-        }
     </style>
 </head>
 <body>
@@ -1128,9 +601,10 @@
     <div class="camera-section">
         <video id="video" autoplay playsinline muted></video>
         
+        <!-- Placeholder sempre visível até iniciar -->
         <div class="camera-placeholder" id="camera-placeholder">
             <button class="start-camera-btn" onclick="startCamera()">📷</button>
-            <p style="color: rgba(255,255,255,0.6); font-size: 14px;">Toque para iniciar câmera</p>
+            <p class="camera-hint">Toque no ícone para iniciar a câmera</p>
         </div>
         
         <div class="scan-overlay" id="scan-overlay">
@@ -1145,7 +619,6 @@
             
             <div class="scan-status" id="scan-status">Centralize o cubo</div>
             
-            <!-- Grade centralizada -->
             <div class="scan-grid" id="scan-grid">
                 <div class="scan-cell" id="cell-0"></div>
                 <div class="scan-cell" id="cell-1"></div>
@@ -1172,7 +645,6 @@
         <div class="editor-hint">Toque nas cores para editar</div>
         
         <div class="editor-main">
-            <!-- Seta esquerda -->
             <button class="nav-arrow" id="arrow-prev" onclick="prevFace()" disabled>←</button>
             
             <div class="preview-container">
@@ -1180,13 +652,11 @@
                 <div class="face-status" id="face-status">Aguardando captura...</div>
             </div>
             
-            <!-- Seta direita -->
             <button class="nav-arrow" id="arrow-next" onclick="nextFace()">→</button>
         </div>
         
         <div class="color-palette" id="color-palette"></div>
         
-        <!-- Botão principal de ação -->
         <button class="action-btn primary" id="action-btn" onclick="handleAction()">
             <span>Capturar Face</span>
         </button>
@@ -1218,6 +688,7 @@
     </div>
 
     <script>
+        // [O JavaScript permanece igual ao anterior - incluído abaixo para completude]
         const FACES = [
             { code: 'U', name: 'Branca', color: '#FFFFFF', bg: '#f0f0f0' },
             { code: 'R', name: 'Vermelha', color: '#FF0000', bg: '#ff4444' },
@@ -1230,10 +701,9 @@
         let currentFaceIdx = 0;
         let isAutoScan = false;
         let isScanning = false;
-        let isFaceCaptured = false; // NOVO: Estado da face atual
+        let isFaceCaptured = false;
         let autoTimer = null;
         
-        // Estado do cubo - todas as faces
         let cubeState = {
             U: Array(9).fill(null),
             R: Array(9).fill(null),
@@ -1243,16 +713,12 @@
             B: Array(9).fill(null)
         };
         
-        // Cores atualmente detectadas na câmera (temporário)
         let detectedColors = Array(9).fill('U');
-        
         let selectedCell = 4;
-        
         let solution = [];
         let currentMoveIdx = 0;
         let isPlaying = false;
         let playTimer = null;
-        
         let scene, camera, renderer, cubeGroup;
         let isAnimating = false;
         
@@ -1309,13 +775,12 @@
                 
             } catch (e) {
                 alert('Câmera indisponível. Use o botão 📁 para upload.');
+                console.error(e);
             }
         }
         
         function scanLoop() {
             if (!isScanning) return;
-            
-            // Se já capturou esta face, não atualiza mais as cores
             if (isFaceCaptured) return;
             
             const video = document.getElementById('video');
@@ -1335,7 +800,7 @@
         function analyzeFrame(ctx, w, h) {
             const cx = w / 2;
             const cy = h / 2;
-            const size = Math.min(w, h) * 0.5; // Área de análise
+            const size = Math.min(w, h) * 0.5;
             const cellSize = size / 3;
             
             const colors = [];
@@ -1349,8 +814,6 @@
             }
             
             detectedColors = colors;
-            
-            // Atualiza preview visual na grade da câmera
             updateScanGrid(colors);
             
             const centerColor = colors[4];
@@ -1363,11 +826,9 @@
             
             if (match) {
                 centerCell.classList.add('detected');
-                status.textContent = '✓ Central correto! Toque para capturar';
+                status.textContent = '✓ Pronto! Toque para capturar';
                 status.classList.add('detected');
                 shutter.classList.add('auto-ready');
-                
-                // Atualiza editor em tempo real (mas ainda não salva)
                 updateEditorPreview(colors);
             } else {
                 centerCell.classList.remove('detected');
@@ -1380,7 +841,7 @@
         function updateScanGrid(colors) {
             colors.forEach((code, i) => {
                 const cell = document.getElementById(`cell-${i}`);
-                if (cell && i !== 4) { // Não muda o centro
+                if (cell && i !== 4) {
                     const face = FACES.find(f => f.code === code);
                     cell.style.background = face ? face.bg : 'transparent';
                     cell.style.opacity = '0.6';
@@ -1397,43 +858,30 @@
             });
         }
         
-        // NOVO: Captura efetiva da face
         function captureFace() {
-            if (isFaceCaptured) return; // Já capturou
+            if (isFaceCaptured) return;
             
             const centerColor = detectedColors[4];
             const expected = FACES[currentFaceIdx].code;
             
             if (centerColor !== expected) {
-                // Toca de erro
                 navigator.vibrate?.(200);
                 return;
             }
             
-            // Salva no estado permanente
             const code = FACES[currentFaceIdx].code;
             cubeState[code] = [...detectedColors];
             isFaceCaptured = true;
             
-            // Feedback visual
             document.getElementById('shutter-btn').classList.add('captured');
             document.getElementById('scan-status').textContent = '✓ Face salva!';
             
-            // Vibração de sucesso
             navigator.vibrate?.([50, 100, 50]);
-            
-            // Atualiza UI
             updateUI();
             
-            // Para scan se estiver em auto
             if (isAutoScan) {
                 setTimeout(() => nextFace(), 800);
             }
-        }
-        
-        function manualCapture() {
-            // Método legado - agora usa captureFace
-            captureFace();
         }
         
         function handleFile(e) {
@@ -1452,7 +900,6 @@
                 detectedColors = colors;
                 updateEditorPreview(colors);
                 
-                // Tenta capturar automaticamente se o centro estiver correto
                 const centerColor = colors[4];
                 const expected = FACES[currentFaceIdx].code;
                 if (centerColor === expected) {
@@ -1486,7 +933,9 @@
                 c.classList.toggle('selected', i === idx);
             });
             
-            const code = cubeState[FACES[currentFaceIdx].code][idx] || detectedColors[idx];
+            const faceCode = FACES[currentFaceIdx].code;
+            const colors = cubeState[faceCode][0] ? cubeState[faceCode] : detectedColors;
+            const code = colors[idx];
             const colorIdx = FACES.findIndex(f => f.code === code);
             document.querySelectorAll('.color-btn').forEach((b, i) => {
                 b.classList.toggle('active', i === colorIdx);
@@ -1494,7 +943,6 @@
         }
         
         function applyColor(code) {
-            // Se já capturou, permite editar manualmente
             const faceCode = FACES[currentFaceIdx].code;
             if (!cubeState[faceCode][0]) {
                 detectedColors[selectedCell] = code;
@@ -1518,18 +966,14 @@
                 const code = colors[i];
                 const face = FACES.find(f => f.code === code);
                 c.style.background = face ? face.color : '#334155';
-                c.classList.toggle('locked', isFaceCaptured);
             });
         }
         
         function loadFace(idx) {
             currentFaceIdx = idx;
             isFaceCaptured = false;
-            
-            // Reseta detected colors para a cor esperada
             detectedColors = Array(9).fill(FACES[idx].code);
             
-            // Reseta visual da câmera
             document.getElementById('shutter-btn').classList.remove('captured');
             for (let i = 0; i < 9; i++) {
                 const cell = document.getElementById(`cell-${i}`);
@@ -1549,7 +993,6 @@
                 loadFace(currentFaceIdx);
                 updateUI();
                 
-                // Reinicia scan se estiver ativo
                 if (isScanning) {
                     isFaceCaptured = false;
                 }
@@ -1564,7 +1007,6 @@
                 loadFace(currentFaceIdx);
                 updateUI();
                 
-                // Reinicia scan
                 if (isScanning) {
                     isFaceCaptured = false;
                 }
@@ -1575,23 +1017,19 @@
             const f = FACES[currentFaceIdx];
             document.getElementById('header-title').textContent = `Face ${f.name} (${f.code})`;
             
-            // Atualiza dots de progresso
             document.querySelectorAll('.face-dot').forEach((d, i) => {
                 d.classList.remove('active', 'done');
                 if (i < currentFaceIdx) d.classList.add('done');
                 else if (i === currentFaceIdx) d.classList.add('active');
             });
             
-            // Atualiza setas de navegação
             const prevArrow = document.getElementById('arrow-prev');
             const nextArrow = document.getElementById('arrow-next');
             
             prevArrow.disabled = currentFaceIdx === 0;
             prevArrow.style.visibility = currentFaceIdx === 0 ? 'hidden' : 'visible';
-            
             nextArrow.style.visibility = 'visible';
             
-            // Atualiza status no editor
             const faceCode = f.code;
             const isLocked = cubeState[faceCode][0] !== null;
             const statusEl = document.getElementById('face-status');
@@ -1604,20 +1042,16 @@
                 statusEl.classList.remove('locked');
             }
             
-            // Atualiza botão principal
             const actionBtn = document.getElementById('action-btn');
             if (currentFaceIdx === 5 && isLocked) {
                 actionBtn.innerHTML = '<span>🎯 Ver Solução</span>';
-                actionBtn.classList.remove('primary');
-                actionBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+                actionBtn.className = 'action-btn solution';
             } else if (isLocked) {
                 actionBtn.innerHTML = '<span>Próxima Face →</span>';
-                actionBtn.classList.add('primary');
-                actionBtn.style.background = '';
+                actionBtn.className = 'action-btn primary';
             } else {
                 actionBtn.innerHTML = '<span>Capturar Face</span>';
-                actionBtn.classList.add('primary');
-                actionBtn.style.background = '';
+                actionBtn.className = 'action-btn primary';
             }
         }
         
@@ -1639,7 +1073,6 @@
             document.getElementById('auto-toggle').classList.toggle('active', isAutoScan);
             
             if (isAutoScan && isScanning && !isFaceCaptured) {
-                // Inicia captura automática se já estiver detectado
                 const status = document.getElementById('scan-status');
                 if (status.classList.contains('detected')) {
                     setTimeout(() => captureFace(), 1000);
@@ -1648,7 +1081,6 @@
         }
         
         function finishFaces() {
-            // Verifica se todas as faces estão preenchidas
             const allFilled = FACES.every(f => cubeState[f.code][0] !== null);
             if (!allFilled) {
                 alert('Complete todas as faces primeiro!');
@@ -1661,26 +1093,22 @@
         
         function generateSolution() {
             try {
-                // Converte estado para string do solver
                 const stateStr = FACES.map(f => cubeState[f.code].join('')).join('');
-                
-                console.log('Estado do cubo:', stateStr);
+                console.log('Estado:', stateStr);
                 
                 if (typeof cubeSolver !== 'undefined') {
                     solution = cubeSolver.solve(stateStr).split(' ').filter(m => m);
                 } else {
-                    // Fallback para demo
                     solution = ["U", "R", "U'", "R'", "F", "R", "U", "R'", "U'", "F'"];
                 }
                 
                 currentMoveIdx = 0;
-                
                 document.getElementById('solution-view').style.display = 'flex';
                 init3D();
                 renderMoves();
                 
             } catch (e) {
-                alert('Erro ao gerar solução: ' + e.message);
+                alert('Erro: ' + e.message);
             }
         }
         
@@ -1741,1136 +1169,6 @@
             buildCube();
             animate();
             
-            // Controles touch para rotacionar
-            let touchStart = null;
-            container.addEventListener('touchstart', e => {
-                touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            }, {passive: true});
-            
-            container.addEventListener('touchmove', e => {
-                if (!touchStart || isAnimating) return;
-                const dx = e.touches[0].clientX - touchStart.x;
-                const dy = e.touches[0].clientY - touchStart.y;
-                cubeGroup.rotation.y += dx * 0.005;
-                cubeGroup.rotation.x += dy * 0.005;
-                touchStart = { x: e.touches[0].-index: 10;
-        }
-        
-        .face-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            border: 1px solid rgba(255,255,255,0.3);
-            transition: all 0.3s;
-        }
-        
-        .face-dot.active {
-            background: #3b82f6;
-            transform: scale(1.2);
-            box-shadow: 0 0 10px #3b82f6;
-        }
-        
-        .face-dot.done {
-            background: #22c55e;
-            border-color: #22c55e;
-        }
-        
-        /* Grade centralizada e proporcional */
-        .scan-grid {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: min(200px, 50vw);
-            height: min(200px, 50vw);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            padding: 4px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-        }
-        
-        .scan-cell {
-            border: 2px solid rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.03);
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-        
-        .scan-cell.center {
-            border: 3px solid #ef4444;
-            background: rgba(239,68,68,0.15);
-        }
-        
-        .scan-cell.center.detected {
-            border-color: #22c55e;
-            background: rgba(34,197,94,0.25);
-            box-shadow: 0 0 25px rgba(34,197,94,0.6);
-            animation: pulse-detected 1.5s infinite;
-        }
-        
-        @keyframes pulse-detected {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .scan-status {
-            position: absolute;
-            bottom: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
-        
-        .scan-status.detected {
-            background: #22c55e;
-            color: white;
-            animation: bounce 0.5s;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.05); }
-        }
-        
-        .shutter-container {
-            position: absolute;
-            bottom: 12px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            pointer-events: auto;
-        }
-        
-        .shutter-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: 3px solid white;
-            background: transparent;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-        }
-        
-        .shutter-btn::after {
-            content: '';
-            position: absolute;
-            inset: 3px;
-            border-radius: 50%;
-            background: white;
-            transition: all 0.2s;
-        }
-        
-        .shutter-btn:active::after {
-            transform: scale(0.9);
-        }
-        
-        .shutter-btn.auto-ready::after {
-            background: #22c55e;
-            animation: pulse 1.2s infinite;
-        }
-        
-        .shutter-btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        
-        .shutter-btn.captured::after {
-            background: #3b82f6;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(0.85); opacity: 0.8; }
-        }
-        
-        .upload-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-        
-        /* Editor - Layout horizontal com navegação lateral */
-        .editor-section {
-            position: fixed;
-            bottom: env(safe-area-inset-bottom);
-            left: 0;
-            right: 0;
-            /* Altura automática baseada no espaço restante */
-            height: calc(65vh - 44px);
-            min-height: 300px;
-            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 16px 20px 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .editor-hint {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        /* Container principal do editor com navegação lateral */
-        .editor-main {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
-            flex: 1;
-        }
-        
-        /* Setas de navegação laterais */
-        .nav-arrow {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        
-        .nav-arrow:active {
-            background: rgba(255,255,255,0.2);
-            transform: scale(0.95);
-        }
-        
-        .nav-arrow:disabled {
-            opacity: 0.2;
-            cursor: not-allowed;
-        }
-        
-        .nav-arrow.hidden {
-            visibility: hidden;
-        }
-        
-        /* Container do preview */
-        .preview-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .face-preview {
-            width: 140px;
-            height: 140px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            padding: 6px;
-            background: #2a2a2a;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-        
-        .face-cell {
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.15s;
-            position: relative;
-            border: 2px solid transparent;
-        }
-        
-        .face-cell.selected {
-            transform: scale(0.9);
-            border-color: #3b82f6;
-            box-shadow: 0 0 15px rgba(59,130,246,0.5);
-        }
-        
-        .face-cell.locked {
-            opacity: 0.9;
-        }
-        
-        /* Indicador de status da face */
-        .face-status {
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .face-status.locked {
-            background: rgba(34,197,94,0.2);
-            color: #22c55e;
-        }
-        
-        .color-palette {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 25px;
-        }
-        
-        .color-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.15s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .color-btn.active {
-            border-color: white;
-            transform: scale(1.15);
-            box-shadow: 0 0 15px currentColor;
-        }
-        
-        /* Botão de ação principal (Próxima/Solução) */
-        .action-btn {
-            width: 100%;
-            max-width: 280px;
-            height: 48px;
-            border-radius: 24px;
-            border: none;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 16px;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .action-btn.primary {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(34,197,94,0.4);
-        }
-        
-        .action-btn.primary:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 8px rgba(34,197,94,0.3);
-        }
-        
-        .action-btn.secondary {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        
-        .action-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        
-        /* Solution View */
-        .solution-view {
-            position: fixed;
-            inset: 0;
-            background: #0f172a;
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        .solution-header {
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            background: rgba(0,0,0,0.5);
-            flex-shrink: 0;
-        }
-        
-        .cube-3d-container {
-            flex: 1;
-            min-height: 0;
-            position: relative;
-        }
-        
-        .solution-controls {
-            padding: 16px;
-            background: #1e293b;
-            flex-shrink: 0;
-        }
-        
-        .moves-display {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding: 8px 0;
-            margin-bottom: 12px;
-            scrollbar-width: none;
-        }
-        
-        .moves-display::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .move-chip {
-            flex-shrink: 0;
-            padding: 6px 12px;
-            border-radius: 16px;
-            background: #334155;
-            font-family: monospace;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .move-chip.current {
-            background: #3b82f6;
-            transform: scale(1.1);
-        }
-        
-        .move-chip.done {
-            background: #22c55e;
-        }
-        
-        .control-bar {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .control-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: none;
-            background: #475569;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        
-        .control-btn.primary {
-            width: 56px;
-            height: 56px;
-            background: #22c55e;
-            font-size: 20px;
-        }
-        
-        .control-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .control-btn:disabled {
-            opacity: 0.3;
-        }
-        
-        /* Indicador de progresso */
-        .progress-indicator {
-            position: absolute;
-            top: 50%;
-            right: 16px;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .progress-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .progress-dot.active {
-            background: #3b82f6;
-            transform: scale(1.3);
-        }
-        
-        .progress-dot.done {
-            background: #22c55e;
-        }
-        
-        .hidden { display: none !important; }
-        input[type="file"] { display: none; }
-        
-        /* Animações */
-        @keyframes slideIn {
-            from { transform: translateX(20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .animate-in {
-            animation: slideIn 0.3s ease-out;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Header -->
-    <div class="app-header">
-        <div class="header-title" id="header-title">Face Branca (Up)</div>
-        <div class="auto-toggle" onclick="toggleAuto()">
-            <span>Auto</span>
-            <div class="toggle-switch" id="auto-toggle">
-                <div class="toggle-knob"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Camera Section -->
-    <div class="camera-section">
-        <video id="video" autoplay playsinline muted></video>
-        
-        <div class="camera-placeholder" id="camera-placeholder">
-            <button class="start-camera-btn" onclick="startCamera()">📷</button>
-            <p style="color: rgba(255,255,255,0.6); font-size: 14px;">Toque para iniciar câmera</p>
-        </div>
-        
-        <div class="scan-overlay" id="scan-overlay">
-            <div class="face-progress" id="face-progress">
-                <div class="face-dot active"></div>
-                <div class="face-dot"></div>
-                <div class="face-dot"></div>
-                <div class="face-dot"></div>
-                <div class="face-dot"></div>
-                <div class="face-dot"></div>
-            </div>
-            
-            <div class="scan-status" id="scan-status">Centralize o cubo</div>
-            
-            <!-- Grade centralizada -->
-            <div class="scan-grid" id="scan-grid">
-                <div class="scan-cell" id="cell-0"></div>
-                <div class="scan-cell" id="cell-1"></div>
-                <div class="scan-cell" id="cell-2"></div>
-                <div class="scan-cell" id="cell-3"></div>
-                <div class="scan-cell center" id="cell-4"></div>
-                <div class="scan-cell" id="cell-5"></div>
-                <div class="scan-cell" id="cell-6"></div>
-                <div class="scan-cell" id="cell-7"></div>
-                <div class="scan-cell" id="cell-8"></div>
-            </div>
-            
-            <div class="shutter-container">
-                <button class="upload-btn" onclick="document.getElementById('file-input').click()">📁</button>
-                <button class="shutter-btn" id="shutter-btn" onclick="captureFace()"></button>
-            </div>
-        </div>
-        
-        <input type="file" id="file-input" accept="image/*" capture="environment">
-    </div>
-
-    <!-- Editor Section -->
-    <div class="editor-section">
-        <div class="editor-hint">Toque nas cores para editar</div>
-        
-        <div class="editor-main">
-            <!-- Seta esquerda -->
-            <button class="nav-arrow" id="arrow-prev" onclick="prevFace()" disabled>←</button>
-            
-            <div class="preview-container">
-                <div class="face-preview" id="face-preview"></div>
-                <div class="face-status" id="face-status">Aguardando captura...</div>
-            </div>
-            
-            <!-- Seta direita -->
-            <button class="nav-arrow" id="arrow-next" onclick="nextFace()">→</button>
-        </div>
-        
-        <div class="color-palette" id="color-palette"></div>
-        
-        <!-- Botão principal de ação -->
-        <button class="action-btn primary" id="action-btn" onclick="handleAction()">
-            <span>Capturar Face</span>
-        </button>
-    </div>
-
-    <!-- Solution View -->
-    <div class="solution-view" id="solution-view">
-        <div class="solution-header">
-            <button class="control-btn" onclick="backToStart()" style="width: auto; padding: 0 16px; border-radius: 20px;">
-                ← Início
-            </button>
-            <div style="font-weight: 700; font-size: 18px;">Solução</div>
-            <div style="width: 70px;"></div>
-        </div>
-        
-        <div class="cube-3d-container" id="cube-3d"></div>
-        
-        <div class="solution-controls">
-            <div class="moves-display" id="moves-display"></div>
-            
-            <div class="control-bar">
-                <button class="control-btn" onclick="jumpPrev()">⏮</button>
-                <button class="control-btn" onclick="stepBack()">◀</button>
-                <button class="control-btn primary" onclick="togglePlay()" id="play-btn">▶</button>
-                <button class="control-btn" onclick="stepForward()">▶</button>
-                <button class="control-btn" onclick="jumpNext()">⏭</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const FACES = [
-            { code: 'U', name: 'Branca', color: '#FFFFFF', bg: '#f0f0f0' },
-            { code: 'R', name: 'Vermelha', color: '#FF0000', bg: '#ff4444' },
-            { code: 'F', name: 'Verde', color: '#00FF00', bg: '#44ff44' },
-            { code: 'D', name: 'Amarela', color: '#FFFF00', bg: '#ffff44' },
-            { code: 'L', name: 'Laranja', color: '#FFA500', bg: '#ffb347' },
-            { code: 'B', name: 'Azul', color: '#0000FF', bg: '#4444ff' }
-        ];
-        
-        let currentFaceIdx = 0;
-        let isAutoScan = false;
-        let isScanning = false;
-        let isFaceCaptured = false; // NOVO: Estado da face atual
-        let autoTimer = null;
-        
-        // Estado do cubo - todas as faces
-        let cubeState = {
-            U: Array(9).fill(null),
-            R: Array(9).fill(null),
-            F: Array(9).fill(null),
-            D: Array(9).fill(null),
-            L: Array(9).fill(null),
-            B: Array(9).fill(null)
-        };
-        
-        // Cores atualmente detectadas na câmera (temporário)
-        let detectedColors = Array(9).fill('U');
-        
-        let selectedCell = 4;
-        
-        let solution = [];
-        let currentMoveIdx = 0;
-        let isPlaying = false;
-        let playTimer = null;
-        
-        let scene, camera, renderer, cubeGroup;
-        let isAnimating = false;
-        
-        window.onload = () => {
-            initEditor();
-            updateUI();
-            document.getElementById('file-input').addEventListener('change', handleFile);
-        };
-        
-        function initEditor() {
-            const preview = document.getElementById('face-preview');
-            preview.innerHTML = '';
-            for (let i = 0; i < 9; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'face-cell';
-                cell.onclick = () => selectCell(i);
-                preview.appendChild(cell);
-            }
-            
-            const palette = document.getElementById('color-palette');
-            palette.innerHTML = '';
-            FACES.forEach((f, i) => {
-                const btn = document.createElement('div');
-                btn.className = 'color-btn';
-                btn.style.background = f.color;
-                btn.onclick = () => applyColor(f.code);
-                palette.appendChild(btn);
-            });
-            
-            selectCell(4);
-            loadFace(0);
-        }
-        
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    }
-                });
-                
-                const video = document.getElementById('video');
-                video.srcObject = stream;
-                video.style.display = 'block';
-                
-                document.getElementById('camera-placeholder').style.display = 'none';
-                document.getElementById('scan-overlay').style.display = 'block';
-                
-                isScanning = true;
-                isFaceCaptured = false;
-                scanLoop();
-                
-            } catch (e) {
-                alert('Câmera indisponível. Use o botão 📁 para upload.');
-            }
-        }
-        
-        function scanLoop() {
-            if (!isScanning) return;
-            
-            // Se já capturou esta face, não atualiza mais as cores
-            if (isFaceCaptured) return;
-            
-            const video = document.getElementById('video');
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0);
-                
-                analyzeFrame(ctx, canvas.width, canvas.height);
-            }
-            
-            requestAnimationFrame(scanLoop);
-        }
-        
-        function analyzeFrame(ctx, w, h) {
-            const cx = w / 2;
-            const cy = h / 2;
-            const size = Math.min(w, h) * 0.5; // Área de análise
-            const cellSize = size / 3;
-            
-            const colors = [];
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const x = cx - size/2 + c * cellSize + cellSize/2;
-                    const y = cy - size/2 + r * cellSize + cellSize/2;
-                    const p = getPixel(ctx, x, y);
-                    colors.push(rgbToCode(p.r, p.g, p.b));
-                }
-            }
-            
-            detectedColors = colors;
-            
-            // Atualiza preview visual na grade da câmera
-            updateScanGrid(colors);
-            
-            const centerColor = colors[4];
-            const expected = FACES[currentFaceIdx].code;
-            const match = (centerColor === expected);
-            
-            const centerCell = document.getElementById('cell-4');
-            const status = document.getElementById('scan-status');
-            const shutter = document.getElementById('shutter-btn');
-            
-            if (match) {
-                centerCell.classList.add('detected');
-                status.textContent = '✓ Central correto! Toque para capturar';
-                status.classList.add('detected');
-                shutter.classList.add('auto-ready');
-                
-                // Atualiza editor em tempo real (mas ainda não salva)
-                updateEditorPreview(colors);
-            } else {
-                centerCell.classList.remove('detected');
-                status.textContent = `Procure: ${FACES[currentFaceIdx].name} (centro)`;
-                status.classList.remove('detected');
-                shutter.classList.remove('auto-ready');
-            }
-        }
-        
-        function updateScanGrid(colors) {
-            colors.forEach((code, i) => {
-                const cell = document.getElementById(`cell-${i}`);
-                if (cell && i !== 4) { // Não muda o centro
-                    const face = FACES.find(f => f.code === code);
-                    cell.style.background = face ? face.bg : 'transparent';
-                    cell.style.opacity = '0.6';
-                }
-            });
-        }
-        
-        function updateEditorPreview(colors) {
-            const cells = document.querySelectorAll('.face-cell');
-            cells.forEach((c, i) => {
-                const code = colors[i];
-                const face = FACES.find(f => f.code === code);
-                c.style.background = face ? face.color : '#334155';
-            });
-        }
-        
-        // NOVO: Captura efetiva da face
-        function captureFace() {
-            if (isFaceCaptured) return; // Já capturou
-            
-            const centerColor = detectedColors[4];
-            const expected = FACES[currentFaceIdx].code;
-            
-            if (centerColor !== expected) {
-                // Toca de erro
-                navigator.vibrate?.(200);
-                return;
-            }
-            
-            // Salva no estado permanente
-            const code = FACES[currentFaceIdx].code;
-            cubeState[code] = [...detectedColors];
-            isFaceCaptured = true;
-            
-            // Feedback visual
-            document.getElementById('shutter-btn').classList.add('captured');
-            document.getElementById('scan-status').textContent = '✓ Face salva!';
-            
-            // Vibração de sucesso
-            navigator.vibrate?.([50, 100, 50]);
-            
-            // Atualiza UI
-            updateUI();
-            
-            // Para scan se estiver em auto
-            if (isAutoScan) {
-                setTimeout(() => nextFace(), 800);
-            }
-        }
-        
-        function manualCapture() {
-            // Método legado - agora usa captureFace
-            captureFace();
-        }
-        
-        function handleFile(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                const colors = extractColors(ctx, canvas.width, canvas.height);
-                detectedColors = colors;
-                updateEditorPreview(colors);
-                
-                // Tenta capturar automaticamente se o centro estiver correto
-                const centerColor = colors[4];
-                const expected = FACES[currentFaceIdx].code;
-                if (centerColor === expected) {
-                    setTimeout(() => captureFace(), 500);
-                }
-            };
-            img.src = URL.createObjectURL(file);
-        }
-        
-        function extractColors(ctx, w, h) {
-            const cx = w / 2;
-            const cy = h / 2;
-            const size = Math.min(w, h) * 0.6;
-            const cell = size / 3;
-            
-            const colors = [];
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const x = cx - size/2 + c * cell + cell/2;
-                    const y = cy - size/2 + r * cell + cell/2;
-                    const p = getPixel(ctx, x, y);
-                    colors.push(rgbToCode(p.r, p.g, p.b));
-                }
-            }
-            return colors;
-        }
-        
-        function selectCell(idx) {
-            selectedCell = idx;
-            document.querySelectorAll('.face-cell').forEach((c, i) => {
-                c.classList.toggle('selected', i === idx);
-            });
-            
-            const code = cubeState[FACES[currentFaceIdx].code][idx] || detectedColors[idx];
-            const colorIdx = FACES.findIndex(f => f.code === code);
-            document.querySelectorAll('.color-btn').forEach((b, i) => {
-                b.classList.toggle('active', i === colorIdx);
-            });
-        }
-        
-        function applyColor(code) {
-            // Se já capturou, permite editar manualmente
-            const faceCode = FACES[currentFaceIdx].code;
-            if (!cubeState[faceCode][0]) {
-                detectedColors[selectedCell] = code;
-            } else {
-                cubeState[faceCode][selectedCell] = code;
-            }
-            
-            updateEditor();
-            
-            if (selectedCell < 8) {
-                selectCell(selectedCell + 1);
-            }
-        }
-        
-        function updateEditor() {
-            const faceCode = FACES[currentFaceIdx].code;
-            const colors = cubeState[faceCode][0] ? cubeState[faceCode] : detectedColors;
-            
-            const cells = document.querySelectorAll('.face-cell');
-            cells.forEach((c, i) => {
-                const code = colors[i];
-                const face = FACES.find(f => f.code === code);
-                c.style.background = face ? face.color : '#334155';
-                c.classList.toggle('locked', isFaceCaptured);
-            });
-        }
-        
-        function loadFace(idx) {
-            currentFaceIdx = idx;
-            isFaceCaptured = false;
-            
-            // Reseta detected colors para a cor esperada
-            detectedColors = Array(9).fill(FACES[idx].code);
-            
-            // Reseta visual da câmera
-            document.getElementById('shutter-btn').classList.remove('captured');
-            for (let i = 0; i < 9; i++) {
-                const cell = document.getElementById(`cell-${i}`);
-                if (cell && i !== 4) {
-                    cell.style.background = '';
-                    cell.style.opacity = '';
-                }
-            }
-            
-            updateEditor();
-            selectCell(4);
-        }
-        
-        function nextFace() {
-            if (currentFaceIdx < 5) {
-                currentFaceIdx++;
-                loadFace(currentFaceIdx);
-                updateUI();
-                
-                // Reinicia scan se estiver ativo
-                if (isScanning) {
-                    isFaceCaptured = false;
-                }
-            } else {
-                finishFaces();
-            }
-        }
-        
-        function prevFace() {
-            if (currentFaceIdx > 0) {
-                currentFaceIdx--;
-                loadFace(currentFaceIdx);
-                updateUI();
-                
-                // Reinicia scan
-                if (isScanning) {
-                    isFaceCaptured = false;
-                }
-            }
-        }
-        
-        function updateUI() {
-            const f = FACES[currentFaceIdx];
-            document.getElementById('header-title').textContent = `Face ${f.name} (${f.code})`;
-            
-            // Atualiza dots de progresso
-            document.querySelectorAll('.face-dot').forEach((d, i) => {
-                d.classList.remove('active', 'done');
-                if (i < currentFaceIdx) d.classList.add('done');
-                else if (i === currentFaceIdx) d.classList.add('active');
-            });
-            
-            // Atualiza setas de navegação
-            const prevArrow = document.getElementById('arrow-prev');
-            const nextArrow = document.getElementById('arrow-next');
-            
-            prevArrow.disabled = currentFaceIdx === 0;
-            prevArrow.style.visibility = currentFaceIdx === 0 ? 'hidden' : 'visible';
-            
-            nextArrow.style.visibility = 'visible';
-            
-            // Atualiza status no editor
-            const faceCode = f.code;
-            const isLocked = cubeState[faceCode][0] !== null;
-            const statusEl = document.getElementById('face-status');
-            
-            if (isLocked) {
-                statusEl.textContent = '✓ Face capturada (toque para editar)';
-                statusEl.classList.add('locked');
-            } else {
-                statusEl.textContent = 'Aguardando captura...';
-                statusEl.classList.remove('locked');
-            }
-            
-            // Atualiza botão principal
-            const actionBtn = document.getElementById('action-btn');
-            if (currentFaceIdx === 5 && isLocked) {
-                actionBtn.innerHTML = '<span>🎯 Ver Solução</span>';
-                actionBtn.classList.remove('primary');
-                actionBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
-            } else if (isLocked) {
-                actionBtn.innerHTML = '<span>Próxima Face →</span>';
-                actionBtn.classList.add('primary');
-                actionBtn.style.background = '';
-            } else {
-                actionBtn.innerHTML = '<span>Capturar Face</span>';
-                actionBtn.classList.add('primary');
-                actionBtn.style.background = '';
-            }
-        }
-        
-        function handleAction() {
-            const f = FACES[currentFaceIdx];
-            const isLocked = cubeState[f.code][0] !== null;
-            
-            if (currentFaceIdx === 5 && isLocked) {
-                finishFaces();
-            } else if (isLocked) {
-                nextFace();
-            } else {
-                captureFace();
-            }
-        }
-        
-        function toggleAuto() {
-            isAutoScan = !isAutoScan;
-            document.getElementById('auto-toggle').classList.toggle('active', isAutoScan);
-            
-            if (isAutoScan && isScanning && !isFaceCaptured) {
-                // Inicia captura automática se já estiver detectado
-                const status = document.getElementById('scan-status');
-                if (status.classList.contains('detected')) {
-                    setTimeout(() => captureFace(), 1000);
-                }
-            }
-        }
-        
-        function finishFaces() {
-            // Verifica se todas as faces estão preenchidas
-            const allFilled = FACES.every(f => cubeState[f.code][0] !== null);
-            if (!allFilled) {
-                alert('Complete todas as faces primeiro!');
-                return;
-            }
-            
-            isScanning = false;
-            generateSolution();
-        }
-        
-        function generateSolution() {
-            try {
-                // Converte estado para string do solver
-                const stateStr = FACES.map(f => cubeState[f.code].join('')).join('');
-                
-                console.log('Estado do cubo:', stateStr);
-                
-                if (typeof cubeSolver !== 'undefined') {
-                    solution = cubeSolver.solve(stateStr).split(' ').filter(m => m);
-                } else {
-                    // Fallback para demo
-                    solution = ["U", "R", "U'", "R'", "F", "R", "U", "R'", "U'", "F'"];
-                }
-                
-                currentMoveIdx = 0;
-                
-                document.getElementById('solution-view').style.display = 'flex';
-                init3D();
-                renderMoves();
-                
-            } catch (e) {
-                alert('Erro ao gerar solução: ' + e.message);
-            }
-        }
-        
-        function renderMoves() {
-            const container = document.getElementById('moves-display');
-            container.innerHTML = '';
-            
-            solution.forEach((move, i) => {
-                const chip = document.createElement('div');
-                chip.className = 'move-chip';
-                chip.textContent = move;
-                chip.onclick = () => goToMove(i);
-                container.appendChild(chip);
-            });
-            
-            updateMoveHighlight();
-        }
-        
-        function updateMoveHighlight() {
-            const chips = document.querySelectorAll('.move-chip');
-            chips.forEach((c, i) => {
-                c.classList.remove('current', 'done');
-                if (i < currentMoveIdx) c.classList.add('done');
-                else if (i === currentMoveIdx) c.classList.add('current');
-            });
-            
-            const current = chips[currentMoveIdx];
-            if (current) current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
-        
-        function init3D() {
-            const container = document.getElementById('cube-3d');
-            container.innerHTML = '';
-            
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0f172a);
-            
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-            camera.position.set(6, 5, 7);
-            camera.lookAt(0, 0, 0);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            container.appendChild(renderer.domElement);
-            
-            const ambient = new THREE.AmbientLight(0xffffff, 0.8);
-            scene.add(ambient);
-            
-            const dir = new THREE.DirectionalLight(0xffffff, 0.6);
-            dir.position.set(5, 10, 7);
-            scene.add(dir);
-            
-            const fill = new THREE.DirectionalLight(0xffffff, 0.3);
-            fill.position.set(-5, 0, -5);
-            scene.add(fill);
-            
-            buildCube();
-            animate();
-            
-            // Controles touch para rotacionar
             let touchStart = null;
             container.addEventListener('touchstart', e => {
                 touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -2904,8 +1202,6 @@
                         if (x === 0 && y === 0 && z === 0) continue;
                         
                         const materials = [];
-                        
-                        // Ordem: right, left, top, bottom, front, back
                         const faces = [
                             { axis: 1, val: 1, code: 'R', idx: getStickerIndex(x,y,z,'R') },
                             { axis: 1, val: -1, code: 'L', idx: getStickerIndex(x,y,z,'L') },
@@ -2947,7 +1243,6 @@
         }
         
         function getStickerIndex(x, y, z, face) {
-            // Mapeia posição 3D para índice 0-8 da face
             switch(face) {
                 case 'U': return (1-Math.round(y))*3 + (Math.round(x)+1);
                 case 'D': return (Math.round(y)+1)*3 + (Math.round(x)+1);
@@ -3139,7 +1434,6 @@
             pause();
             document.getElementById('solution-view').style.display = 'none';
             
-            // Reseta tudo
             currentFaceIdx = 0;
             cubeState = {
                 U: Array(9).fill(null),
@@ -3183,20 +1477,13 @@
             const hsv = rgbToHsv(r,g,b);
             const [h,s,v] = hsv;
             
-            // Branco (alto brilho, baixa saturação)
             if (v > 0.75 && s < 0.3) return 'U';
-            // Amarelo
             if (h > 50 && h < 80 && s > 0.4) return 'D';
-            // Laranja
             if (h > 15 && h < 45 && s > 0.5) return 'L';
-            // Vermelho
             if ((h < 20 || h > 340) && s > 0.4) return 'R';
-            // Verde
             if (h > 85 && h < 160 && s > 0.3) return 'F';
-            // Azul
             if (h > 200 && h < 270 && s > 0.4) return 'B';
             
-            // Fallback baseado no brilho
             return v > 0.6 ? 'U' : 'F';
         }
         
