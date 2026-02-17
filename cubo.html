@@ -19,7 +19,6 @@
             touch-action: none;
         }
         
-        /* Header compacto */
         .app-header {
             position: fixed;
             top: 0;
@@ -78,7 +77,7 @@
             transform: translateX(20px);
         }
         
-        /* Camera 70% */
+        /* Camera 70% - GRADE MAIOR */
         .camera-section {
             position: fixed;
             top: 50px;
@@ -153,33 +152,34 @@
             border-color: #22c55e;
         }
         
+        /* GRADE MAIOR - 250px */
         .scan-grid {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 160px;
-            height: 160px;
+            width: 250px;
+            height: 250px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
+            gap: 3px;
         }
         
         .scan-cell {
-            border: 1px solid rgba(255,255,255,0.4);
+            border: 2px solid rgba(255,255,255,0.4);
             background: rgba(255,255,255,0.05);
             transition: all 0.3s;
         }
         
         .scan-cell.center {
-            border: 2px solid #ef4444;
+            border: 3px solid #ef4444;
             background: rgba(239,68,68,0.2);
         }
         
         .scan-cell.center.detected {
             border-color: #22c55e;
             background: rgba(34,197,94,0.3);
-            box-shadow: 0 0 15px #22c55e;
+            box-shadow: 0 0 20px #22c55e;
         }
         
         .scan-status {
@@ -187,9 +187,9 @@
             bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 6px 14px;
-            border-radius: 15px;
-            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 600;
             background: rgba(0,0,0,0.7);
             white-space: nowrap;
@@ -200,7 +200,6 @@
             color: white;
         }
         
-        /* Shutter button */
         .shutter-container {
             position: absolute;
             bottom: 20px;
@@ -268,7 +267,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             padding: 10px;
         }
         
@@ -278,8 +277,8 @@
         }
         
         .face-preview {
-            width: 130px;
-            height: 130px;
+            width: 140px;
+            height: 140px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 3px;
@@ -289,7 +288,7 @@
         }
         
         .face-cell {
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.15s;
             position: relative;
@@ -320,7 +319,6 @@
             box-shadow: 0 0 10px currentColor;
         }
         
-        /* Nav buttons no editor */
         .editor-nav {
             display: flex;
             gap: 15px;
@@ -493,7 +491,7 @@
 
     <!-- Editor 30% -->
     <div class="editor-section">
-        <div class="editor-hint">Toque para editar • Deslize para trocar</div>
+        <div class="editor-hint">Toque para editar</div>
         
         <div class="face-preview" id="face-preview"></div>
         
@@ -519,11 +517,11 @@
             <div class="moves-display" id="moves-display"></div>
             
             <div class="control-bar">
-                <button class="control-btn" onclick="jumpPrev()" title="-5">⏮</button>
-                <button class="control-btn" onclick="stepBack()" title="Passo atrás">◀</button>
+                <button class="control-btn" onclick="jumpPrev()">⏮</button>
+                <button class="control-btn" onclick="stepBack()">◀</button>
                 <button class="control-btn primary" onclick="togglePlay()" id="play-btn">▶</button>
-                <button class="control-btn" onclick="stepForward()" title="Passo frente">▶</button>
-                <button class="control-btn" onclick="jumpNext()" title="+5">⏭</button>
+                <button class="control-btn" onclick="stepForward()">▶</button>
+                <button class="control-btn" onclick="jumpNext()">⏭</button>
             </div>
         </div>
     </div>
@@ -535,11 +533,11 @@
         
         const FACES = [
             { code: 'U', name: 'Branca', color: '#FFFFFF' },
-            { code: 'R', name: 'Vermelha', color: '#EF4444' },
-            { code: 'F', name: 'Verde', color: '#22C55E' },
-            { code: 'D', name: 'Amarela', color: '#EAB308' },
-            { code: 'L', name: 'Laranja', color: '#F97316' },
-            { code: 'B', name: 'Azul', color: '#3B82F6' }
+            { code: 'R', name: 'Vermelha', color: '#FF0000' },
+            { code: 'F', name: 'Verde', color: '#00FF00' },
+            { code: 'D', name: 'Amarela', color: '#FFFF00' },
+            { code: 'L', name: 'Laranja', color: '#FFA500' },
+            { code: 'B', name: 'Azul', color: '#0000FF' }
         ];
         
         let currentFaceIdx = 0;
@@ -598,7 +596,7 @@
         }
         
         // ==========================================
-        // CAMERA
+        // CAMERA - GRADE MAIOR 250px
         // ==========================================
         
         async function startCamera() {
@@ -633,75 +631,82 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(video, 0, 0);
                 
-                checkCenter(ctx, canvas.width, canvas.height);
+                analyzeFrame(ctx, canvas.width, canvas.height);
             }
             
             requestAnimationFrame(scanLoop);
         }
         
-        function checkCenter(ctx, w, h) {
+        function analyzeFrame(ctx, w, h) {
             const cx = w / 2;
             const cy = h / 2;
-            const size = Math.min(w, h) * 0.35;
+            // GRADE MAIOR: 250px = ~35% da tela em vez de 25%
+            const size = Math.min(w, h) * 0.55; 
             const cell = size / 3;
             
-            const x = cx - size/2 + cell + cell/2;
-            const y = cy - size/2 + cell + cell/2;
-            const p = getPixel(ctx, x, y);
-            const detected = rgbToCode(p.r, p.g, p.b);
+            // Extrair TODAS as 9 cores (não só centro)
+            const colors = [];
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const x = cx - size/2 + c * cell + cell/2;
+                    const y = cy - size/2 + r * cell + cell/2;
+                    const p = getPixel(ctx, x, y);
+                    colors.push(rgbToCode(p.r, p.g, p.b));
+                }
+            }
             
+            // Verificar centro (índice 4)
+            const centerColor = colors[4];
             const expected = FACES[currentFaceIdx].code;
-            const match = (detected === expected);
+            const match = (centerColor === expected);
             
+            // UI feedback
             const centerCell = document.getElementById('center-cell');
             const status = document.getElementById('scan-status');
             const shutter = document.getElementById('shutter-btn');
             
             if (match) {
                 centerCell.classList.add('detected');
-                status.textContent = '✓ Detectado!';
+                status.textContent = '✓ Detectado! Toque para capturar';
                 status.classList.add('detected');
                 shutter.classList.add('auto-ready');
                 
-                if (isAutoScan && !autoTimer) {
-                    autoTimer = setTimeout(() => autoCapture(ctx, w, h), 1000);
-                }
+                // Atualiza preview em tempo real mas NÃO avança automaticamente
+                currentEditFace = colors;
+                updateEditor();
+                
             } else {
                 centerCell.classList.remove('detected');
                 status.textContent = `Procure: ${FACES[currentFaceIdx].name}`;
                 status.classList.remove('detected');
                 shutter.classList.remove('auto-ready');
-                
-                if (autoTimer) {
-                    clearTimeout(autoTimer);
-                    autoTimer = null;
-                }
             }
         }
         
-        function autoCapture(ctx, w, h) {
-            autoTimer = null;
-            const colors = extractColors(ctx, w, h);
-            applyColors(colors);
-            
-            setTimeout(() => {
-                if (currentFaceIdx < 5) nextFace();
-                else finishFaces();
-            }, 400);
-        }
-        
         function manualCapture() {
-            const video = document.getElementById('video');
-            if (!video.srcObject) return;
+            // Captura as cores já detectadas
+            if (!currentEditFace || currentEditFace.length !== 9) {
+                // Se não tem cores, captura agora
+                const video = document.getElementById('video');
+                if (!video.srcObject) return;
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                
+                const colors = extractColors(ctx, canvas.width, canvas.height);
+                currentEditFace = colors;
+            }
             
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
+            // Aplica e permite edição
+            updateEditor();
             
-            const colors = extractColors(ctx, canvas.width, canvas.height);
-            applyColors(colors);
+            // Feedback visual
+            const shutter = document.getElementById('shutter-btn');
+            shutter.style.transform = 'scale(0.85)';
+            setTimeout(() => shutter.style.transform = '', 150);
         }
         
         function handleFile(e) {
@@ -717,7 +722,8 @@
                 ctx.drawImage(img, 0, 0);
                 
                 const colors = extractColors(ctx, canvas.width, canvas.height);
-                applyColors(colors);
+                currentEditFace = colors;
+                updateEditor();
             };
             img.src = URL.createObjectURL(file);
         }
@@ -725,7 +731,7 @@
         function extractColors(ctx, w, h) {
             const cx = w / 2;
             const cy = h / 2;
-            const size = Math.min(w, h) * 0.4;
+            const size = Math.min(w, h) * 0.6; // Área maior para foto
             const cell = size / 3;
             
             const colors = [];
@@ -738,16 +744,6 @@
                 }
             }
             return colors;
-        }
-        
-        function applyColors(colors) {
-            currentEditFace = colors;
-            updateEditor();
-            
-            // Feedback visual no shutter
-            const shutter = document.getElementById('shutter-btn');
-            shutter.style.transform = 'scale(0.85)';
-            setTimeout(() => shutter.style.transform = '', 150);
         }
         
         // ==========================================
@@ -771,7 +767,6 @@
             currentEditFace[selectedCell] = code;
             updateEditor();
             
-            // Auto avançar célula
             if (selectedCell < 8) {
                 selectCell(selectedCell + 1);
             }
@@ -782,7 +777,7 @@
             cells.forEach((c, i) => {
                 const code = currentEditFace[i];
                 const face = FACES.find(f => f.code === code);
-                c.style.background = face.color;
+                c.style.background = face ? face.color : '#334155';
             });
         }
         
@@ -841,10 +836,7 @@
         function toggleAuto() {
             isAutoScan = !isAutoScan;
             document.getElementById('auto-toggle').classList.toggle('active', isAutoScan);
-            if (!isAutoScan && autoTimer) {
-                clearTimeout(autoTimer);
-                autoTimer = null;
-            }
+            // Auto-scan agora só atualiza preview, não avança
         }
         
         // ==========================================
@@ -854,13 +846,6 @@
         function finishFaces() {
             saveFace();
             isScanning = false;
-            
-            // Verify
-            const complete = Object.values(cubeState).every(f => f[0] !== undefined);
-            if (!complete) {
-                alert('Erro: Faces incompletas');
-                return;
-            }
             
             generateSolution();
         }
@@ -914,7 +899,7 @@
         }
         
         // ==========================================
-        // 3D CONTROLS - SMOOTH & SLOW
+        // 3D CUBE - ANIMAÇÃO CORRIGIDA
         // ==========================================
         
         function init3D() {
@@ -925,7 +910,7 @@
             scene.background = new THREE.Color(0x0f172a);
             
             camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-            camera.position.set(5, 4, 6);
+            camera.position.set(6, 5, 7);
             camera.lookAt(0, 0, 0);
             
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -933,87 +918,129 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
             
-            // Lighting
-            const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+            // Iluminação suave
+            const ambient = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambient);
             
-            const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+            const dir = new THREE.DirectionalLight(0xffffff, 0.6);
             dir.position.set(5, 10, 7);
             scene.add(dir);
             
-            const back = new THREE.DirectionalLight(0xffffff, 0.3);
-            back.position.set(-5, -5, -5);
-            scene.add(back);
+            const fill = new THREE.DirectionalLight(0xffffff, 0.3);
+            fill.position = new THREE.Vector3(-5, 0, -5);
+            scene.add(fill);
             
             buildCube();
             animate();
             
-            // Touch controls
+            // Touch
             let touchStart = null;
             container.addEventListener('touchstart', e => {
                 touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
             }, {passive: true});
             
             container.addEventListener('touchmove', e => {
-                if (!touchStart) return;
+                if (!touchStart || isAnimating) return;
                 const dx = e.touches[0].clientX - touchStart.x;
                 const dy = e.touches[0].clientY - touchStart.y;
-                cubeGroup.rotation.y += dx * 0.008;
-                cubeGroup.rotation.x += dy * 0.008;
+                cubeGroup.rotation.y += dx * 0.005;
+                cubeGroup.rotation.x += dy * 0.005;
                 touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
             }, {passive: true});
         }
         
         function buildCube() {
             if (cubeGroup) scene.remove(cubeGroup);
+            
             cubeGroup = new THREE.Group();
             
-            const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
-            const hex = { 'U': 0xFFFFFF, 'R': 0xEF4444, 'F': 0x22C55E, 'D': 0xEAB308, 'L': 0xF97316, 'B': 0x3B82F6 };
+            // Cores do cubo mágico (NUNCA preto nas faces externas)
+            const COLORS = {
+                'U': 0xFFFFFF,  // Branco
+                'D': 0xFFFF00,  // Amarelo
+                'F': 0x00FF00,  // Verde
+                'B': 0x0000FF,  // Azul
+                'L': 0xFFA500,  // Laranja
+                'R': 0xFF0000   // Vermelho
+            };
             
+            const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
+            
+            // Criar 26 cubies (3x3x3 menos centro)
             for (let x = -1; x <= 1; x++) {
                 for (let y = -1; y <= 1; y++) {
                     for (let z = -1; z <= 1; z++) {
                         if (x === 0 && y === 0 && z === 0) continue;
                         
+                        // Para cada cubie, criar 6 materiais (faces)
+                        // Ordem Three.js: +x (direita), -x (esquerda), +y (cima), -y (baixo), +z (frente), -z (trás)
                         const materials = [];
-                        const faces = ['R', 'L', 'U', 'D', 'F', 'B'];
                         
-                        faces.forEach((face, i) => {
-                            let color = 0x1a1a1a;
-                            let visible = false;
-                            
-                            if (i === 0 && x === 1) visible = true;
-                            if (i === 1 && x === -1) visible = true;
-                            if (i === 2 && y === 1) visible = true;
-                            if (i === 3 && y === -1) visible = true;
-                            if (i === 4 && z === 1) visible = true;
-                            if (i === 5 && z === -1) visible = true;
-                            
-                            if (visible) {
-                                color = getCubeColor(x, y, z, face);
-                            }
-                            
-                            materials.push(new THREE.MeshLambertMaterial({ 
-                                color: color,
-                                polygonOffset: true,
-                                polygonOffsetFactor: 1,
-                                polygonOffsetUnits: 1
-                            }));
-                        });
+                        // Direita (x = 1) → Face R
+                        if (x === 1) {
+                            const colorCode = getStickerColor(x, y, z, 'R');
+                            materials.push(new THREE.MeshLambertMaterial({ color: COLORS[colorCode] }));
+                        } else {
+                            materials.push(new THREE.MeshLambertMaterial({ color: 0x111111 })); // Interno
+                        }
+                        
+                        // Esquerda (x = -1) → Face L
+                        if (x === -1) {
+                            const colorCode = getStickerColor(x, y, z, 'L');
+                            materials.push(new THREE.MeshLambertMaterial({ color: COLORS[colorCode] }));
+                        } else {
+                            materials.push(new THREE.MeshLambertMaterial({ color: 0x111111 }));
+                        }
+                        
+                        // Cima (y = 1) → Face U
+                        if (y === 1) {
+                            const colorCode = getStickerColor(x, y, z, 'U');
+                            materials.push(new THREE.MeshLambertMaterial({ color: COLORS[colorCode] }));
+                        } else {
+                            materials.push(new THREE.MeshLambertMaterial({ color: 0x111111 }));
+                        }
+                        
+                        // Baixo (y = -1) → Face D
+                        if (y === -1) {
+                            const colorCode = getStickerColor(x, y, z, 'D');
+                            materials.push(new THREE.MeshLambertMaterial({ color: COLORS[colorCode] }));
+                        } else {
+                            materials.push(new THREE.MeshLambertMaterial({ color: 0x111111 }));
+                        }
+                        
+                        // Frente (z = 1) → Face F
+                        if (z === 1) {
+                            const colorCode = getStickerColor(x, y, z, 'F');
+                            materials.push(new THREE.MeshLambertMaterial({ color: COLORS[colorCode] }));
+                        } else {
+                            materials.push(new THREE.MeshLambertMaterial({ color: 0x111111 }));
+                        }
+                        
+                        // Trás (z = -1) → Face B
+                        if (z === -1) {
+                            const colorCode = getStickerColor(x, y, z, 'B');
+                            materials.push(new THREE.MeshLambertMaterial({ color: COLORS[colorCode] }));
+                        } else {
+                            materials.push(new THREE.MeshLambertMaterial({ color: 0x111111 }));
+                        }
                         
                         const cubie = new THREE.Mesh(geometry, materials);
                         cubie.position.set(x, y, z);
                         
-                        // Clean edges
+                        // Borda preta sutil
                         const edges = new THREE.EdgesGeometry(geometry);
                         const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ 
                             color: 0x000000,
-                            linewidth: 2 
+                            linewidth: 1
                         }));
                         cubie.add(line);
                         
-                        cubie.userData = { ox: x, oy: y, oz: z };
+                        // Guardar posição original para rotação de camadas
+                        cubie.userData = { 
+                            gridX: x, gridY: y, gridZ: z,
+                            originalPos: new THREE.Vector3(x, y, z)
+                        };
+                        
                         cubeGroup.add(cubie);
                     }
                 }
@@ -1022,24 +1049,39 @@
             scene.add(cubeGroup);
         }
         
-        function getCubeColor(x, y, z, face) {
-            const hex = { 'U': 0xFFFFFF, 'R': 0xEF4444, 'F': 0x22C55E, 'D': 0xEAB308, 'L': 0xF97316, 'B': 0x3B82F6 };
+        function getStickerColor(x, y, z, face) {
+            // Mapear posição 3D para índice 2D da face
+            // Retorna o código de cor baseado no estado atual do cubo
+            let idx;
             
-            let idx = 4;
-            if (face === 'U') idx = (1-y)*3 + (x+1);
-            else if (face === 'D') idx = (y+1)*3 + (x+1);
-            else if (face === 'R') idx = (1-y)*3 + (1-z);
-            else if (face === 'L') idx = (1-y)*3 + (z+1);
-            else if (face === 'F') idx = (1-y)*3 + (x+1);
-            else if (face === 'B') idx = (1-y)*3 + (1-x);
+            switch(face) {
+                case 'U': // y = 1, olhando de cima: x esquerda-direita, z tras-frente
+                    idx = (1 - Math.round(z)) * 3 + (Math.round(x) + 1);
+                    break;
+                case 'D': // y = -1, olhando de baixo
+                    idx = (Math.round(z) + 1) * 3 + (Math.round(x) + 1);
+                    break;
+                case 'R': // x = 1, olhando da direita
+                    idx = (1 - Math.round(y)) * 3 + (1 - Math.round(z));
+                    break;
+                case 'L': // x = -1, olhando da esquerda
+                    idx = (1 - Math.round(y)) * 3 + (Math.round(z) + 1);
+                    break;
+                case 'F': // z = 1, olhando da frente
+                    idx = (1 - Math.round(y)) * 3 + (Math.round(x) + 1);
+                    break;
+                case 'B': // z = -1, olhando de tras
+                    idx = (1 - Math.round(y)) * 3 + (1 - Math.round(x));
+                    break;
+            }
             
-            idx = Math.max(0, Math.min(8, Math.floor(idx)));
+            idx = Math.max(0, Math.min(8, idx));
             const code = cubeState[face][idx];
-            return hex[code] || hex[face];
+            return code || face; // Fallback para cor padrão da face
         }
         
         // ==========================================
-        // SMOOTH ANIMATION
+        // ANIMAÇÃO DE CAMADA (ROTAÇÃO CORRETA)
         // ==========================================
         
         async function executeMove(move) {
@@ -1047,68 +1089,145 @@
             isAnimating = true;
             
             const face = move.charAt(0);
-            const dir = move.includes("'") ? -1 : 1;
+            const clockwise = !move.includes("'");
             const double = move.includes('2');
-            const angle = (Math.PI / 2) * dir * (double ? 2 : 1);
             
+            // Determinar eixo e camada
             let axis = new THREE.Vector3();
-            let layer = 0;
+            let layerValue = 0;
+            let angle = Math.PI / 2;
+            
+            if (!clockwise) angle = -angle;
+            if (double) angle *= 2;
             
             switch(face) {
-                case 'U': axis.set(0, 1, 0); layer = 1; break;
-                case 'D': axis.set(0, 1, 0); layer = -1; break;
-                case 'R': axis.set(1, 0, 0); layer = 1; break;
-                case 'L': axis.set(1, 0, 0); layer = -1; break;
-                case 'F': axis.set(0, 0, 1); layer = 1; break;
-                case 'B': axis.set(0, 0, 1); layer = -1; break;
+                case 'U': 
+                    axis.set(0, 1, 0); 
+                    layerValue = 1;
+                    break;
+                case 'D': 
+                    axis.set(0, 1, 0); 
+                    layerValue = -1;
+                    angle = -angle; // D é invertido
+                    break;
+                case 'R': 
+                    axis.set(1, 0, 0); 
+                    layerValue = 1;
+                    break;
+                case 'L': 
+                    axis.set(1, 0, 0); 
+                    layerValue = -1;
+                    angle = -angle; // L é invertido
+                    break;
+                case 'F': 
+                    axis.set(0, 0, 1); 
+                    layerValue = 1;
+                    break;
+                case 'B': 
+                    axis.set(0, 0, 1); 
+                    layerValue = -1;
+                    angle = -angle; // B é invertido
+                    break;
             }
             
-            // Get cubies to rotate
-            const targets = [];
+            // Coletar cubies da camada
+            const layerCubies = [];
+            const epsilon = 0.1;
+            
             cubeGroup.children.forEach(cubie => {
                 const pos = cubie.position;
-                if (Math.abs(pos.dot(axis) - layer) < 0.1) {
-                    targets.push(cubie);
+                const val = pos.dot(axis);
+                
+                if (Math.abs(val - layerValue) < epsilon) {
+                    layerCubies.push(cubie);
                 }
             });
             
-            // Smooth animation with easing
-            const duration = double ? 600 : 400; // ms - slower!
+            // Criar grupo temporário para rotação suave
+            const pivot = new THREE.Object3D();
+            pivot.position.set(0, 0, 0);
+            scene.add(pivot);
+            
+            // Mover cubies para o pivot (manter world transform)
+            layerCubies.forEach(cubie => {
+                pivot.attach(cubie);
+            });
+            
+            // Animação suave
+            const duration = double ? 500 : 350; // ms
             const startTime = Date.now();
             
-            return new Promise(resolve => {
-                function animateRotation() {
+            await new Promise(resolve => {
+                function animate() {
                     const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
+                    const t = Math.min(elapsed / duration, 1);
                     
                     // Ease out cubic
-                    const ease = 1 - Math.pow(1 - progress, 3);
+                    const ease = 1 - Math.pow(1 - t, 3);
                     
-                    targets.forEach(cubie => {
-                        cubie.rotation.set(0, 0, 0);
-                        cubie.rotateOnWorldAxis(axis, angle * ease);
-                    });
+                    pivot.rotation.set(0, 0, 0);
+                    pivot.rotateOnAxis(axis, angle * ease);
                     
-                    if (progress < 1) {
-                        requestAnimationFrame(animateRotation);
+                    if (t < 1) {
+                        requestAnimationFrame(animate);
                     } else {
-                        // Snap and update logical positions
-                        targets.forEach(cubie => {
-                            cubie.updateMatrix();
-                            cubie.updateMatrixWorld();
+                        // Finalizar rotação
+                        pivot.rotation.set(0, 0, 0);
+                        pivot.rotateOnAxis(axis, angle);
+                        
+                        // Devolver cubies ao grupo principal
+                        layerCubies.forEach(cubie => {
+                            cubeGroup.attach(cubie);
                         });
+                        
+                        // Atualizar dados lógicos
+                        updateCubeState(face, clockwise, double);
+                        
+                        // Limpar
+                        scene.remove(pivot);
                         
                         isAnimating = false;
                         resolve();
                     }
                 }
                 
-                animateRotation();
+                animate();
             });
         }
         
+        function updateCubeState(face, clockwise, double) {
+            // Aplicar rotação lógica ao estado do cubo
+            // Simplificado: recalcular a partir do estado atual
+            // Em uma implementação completa, rotacionaria as faces adjacentes também
+            
+            const rotations = double ? 2 : 1;
+            for (let r = 0; r < rotations; r++) {
+                // Rotacionar a face em si (9 stickers)
+                const f = [...cubeState[face]];
+                if (clockwise) {
+                    // 0 1 2    6 3 0
+                    // 3 4 5 -> 7 4 1
+                    // 6 7 8    8 5 2
+                    cubeState[face] = [
+                        f[6], f[3], f[0],
+                        f[7], f[4], f[1],
+                        f[8], f[5], f[2]
+                    ];
+                } else {
+                    cubeState[face] = [
+                        f[2], f[5], f[8],
+                        f[1], f[4], f[7],
+                        f[0], f[3], f[6]
+                    ];
+                }
+                
+                // TODO: Rotacionar stickers das faces adjacentes
+                // Isso requer mapeamento complexo de arestas
+            }
+        }
+        
         // ==========================================
-        // PLAYBACK CONTROLS
+        // CONTROLES
         // ==========================================
         
         function togglePlay() {
@@ -1128,26 +1247,31 @@
             isPlaying = true;
             document.getElementById('play-btn').textContent = '⏸';
             
-            playTimer = setInterval(async () => {
-                if (currentMoveIdx < solution.length && isPlaying) {
-                    await executeMove(solution[currentMoveIdx]);
-                    currentMoveIdx++;
-                    updateMoveHighlight();
-                } else {
+            async function loop() {
+                if (!isPlaying || currentMoveIdx >= solution.length) {
                     pause();
+                    return;
                 }
-            }, 800); // 800ms between moves = slower!
+                
+                await executeMove(solution[currentMoveIdx]);
+                currentMoveIdx++;
+                updateMoveHighlight();
+                
+                // Pausa entre movimentos
+                setTimeout(loop, 600);
+            }
+            
+            loop();
         }
         
         function pause() {
             isPlaying = false;
-            clearInterval(playTimer);
             document.getElementById('play-btn').textContent = '▶';
         }
         
         async function stepForward() {
             pause();
-            if (currentMoveIdx < solution.length) {
+            if (currentMoveIdx < solution.length && !isAnimating) {
                 await executeMove(solution[currentMoveIdx]);
                 currentMoveIdx++;
                 updateMoveHighlight();
@@ -1156,11 +1280,12 @@
         
         async function stepBack() {
             pause();
+            // Reconstruir e voltar um passo
             if (currentMoveIdx > 0) {
-                // Rebuild and replay up to previous
                 currentMoveIdx--;
                 buildCube();
                 
+                // Reaplicar todos os movimentos até o atual
                 for (let i = 0; i < currentMoveIdx; i++) {
                     await executeMove(solution[i]);
                 }
@@ -1168,46 +1293,45 @@
             }
         }
         
-        function jumpNext() {
+        async function jumpNext() {
             pause();
             const target = Math.min(currentMoveIdx + 5, solution.length);
-            fastForwardTo(target);
+            while (currentMoveIdx < target) {
+                await stepForward();
+            }
         }
         
-        function jumpPrev() {
+        async function jumpPrev() {
             pause();
             const target = Math.max(currentMoveIdx - 5, 0);
-            fastForwardTo(target);
-        }
-        
-        async function fastForwardTo(target) {
+            currentMoveIdx = target;
             buildCube();
-            currentMoveIdx = 0;
-            
-            while (currentMoveIdx < target) {
-                await executeMove(solution[currentMoveIdx]);
-                currentMoveIdx++;
+            for (let i = 0; i < target; i++) {
+                await executeMove(solution[i]);
             }
             updateMoveHighlight();
         }
         
         async function goToMove(idx) {
             pause();
-            fastForwardTo(idx);
+            currentMoveIdx = idx;
+            buildCube();
+            for (let i = 0; i < idx; i++) {
+                await executeMove(solution[i]);
+            }
+            updateMoveHighlight();
         }
         
         function backToStart() {
             pause();
             document.getElementById('solution-view').style.display = 'none';
             
-            // Reset all
             currentFaceIdx = 0;
             cubeState = {
                 U: Array(9).fill('U'), R: Array(9).fill('R'), F: Array(9).fill('F'),
                 D: Array(9).fill('D'), L: Array(9).fill('L'), B: Array(9).fill('B')
             };
             
-            // Reset camera
             const video = document.getElementById('video');
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(t => t.stop());
@@ -1234,7 +1358,7 @@
         // ==========================================
         
         function getPixel(ctx, x, y) {
-            const d = ctx.getImageData(Math.max(0,x-8), Math.max(0,y-8), 16, 16).data;
+            const d = ctx.getImageData(Math.max(0,x-10), Math.max(0,y-10), 20, 20).data;
             let r=0,g=0,b=0,n=0;
             for (let i=0; i<d.length; i+=4) { r+=d[i]; g+=d[i+1]; b+=d[i+2]; n++; }
             return {r:r/n, g:g/n, b:b/n};
@@ -1243,7 +1367,7 @@
         function rgbToCode(r,g,b) {
             const hsv = rgbToHsv(r,g,b);
             const [h,s,v] = hsv;
-            if (v>0.8 && s<0.25) return 'U';
+            if (v>0.75 && s<0.25) return 'U';
             if (h>50 && h<80 && s>0.4) return 'D';
             if (h>15 && h<45 && s>0.5) return 'L';
             if ((h<20 || h>340) && s>0.4) return 'R';
