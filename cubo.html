@@ -3,33 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Rubik Solver - iOS Optimized</title>
+    <title>Rubik Scanner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cube-solver@2.4.1/dist/bundle.min.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        * { -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            overflow-x: hidden;
-        }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .camera-container {
-            position: relative;
-            border-radius: 1rem;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #000;
-            min-height: 350px;
+            color: white;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        .camera-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            background: #111;
+            overflow: hidden;
         }
         
         #video {
@@ -37,122 +34,36 @@
             height: 100%;
             object-fit: cover;
             display: none;
-            -webkit-transform: translateZ(0); /* iOS fix */
         }
         
-        .camera-fallback {
+        .camera-guide {
             position: absolute;
             inset: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            padding: 20px;
         }
         
-        .ios-button {
-            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-            color: white;
-            padding: 18px 32px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 17px;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .ios-button:active {
-            transform: scale(0.95);
-        }
-        
-        .ios-button.secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .scan-area {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .grid-overlay {
             width: 200px;
             height: 200px;
-            border: 3px solid #22c55e;
-            border-radius: 12px;
-            display: none;
-            pointer-events: none;
-        }
-        
-        .scan-area::before {
-            content: '';
-            position: absolute;
-            inset: 20px;
-            border: 2px dashed rgba(34, 197, 94, 0.5);
-            border-radius: 8px;
-        }
-        
-        .face-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            width: 150px;
-            height: 150px;
-            padding: 6px;
-            background: #1e293b;
-            border-radius: 12px;
-            margin: 0 auto;
+            gap: 2px;
+            opacity: 0.6;
         }
         
-        .face-cell {
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.3);
-            transition: all 0.3s;
+        .grid-cell {
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.05);
         }
         
-        .face-cell.center {
-            border: 3px solid white;
-            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        .grid-cell.center {
+            border: 2px solid #22c55e;
+            background: rgba(34,197,94,0.2);
         }
         
-        .step-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            font-weight: bold;
-            font-size: 14px;
-            margin-right: 8px;
-        }
-        
-        .step-badge.active {
-            background: #3b82f6;
-            box-shadow: 0 0 10px #3b82f6;
-        }
-        
-        .step-badge.done {
-            background: #22c55e;
-        }
-        
-        #cube3d {
-            width: 100%;
-            height: 280px;
-            border-radius: 1rem;
-            overflow: hidden;
-            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-        }
-        
-        .capture-btn {
+        .shutter-btn {
             position: absolute;
             bottom: 30px;
             left: 50%;
@@ -160,790 +71,443 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background: white;
-            border: 4px solid rgba(255,255,255,0.3);
+            border: 4px solid white;
+            background: transparent;
             cursor: pointer;
-            display: none;
+        }
+        
+        .shutter-btn::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 50%;
+            background: white;
+            transition: transform 0.1s;
+        }
+        
+        .shutter-btn:active::after {
+            transform: scale(0.9);
+        }
+        
+        .edit-view {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            gap: 20px;
         }
         
-        .capture-btn::after {
+        .face-cube {
+            width: 180px;
+            height: 180px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            padding: 8px;
+            background: #2a2a2a;
+            border-radius: 12px;
+        }
+        
+        .face-cell {
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            position: relative;
+        }
+        
+        .face-cell:active {
+            transform: scale(0.95);
+        }
+        
+        .face-cell.selected::after {
             content: '';
-            width: 54px;
-            height: 54px;
+            position: absolute;
+            inset: -4px;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+        }
+        
+        .color-palette {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px;
+        }
+        
+        .color-btn {
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: #22c55e;
-            transition: all 0.3s;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
-        .capture-btn:disabled::after {
-            background: #ef4444;
+        .color-btn.active {
+            border-color: white;
+            transform: scale(1.15);
+            box-shadow: 0 0 20px currentColor;
         }
         
-        .capture-btn.valid::after {
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 20px;
+        }
+        
+        .action-btn {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .action-btn.primary {
             background: #22c55e;
-            box-shadow: 0 0 20px #22c55e;
         }
         
         .hidden { display: none !important; }
         
-        .debug-info {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.9);
-            color: #0f0;
-            font-family: monospace;
-            font-size: 11px;
-            padding: 10px;
-            z-index: 9999;
-            max-height: 100px;
-            overflow-y: auto;
+        .step-indicator {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .step-dot.active {
+            background: #22c55e;
+            width: 24px;
+            border-radius: 4px;
+        }
+        
+        .step-dot.done {
+            background: #22c55e;
+        }
+        
+        #file-input {
             display: none;
+        }
+        
+        .upload-fab {
+            position: absolute;
+            bottom: 35px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .edit-hint {
+            position: absolute;
+            top: 20px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
         }
     </style>
 </head>
-<body class="text-white min-h-screen pb-20">
+<body>
 
-    <!-- Debug (mostrar se necessário) -->
-    <div id="debug-panel" class="debug-info"></div>
-
-    <!-- Header -->
-    <header class="p-4 border-b border-white/10 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">R</div>
-                <div>
-                    <h1 class="text-xl font-bold text-white">Rubik Solver</h1>
-                    <p class="text-xs text-gray-400">iOS Optimized</p>
-                </div>
-            </div>
-            <button onclick="toggleDebug()" class="px-3 py-1 text-xs bg-slate-700 rounded-lg">Debug</button>
+    <!-- Câmera (Top Half) -->
+    <div class="camera-view">
+        <video id="video" autoplay playsinline muted></video>
+        
+        <div class="step-indicator" id="step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
         </div>
-    </header>
-
-    <main class="max-w-6xl mx-auto p-4 space-y-4">
-
-        <!-- Progresso -->
-        <div class="glass-panel rounded-2xl p-4">
-            <div class="flex items-center justify-center mb-3">
-                <span class="step-badge active" id="badge-0">1</span>
-                <span class="step-badge" id="badge-1">2</span>
-                <span class="step-badge" id="badge-2">3</span>
-                <span class="step-badge" id="badge-3">4</span>
-                <span class="step-badge" id="badge-4">5</span>
-                <span class="step-badge" id="badge-5">6</span>
-            </div>
-            <h2 class="text-center text-lg font-semibold" id="step-title">Face Branca (Up)</h2>
-            <p class="text-center text-sm text-gray-400 mt-1" id="step-desc">Toque na câmera abaixo</p>
-        </div>
-
-        <!-- Câmera / Captura -->
-        <div class="glass-panel rounded-2xl overflow-hidden">
-            <div class="camera-container relative max-w-md mx-auto aspect-square">
-                
-                <!-- Vídeo (escondido inicialmente) -->
-                <video id="video" autoplay playsinline muted webkit-playsinline></video>
-                <canvas id="canvas" class="hidden"></canvas>
-                
-                <!-- Área de Scan (quando câmera ativa) -->
-                <div class="scan-area" id="scan-area">
-                    <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-green-400 text-sm font-bold whitespace-nowrap" id="center-status">
-                        Aguardando...
-                    </div>
-                </div>
-                
-                <!-- Botão de Captura (círculo iOS style) -->
-                <button onclick="capture()" id="capture-btn" class="capture-btn" disabled></button>
-                
-                <!-- Fallback / Inicial -->
-                <div id="camera-fallback" class="camera-fallback">
-                    <div class="text-5xl mb-4">📸</div>
-                    <h3 class="text-xl font-bold mb-2">Capturar Face</h3>
-                    <p class="text-sm text-gray-400 text-center mb-4 max-w-xs">
-                        Toque para abrir a câmera do iPhone
-                    </p>
-                    
-                    <!-- Input file nativo iOS (funciona 100%) -->
-                    <input type="file" id="ios-camera-input" accept="image/*" capture="environment" class="hidden">
-                    
-                    <button onclick="openIOSCamera()" class="ios-button">
-                        <span>📷</span>
-                        <span>Abrir Câmera</span>
-                    </button>
-                    
-                    <button onclick="document.getElementById('ios-camera-input').click()" class="ios-button secondary">
-                        <span>🖼</span>
-                        <span>Escolher da Galeria</span>
-                    </button>
-                    
-                    <div id="error-msg" class="hidden mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-sm text-red-200 max-w-xs text-center"></div>
-                </div>
-            </div>
-            
-            <!-- Preview da Face Atual -->
-            <div class="p-4 bg-slate-900/50 border-t border-white/10">
-                <p class="text-center text-sm text-gray-400 mb-3">Preview - Centro deve ser <span id="expected-color" class="font-bold text-white">BRANCO</span></p>
-                <div class="face-grid" id="preview-grid">
-                    <div class="face-cell" style="background: #334155;"></div>
-                    <div class="face-cell" style="background: #334155;"></div>
-                    <div class="face-cell" style="background: #334155;"></div>
-                    <div class="face-cell" style="background: #334155;"></div>
-                    <div class="face-cell center" style="background: #334155;"></div>
-                    <div class="face-cell" style="background: #334155;"></div>
-                    <div class="face-cell" style="background: #334155;"></div>
-                    <div class="face-cell" style="background: #334155;"></div>
-                    <div class="face-cell" style="background: #334155;"></div>
-                </div>
+        
+        <div class="camera-guide">
+            <div class="grid-overlay" id="grid-overlay">
+                <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                <div class="grid-cell"></div><div class="grid-cell center"></div><div class="grid-cell"></div>
+                <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
             </div>
         </div>
+        
+        <button class="shutter-btn" onclick="capture()"></button>
+        <button class="upload-fab" onclick="document.getElementById('file-input').click()">📁</button>
+        <input type="file" id="file-input" accept="image/*" capture="environment">
+    </div>
 
-        <!-- Faces Capturadas -->
-        <div class="glass-panel rounded-2xl p-4">
-            <h3 class="text-lg font-semibold mb-3 text-center">Progresso</h3>
-            <div class="grid grid-cols-3 gap-2" id="progress-grid">
-                <!-- Gerado via JS -->
-            </div>
-            
-            <button onclick="solve()" id="solve-btn" class="w-full mt-4 py-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                Resolver Cubo
-            </button>
+    <!-- Editor (Bottom Half) -->
+    <div class="edit-view">
+        <div class="edit-hint">Toque nas cores para editar</div>
+        
+        <div class="face-cube" id="face-cube">
+            <!-- Gerado via JS -->
         </div>
-
-        <!-- 3D -->
-        <div class="glass-panel rounded-2xl p-4">
-            <h3 class="text-lg font-semibold mb-3 text-center">Visualização 3D</h3>
-            <div id="cube3d"></div>
+        
+        <div class="color-palette" id="color-palette">
+            <!-- Gerado via JS -->
         </div>
+    </div>
 
-        <!-- Solução -->
-        <div class="glass-panel rounded-2xl p-4 hidden" id="solution-panel">
-            <h3 class="text-lg font-semibold mb-3">Solução</h3>
-            <div class="flex gap-2 mb-3">
-                <button onclick="playAll()" class="flex-1 py-2 bg-blue-600 rounded-lg font-bold">▶ Play</button>
-                <button onclick="nextStep()" class="flex-1 py-2 bg-purple-600 rounded-lg font-bold">⏭ Step</button>
-            </div>
-            <div id="moves-list" class="flex flex-wrap gap-2"></div>
-        </div>
-
-    </main>
+    <!-- Barra de Ação -->
+    <div class="bottom-bar">
+        <button class="action-btn" onclick="reset()">↺</button>
+        <button class="action-btn primary" onclick="confirm()">✓ Confirmar</button>
+    </div>
 
     <script>
-        // ==========================================
-        // CONFIGURAÇÃO
-        // ==========================================
-        
-        const STEPS = [
-            { face: 'U', name: 'Branca', color: '#FFFFFF', desc: 'Centro branco' },
-            { face: 'R', name: 'Vermelha', color: '#FF0000', desc: 'Centro vermelho' },
-            { face: 'F', name: 'Verde', color: '#00FF00', desc: 'Centro verde' },
-            { face: 'D', name: 'Amarela', color: '#FFFF00', desc: 'Centro amarelo' },
-            { face: 'L', name: 'Laranja', color: '#FFA500', desc: 'Centro laranja' },
-            { face: 'B', name: 'Azul', color: '#0000FF', desc: 'Centro azul' }
+        const COLORS = [
+            { code: 'U', hex: '#FFFFFF', name: 'Branco' },
+            { code: 'R', hex: '#EF4444', name: 'Vermelho' },
+            { code: 'F', hex: '#22C55E', name: 'Verde' },
+            { code: 'D', hex: '#EAB308', name: 'Amarelo' },
+            { code: 'L', hex: '#F97316', name: 'Laranja' },
+            { code: 'B', hex: '#3B82F6', name: 'Azul' }
         ];
         
-        const COLOR_MAP = {
-            'U': '#FFFFFF', 'R': '#FF0000', 'F': '#00FF00',
-            'D': '#FFFF00', 'L': '#FFA500', 'B': '#0000FF'
-        };
-        
+        const STEPS = ['U', 'R', 'F', 'D', 'L', 'B'];
         let currentStep = 0;
-        let cubeState = { U: [], R: [], F: [], D: [], L: [], B: [] };
-        let solution = [];
-        let currentMove = 0;
-        let isPlaying = false;
+        let currentFace = Array(9).fill('U');
+        let selectedCell = 4; // Centro selecionado por padrão
         
-        // Three.js
-        let scene, camera, renderer, cubeGroup;
-        
-        // ==========================================
-        // INICIALIZAÇÃO
-        // ==========================================
-        
-        window.onload = function() {
-            log('Iniciando... iOS: ' + /iPad|iPhone|iPod/.test(navigator.userAgent));
-            initProgressGrid();
-            init3D();
-            updateStepUI();
-            
-            // Setup input file
-            document.getElementById('ios-camera-input').addEventListener('change', handleIOSPhoto);
+        // Inicialização
+        window.onload = () => {
+            initCamera();
+            initEditor();
+            updateStepIndicator();
         };
         
-        function log(msg) {
-            console.log(msg);
-            const debug = document.getElementById('debug-panel');
-            debug.innerHTML += msg + '<br>';
+        // Câmera
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
+                });
+                document.getElementById('video').srcObject = stream;
+                document.getElementById('video').style.display = 'block';
+            } catch (e) {
+                console.log('Câmera não disponível, usando upload');
+            }
         }
         
-        function toggleDebug() {
-            const debug = document.getElementById('debug-panel');
-            debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        function initProgressGrid() {
-            const grid = document.getElementById('progress-grid');
-            grid.innerHTML = '';
+        // Editor
+        function initEditor() {
+            // Criar grid 3x3
+            const cube = document.getElementById('face-cube');
+            cube.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'face-cell';
+                cell.style.background = COLORS[0].hex;
+                cell.onclick = () => selectCell(i);
+                cube.appendChild(cell);
+            }
             
-            STEPS.forEach((step, i) => {
-                const div = document.createElement('div');
-                div.className = 'bg-slate-800 rounded-lg p-2 text-center border border-slate-700';
-                div.id = `progress-${i}`;
-                div.innerHTML = `
-                    <div class="w-8 h-8 rounded-full mx-auto mb-1 flex items-center justify-center text-xs font-bold" 
-                         style="background: ${step.color}; color: ${step.face === 'U' || step.face === 'D' ? '#000' : '#fff'}">
-                        ${step.face}
-                    </div>
-                    <div class="text-xs text-gray-400 status">Pendente</div>
-                `;
-                grid.appendChild(div);
+            // Criar paleta
+            const palette = document.getElementById('color-palette');
+            palette.innerHTML = '';
+            COLORS.forEach((c, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'color-btn' + (i === 0 ? ' active' : '');
+                btn.style.background = c.hex;
+                btn.onclick = () => setColor(c.code);
+                palette.appendChild(btn);
+            });
+            
+            selectCell(4);
+        }
+        
+        function selectCell(index) {
+            selectedCell = index;
+            document.querySelectorAll('.face-cell').forEach((c, i) => {
+                c.classList.toggle('selected', i === index);
             });
         }
         
-        // ==========================================
-        // CÂMERA iOS (MÉTODO NATIVO)
-        // ==========================================
-        
-        function openIOSCamera() {
-            log('Abrindo câmera iOS nativa...');
-            document.getElementById('ios-camera-input').click();
+        function setColor(code) {
+            currentFace[selectedCell] = code;
+            const color = COLORS.find(c => c.code === code);
+            document.querySelectorAll('.face-cell')[selectedCell].style.background = color.hex;
+            
+            // Auto-selecionar próxima célula (esquerda para direita, cima para baixo)
+            if (selectedCell < 8) {
+                selectCell(selectedCell + 1);
+            }
+            
+            // Atualizar paleta ativa
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.style.background === color.hex) {
+                    btn.classList.add('active');
+                }
+            });
         }
         
-        function handleIOSPhoto(event) {
-            const file = event.target.files[0];
-            if (!file) {
-                log('Nenhum arquivo selecionado');
+        // Captura de foto
+        function capture() {
+            const video = document.getElementById('video');
+            if (!video.srcObject) {
+                document.getElementById('file-input').click();
                 return;
             }
             
-            log('Foto selecionada: ' + file.name);
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    processPhoto(img);
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function processPhoto(img) {
-            const canvas = document.getElementById('canvas');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
             
-            // Redimensionar para processamento mais rápido
-            const maxSize = 800;
-            let w = img.width;
-            let h = img.height;
-            
-            if (w > h) {
-                if (w > maxSize) { h *= maxSize / w; w = maxSize; }
-            } else {
-                if (h > maxSize) { w *= maxSize / h; h = maxSize; }
-            }
-            
-            canvas.width = w;
-            canvas.height = h;
-            ctx.drawImage(img, 0, 0, w, h);
-            
-            // Extrair cores do centro (3x3 grid)
-            const colors = extractColors(ctx, w, h);
-            updatePreview(colors);
-            
-            // Validar centro
-            const expected = STEPS[currentStep].face;
-            const centerColor = colors[4];
-            const isValid = (centerColor === expected);
-            
-            log('Centro detectado: ' + centerColor + ' | Esperado: ' + expected + ' | Válido: ' + isValid);
-            
-            if (isValid) {
-                // Mostrar interface de captura
-                showCaptureInterface(colors);
-            } else {
-                showError('Centro incorreto. Detectado: ' + centerColor + ', mas esperado: ' + expected + '. Tente novamente.');
-            }
+            // Extrair cores do centro
+            const colors = extractFromCanvas(ctx, canvas.width, canvas.height);
+            applyColors(colors);
         }
         
-        function extractColors(ctx, w, h) {
-            const centerX = w / 2;
-            const centerY = h / 2;
-            const size = Math.min(w, h) * 0.6; // Área maior para facilitar
-            const cellSize = size / 3;
+        // Upload de arquivo
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                const colors = extractFromCanvas(ctx, canvas.width, canvas.height);
+                applyColors(colors);
+            };
+            img.src = URL.createObjectURL(file);
+        });
+        
+        function extractFromCanvas(ctx, w, h) {
+            const cx = w / 2;
+            const cy = h / 2;
+            const size = Math.min(w, h) * 0.4;
+            const cell = size / 3;
             
             const colors = [];
-            
-            for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 3; col++) {
-                    const x = centerX - size/2 + col * cellSize + cellSize/2;
-                    const y = centerY - size/2 + row * cellSize + cellSize/2;
-                    
-                    // Amostra maior para robustez
-                    const pixel = getAverageColor(ctx, x-20, y-20, 40, 40);
-                    const colorCode = rgbToCode(pixel.r, pixel.g, pixel.b);
-                    colors.push(colorCode);
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const x = cx - size/2 + c * cell + cell/2;
+                    const y = cy - size/2 + r * cell + cell/2;
+                    const p = getPixel(ctx, x, y);
+                    colors.push(rgbToCode(p.r, p.g, p.b));
                 }
             }
-            
             return colors;
         }
         
-        function getAverageColor(ctx, x, y, w, h) {
-            x = Math.max(0, x);
-            y = Math.max(0, y);
-            w = Math.min(w, ctx.canvas.width - x);
-            h = Math.min(h, ctx.canvas.height - y);
-            
-            try {
-                const data = ctx.getImageData(x, y, w, h).data;
-                let r = 0, g = 0, b = 0, count = 0;
-                
-                for (let i = 0; i < data.length; i += 4) {
-                    r += data[i];
-                    g += data[i+1];
-                    b += data[i+2];
-                    count++;
-                }
-                
-                return {
-                    r: Math.round(r / count),
-                    g: Math.round(g / count),
-                    b: Math.round(b / count)
-                };
-            } catch (e) {
-                return { r: 0, g: 0, b: 0 };
+        function getPixel(ctx, x, y) {
+            const d = ctx.getImageData(x-10, y-10, 20, 20).data;
+            let r=0, g=0, b=0, n=0;
+            for (let i=0; i<d.length; i+=4) {
+                r+=d[i]; g+=d[i+1]; b+=d[i+2]; n++;
             }
+            return {r:r/n, g:g/n, b:b/n};
         }
         
         function rgbToCode(r, g, b) {
-            const hsv = rgbToHsv(r, g, b);
-            const h = hsv[0], s = hsv[1], v = hsv[2];
+            const hsv = rgbToHsv(r,g,b);
+            const [h,s,v] = hsv;
             
-            // Branco (alta luminosidade, baixa saturação)
-            if (v > 0.8 && s < 0.25) return 'U';
-            
-            // Amarelo
-            if (h >= 50 && h < 80 && s > 0.4 && v > 0.5) return 'D';
-            
-            // Laranja
-            if (h >= 15 && h < 45 && s > 0.5 && v > 0.4) return 'L';
-            
-            // Vermelho
-            if ((h < 20 || h > 340) && s > 0.4 && v > 0.3) return 'R';
-            
-            // Verde
-            if (h >= 85 && h < 160 && s > 0.3 && v > 0.3) return 'F';
-            
-            // Azul
-            if (h >= 200 && h < 270 && s > 0.4 && v > 0.3) return 'B';
-            
-            // Fallbacks
-            if (v > 0.75) return 'U';
-            if (h < 35) return 'L';
-            if (h < 85) return 'D';
-            if (h < 150) return 'F';
-            if (h < 220) return 'B';
-            return 'R';
+            if (v>0.8 && s<0.25) return 'U';
+            if (h>50 && h<80 && s>0.4) return 'D';
+            if (h>15 && h<45 && s>0.5) return 'L';
+            if ((h<15 || h>340) && s>0.4) return 'R';
+            if (h>90 && h<150 && s>0.3) return 'F';
+            if (h>200 && h<260 && s>0.4) return 'B';
+            return 'U';
         }
         
-        function rgbToHsv(r, g, b) {
-            r /= 255; g /= 255; b /= 255;
-            const max = Math.max(r, g, b);
-            const min = Math.min(r, g, b);
-            let h, s, v = max;
-            const d = max - min;
-            s = max === 0 ? 0 : d / max;
-            
-            if (max === min) {
-                h = 0;
-            } else {
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
+        function rgbToHsv(r,g,b) {
+            r/=255; g/=255; b/=255;
+            const max=Math.max(r,g,b), min=Math.min(r,g,b);
+            let h=0,s=0,v=max;
+            const d=max-min;
+            s=max===0?0:d/max;
+            if(max!==min) {
+                switch(max) {
+                    case r: h=(g-b)/d+(g<b?6:0); break;
+                    case g: h=(b-r)/d+2; break;
+                    case b: h=(r-g)/d+4; break;
                 }
-                h /= 6;
+                h/=6;
             }
-            return [h * 360, s, v];
+            return [h*360,s,v];
         }
         
-        // ==========================================
-        // UI E CAPTURA
-        // ==========================================
-        
-        function updatePreview(colors) {
-            const grid = document.getElementById('preview-grid');
-            const cells = grid.querySelectorAll('.face-cell');
-            
+        function applyColors(colors) {
+            currentFace = colors;
+            const cells = document.querySelectorAll('.face-cell');
             colors.forEach((code, i) => {
-                cells[i].style.background = COLOR_MAP[code] || '#334155';
-                if (i === 4) {
-                    const step = STEPS[currentStep];
-                    const isCorrect = (code === step.face);
-                    cells[i].style.border = isCorrect ? '3px solid #22c55e' : '3px solid #ef4444';
-                }
+                const c = COLORS.find(x => x.code === code);
+                cells[i].style.background = c.hex;
             });
         }
         
-        function showCaptureInterface(colors) {
-            // Esconder fallback, mostrar vídeo (simulado) e botão de captura
-            document.getElementById('camera-fallback').classList.add('hidden');
-            document.getElementById('video').style.display = 'block';
-            document.getElementById('scan-area').style.display = 'block';
-            document.getElementById('capture-btn').style.display = 'flex';
-            document.getElementById('capture-btn').disabled = false;
-            document.getElementById('capture-btn').classList.add('valid');
-            document.getElementById('center-status').textContent = '✓ Centro correto! Toque para capturar';
-            document.getElementById('center-status').className = 'absolute -top-8 left-1/2 transform -translate-x-1/2 text-green-400 text-sm font-bold whitespace-nowrap';
-            
-            // Salvar cores temporariamente
-            window.tempColors = colors;
-        }
-        
-        function capture() {
-            if (!window.tempColors) return;
-            
-            const face = STEPS[currentStep].face;
-            cubeState[face] = [...window.tempColors];
-            
-            log('Face ' + face + ' capturada: ' + window.tempColors.join(','));
-            
-            // Atualizar progresso
-            document.getElementById(`progress-${currentStep}`).querySelector('.status').textContent = '✓ OK';
-            document.getElementById(`progress-${currentStep}`).classList.add('border-green-500');
-            document.getElementById(`badge-${currentStep}`).classList.add('done');
-            document.getElementById(`badge-${currentStep}`).classList.remove('active');
+        // Ações
+        function confirm() {
+            // Salvar face atual
+            console.log('Face', STEPS[currentStep], ':', currentFace);
             
             // Próximo passo
             currentStep++;
-            
             if (currentStep < 6) {
-                // Próxima face
-                document.getElementById(`badge-${currentStep}`).classList.add('active');
-                updateStepUI();
-                resetCameraUI();
+                updateStepIndicator();
+                // Reset para próxima face (centro já vem preenchido)
+                const nextCenter = STEPS[currentStep];
+                currentFace = Array(9).fill(nextCenter);
+                applyColors(currentFace);
+                selectCell(0); // Começar pelo canto
             } else {
-                // Finalizado
-                finishCapture();
+                alert('Todas as faces capturadas! Pronto para resolver.');
             }
         }
         
-        function resetCameraUI() {
-            document.getElementById('camera-fallback').classList.remove('hidden');
-            document.getElementById('video').style.display = 'none';
-            document.getElementById('scan-area').style.display = 'none';
-            document.getElementById('capture-btn').style.display = 'none';
-            document.getElementById('capture-btn').disabled = true;
-            document.getElementById('capture-btn').classList.remove('valid');
-            document.getElementById('ios-camera-input').value = '';
-            window.tempColors = null;
-            
-            // Reset preview
-            const cells = document.getElementById('preview-grid').querySelectorAll('.face-cell');
-            cells.forEach(c => {
-                c.style.background = '#334155';
-                c.style.border = '1px solid rgba(0,0,0,0.3)';
-            });
-            cells[4].style.border = '3px solid white';
+        function reset() {
+            currentFace = Array(9).fill(STEPS[currentStep]);
+            applyColors(currentFace);
+            selectCell(4);
         }
         
-        function updateStepUI() {
-            const step = STEPS[currentStep];
-            document.getElementById('step-title').textContent = 'Face ' + step.name + ' (' + step.face + ')';
-            document.getElementById('step-desc').textContent = step.desc;
-            document.getElementById('expected-color').textContent = step.name.toUpperCase();
-            document.getElementById('expected-color').style.color = step.color;
-        }
-        
-        function finishCapture() {
-            document.getElementById('step-title').textContent = '✓ Todas as faces capturadas!';
-            document.getElementById('step-desc').textContent = 'Pronto para resolver';
-            document.querySelector('.camera-container').style.display = 'none';
-            document.getElementById('solve-btn').disabled = false;
-            
-            // Construir cubo 3D com cores
-            buildColoredCube();
-        }
-        
-        function showError(msg) {
-            const el = document.getElementById('error-msg');
-            el.textContent = msg;
-            el.classList.remove('hidden');
-            setTimeout(() => el.classList.add('hidden'), 5000);
-        }
-        
-        // ==========================================
-        // SOLVER E 3D
-        // ==========================================
-        
-        async function solve() {
-            const btn = document.getElementById('solve-btn');
-            btn.disabled = true;
-            btn.textContent = 'Calculando...';
-            
-            try {
-                const stateStr = STEPS.map(s => cubeState[s.face].join('')).join('');
-                log('Estado: ' + stateStr);
-                
-                let solutionStr;
-                if (typeof cubeSolver !== 'undefined') {
-                    solutionStr = cubeSolver.solve(stateStr);
-                } else {
-                    solutionStr = "U R U' R' F R U R' U' F' U2 R2 F2";
-                }
-                
-                solution = solutionStr.split(' ').filter(m => m);
-                log('Solução: ' + solution.length + ' movimentos');
-                
-                displaySolution();
-                document.getElementById('solution-panel').classList.remove('hidden');
-                btn.textContent = '✓ Resolvido!';
-                
-            } catch (err) {
-                log('Erro: ' + err.message);
-                alert('Erro ao calcular. Tente novamente.');
-                btn.disabled = false;
-                btn.textContent = 'Resolver Cubo';
-            }
-        }
-        
-        function displaySolution() {
-            const list = document.getElementById('moves-list');
-            list.innerHTML = '';
-            solution.forEach((move, i) => {
-                const span = document.createElement('span');
-                span.className = 'bg-slate-700 px-3 py-1 rounded font-mono font-bold text-sm cursor-pointer hover:bg-blue-600';
-                span.textContent = move;
-                span.onclick = () => executeMoveAnim(i);
-                list.appendChild(span);
+        function updateStepIndicator() {
+            const dots = document.querySelectorAll('.step-dot');
+            dots.forEach((d, i) => {
+                d.classList.remove('active', 'done');
+                if (i < currentStep) d.classList.add('done');
+                else if (i === currentStep) d.classList.add('active');
             });
         }
-        
-        async function playAll() {
-            if (isPlaying) return;
-            isPlaying = true;
-            
-            while (currentMove < solution.length && isPlaying) {
-                await executeMove(solution[currentMove]);
-                highlightMove(currentMove);
-                currentMove++;
-                await new Promise(r => setTimeout(r, 500));
-            }
-            
-            isPlaying = false;
-        }
-        
-        function nextStep() {
-            if (currentMove < solution.length) {
-                executeMove(solution[currentMove]);
-                highlightMove(currentMove);
-                currentMove++;
-            }
-        }
-        
-        function executeMoveAnim(index) {
-            currentMove = 0;
-            buildColoredCube();
-            (async () => {
-                while (currentMove <= index) {
-                    await executeMove(solution[currentMove]);
-                    currentMove++;
-                }
-                highlightMove(index);
-            })();
-        }
-        
-        function highlightMove(index) {
-            const moves = document.getElementById('moves-list').children;
-            Array.from(moves).forEach((m, i) => {
-                m.classList.toggle('bg-blue-600', i === index);
-                m.classList.toggle('bg-slate-700', i !== index);
-            });
-        }
-        
-        // ==========================================
-        // THREE.JS
-        // ==========================================
-        
-        function init3D() {
-            const container = document.getElementById('cube3d');
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0f172a);
-            
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-            camera.position.set(4, 3, 5);
-            camera.lookAt(0, 0, 0);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
-            
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-            dir.position.set(5, 10, 7);
-            scene.add(dir);
-            
-            buildColoredCube();
-            animate();
-            
-            // Touch controls
-            let touchStart = null;
-            container.addEventListener('touchstart', e => {
-                touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            });
-            container.addEventListener('touchmove', e => {
-                if (!touchStart) return;
-                const dx = e.touches[0].clientX - touchStart.x;
-                const dy = e.touches[0].clientY - touchStart.y;
-                cubeGroup.rotation.y += dx * 0.01;
-                cubeGroup.rotation.x += dy * 0.01;
-                touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            });
-        }
-        
-        function buildColoredCube() {
-            if (cubeGroup) scene.remove(cubeGroup);
-            cubeGroup = new THREE.Group();
-            
-            const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
-            const hexColors = {
-                'U': 0xFFFFFF, 'R': 0xFF0000, 'F': 0x00FF00,
-                'D': 0xFFFF00, 'L': 0xFFA500, 'B': 0x0000FF
-            };
-            
-            for (let x = -1; x <= 1; x++) {
-                for (let y = -1; y <= 1; y++) {
-                    for (let z = -1; z <= 1; z++) {
-                        if (x === 0 && y === 0 && z === 0) continue;
-                        
-                        const materials = [];
-                        const faces = ['R', 'L', 'U', 'D', 'F', 'B'];
-                        
-                        faces.forEach((face, i) => {
-                            let color = 0x111111;
-                            let visible = false;
-                            
-                            if (i === 0 && x === 1) visible = true;
-                            if (i === 1 && x === -1) visible = true;
-                            if (i === 2 && y === 1) visible = true;
-                            if (i === 3 && y === -1) visible = true;
-                            if (i === 4 && z === 1) visible = true;
-                            if (i === 5 && z === -1) visible = true;
-                            
-                            if (visible && cubeState[face] && cubeState[face].length === 9) {
-                                // Mapear posição para índice da face
-                                color = getColorForPosition(x, y, z, face);
-                            } else if (visible) {
-                                color = hexColors[face];
-                            }
-                            
-                            materials.push(new THREE.MeshLambertMaterial({ color: color }));
-                        });
-                        
-                        const cubie = new THREE.Mesh(geometry, materials);
-                        cubie.position.set(x, y, z);
-                        
-                        const edges = new THREE.EdgesGeometry(geometry);
-                        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 }));
-                        cubie.add(line);
-                        
-                        cubeGroup.add(cubie);
-                    }
-                }
-            }
-            
-            scene.add(cubeGroup);
-        }
-        
-        function getColorForPosition(x, y, z, face) {
-            const hex = { 'U': 0xFFFFFF, 'R': 0xFF0000, 'F': 0x00FF00, 'D': 0xFFFF00, 'L': 0xFFA500, 'B': 0x0000FF };
-            
-            if (!cubeState[face] || cubeState[face].length !== 9) return hex[face];
-            
-            // Mapear coordenadas 3D para índice 2D da face
-            let idx = 4; // centro por padrão
-            
-            if (face === 'U') { // y = 1
-                idx = (1 - z) * 3 + (x + 1);
-            } else if (face === 'D') { // y = -1
-                idx = (z + 1) * 3 + (x + 1);
-            } else if (face === 'R') { // x = 1
-                idx = (1 - y) * 3 + (1 - z);
-            } else if (face === 'L') { // x = -1
-                idx = (1 - y) * 3 + (z + 1);
-            } else if (face === 'F') { // z = 1
-                idx = (1 - y) * 3 + (x + 1);
-            } else if (face === 'B') { // z = -1
-                idx = (1 - y) * 3 + (1 - x);
-            }
-            
-            idx = Math.max(0, Math.min(8, Math.floor(idx)));
-            const code = cubeState[face][idx];
-            return hex[code] || hex[face];
-        }
-        
-        function executeMove(move) {
-            return new Promise((resolve) => {
-                const face = move.charAt(0);
-                const dir = move.includes("'") ? -1 : 1;
-                const angle = (Math.PI / 2) * dir;
-                
-                let axis = new THREE.Vector3();
-                let layer = 0;
-                
-                switch(face) {
-                    case 'U': axis.set(0, 1, 0); layer = 1; break;
-                    case 'D': axis.set(0, 1, 0); layer = -1; break;
-                    case 'R': axis.set(1, 0, 0); layer = 1; break;
-                    case 'L': axis.set(1, 0, 0); layer = -1; break;
-                    case 'F': axis.set(0, 0, 1); layer = 1; break;
-                    case 'B': axis.set(0, 0, 1); layer = -1; break;
-                }
-                
-                const targets = [];
-                cubeGroup.children.forEach(cubie => {
-                    if (Math.abs(cubie.position.dot(axis) - layer) < 0.1) {
-                        targets.push(cubie);
-                    }
-                });
-                
-                const start = Date.now();
-                const duration = 250;
-                
-                function anim() {
-                    const elapsed = Date.now() - start;
-                    const p = Math.min(elapsed / duration, 1);
-                    const ease = 1 - Math.pow(1 - p, 3);
-                    
-                    targets.forEach(c => c.rotateOnWorldAxis(axis, angle * ease));
-                    
-                    if (p < 1) requestAnimationFrame(anim);
-                    else resolve();
-                }
-                
-                anim();
-            });
-        }
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
-        
-        window.addEventListener('resize', () => {
-            if (camera && renderer) {
-                const container = document.getElementById('cube3d');
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            }
-        });
     </script>
 </body>
 </html>
