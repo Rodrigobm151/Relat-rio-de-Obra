@@ -28,18 +28,33 @@
             border-radius: 1rem;
             overflow: hidden;
             background: #000;
+            min-height: 300px;
         }
         
         #video {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: none; /* Escondido até iniciar */
+        }
+        
+        .camera-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 1rem;
         }
         
         .guide-overlay {
             position: absolute;
             inset: 0;
             pointer-events: none;
+            display: none; /* Escondido até iniciar */
         }
         
         .center-validator {
@@ -192,18 +207,6 @@
             background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
         }
         
-        .move-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s;
-            font-family: monospace;
-            font-weight: bold;
-        }
-        
-        .move-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-        
         .capture-btn {
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             transition: all 0.3s;
@@ -236,6 +239,8 @@
             font-weight: 600;
             transition: all 0.3s;
             z-index: 10;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
         }
         
         .validation-message.error {
@@ -253,22 +258,68 @@
             color: white;
         }
         
-        .hidden { display: none !important; }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+        .start-camera-btn {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            transition: all 0.3s;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .start-camera-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+        }
+        
+        .upload-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .error-log {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+            max-width: 100%;
+            word-break: break-word;
+        }
+        
+        .hidden { display: none !important; }
+        
+        input[type="file"] {
+            display: none;
         }
     </style>
 </head>
 <body class="text-white min-h-screen pb-20">
 
+    <!-- Debug Panel (visível apenas se houver erro) -->
+    <div id="debug-panel" class="hidden fixed top-0 left-0 right-0 bg-red-900/90 p-4 z-50 text-xs font-mono">
+        <strong>Debug:</strong> <span id="debug-msg"></span>
+    </div>
+
     <!-- Header -->
-    <header class="p-4 border-b border-white/10 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+    <header class="p-4 border-b border-white/10 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-xl font-bold">R</div>
@@ -310,13 +361,30 @@
                 <div class="glass-panel rounded-2xl overflow-hidden">
                     <!-- Câmera -->
                     <div class="camera-section relative aspect-square max-w-md mx-auto">
-                        <video id="video" autoplay playsinline></video>
+                        <video id="video" autoplay playsinline muted></video>
                         <canvas id="capture-canvas" class="hidden"></canvas>
+                        <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(event)">
                         
-                        <!-- Overlay de Validação -->
-                        <div class="guide-overlay">
+                        <!-- Placeholder / Botão Inicial -->
+                        <div id="camera-placeholder" class="camera-placeholder">
+                            <div class="text-6xl mb-4">📷</div>
+                            <h3 class="text-lg font-semibold mb-2">Câmera não iniciada</h3>
+                            <p class="text-sm text-gray-400 text-center px-4 mb-4">
+                                Clique no botão abaixo para permitir o acesso à câmera
+                            </p>
+                            <button onclick="startCamera()" class="start-camera-btn">
+                                🎥 Iniciar Câmera
+                            </button>
+                            <button onclick="document.getElementById('file-input').click()" class="upload-btn">
+                                📁 Ou enviar foto
+                            </button>
+                            <div id="camera-error" class="hidden error-log"></div>
+                        </div>
+                        
+                        <!-- Overlay de Validação (inicialmente escondido) -->
+                        <div id="guide-overlay" class="guide-overlay">
                             <div class="validation-message hint" id="validation-msg">
-                                Aguardando centro branco...
+                                Clique em "Iniciar Câmera" primeiro
                             </div>
                             
                             <!-- Grid de Scan -->
@@ -330,8 +398,8 @@
                             <div class="center-validator" id="center-validator"></div>
                         </div>
                         
-                        <!-- Botão de Captura -->
-                        <button onclick="captureFace()" id="capture-btn" class="capture-btn absolute bottom-6 left-1/2 transform -translate-x-1/2 px-8 py-4 rounded-full font-bold text-lg flex items-center gap-2 z-10" disabled>
+                        <!-- Botão de Captura (inicialmente escondido) -->
+                        <button onclick="captureFace()" id="capture-btn" class="capture-btn absolute bottom-6 left-1/2 transform -translate-x-1/2 px-8 py-4 rounded-full font-bold text-lg flex items-center gap-2 z-10 hidden" disabled>
                             <span id="capture-icon">📷</span>
                             <span id="capture-text">Centralize o cubo</span>
                         </button>
@@ -448,7 +516,7 @@
         </div>
 
         <!-- Solução -->
-        <div class="glass-panel rounded-2xl p-4" id="solution-panel" style="display: none;">
+        <div class="glass-panel rounded-2xl p-4 hidden" id="solution-panel">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold">Solução Passo a Passo</h3>
                 <div class="text-sm text-gray-400">
@@ -492,6 +560,7 @@
         let currentStep = 0;
         let isCenterValid = false;
         let lastFrameColors = null;
+        let isCameraRunning = false;
         
         // Estado do cubo
         let cubeState = {
@@ -515,10 +584,9 @@
         // ==========================================
         
         window.onload = function() {
-            initCamera();
+            console.log('Página carregada. Aguardando início da câmera...');
             init3D();
             initFaceGrids();
-            startFrameProcessing();
             updateUI();
         };
         
@@ -535,44 +603,170 @@
                 }
             });
             
-            // Preview atual
             updateCurrentPreview();
         }
         
         // ==========================================
-        // CÂMERA E PROCESSAMENTO DE FRAME
+        // CÂMERA - INÍCIO EXPLÍCITO
         // ==========================================
         
-        let currentStream = null;
-        
-        async function initCamera() {
+        async function startCamera() {
+            console.log('Tentando iniciar câmera...');
+            const errorDiv = document.getElementById('camera-error');
+            errorDiv.classList.add('hidden');
+            
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: 1280, height: 720 }
-                });
+                // Verificar suporte
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Seu navegador não suporta acesso à câmera. Use Chrome, Safari ou Firefox atualizado.');
+                }
+                
+                // Tentar câmera traseira primeiro (melhor para cubos)
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                };
+                
+                console.log('Solicitando permissão...');
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                console.log('Permissão concedida! Iniciando video...');
                 const video = document.getElementById('video');
                 video.srcObject = stream;
-                currentStream = stream;
+                
+                // Aguardar video pronto
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        console.log('Video pronto!');
+                        resolve();
+                    };
+                });
+                
+                video.play();
+                isCameraRunning = true;
+                
+                // Esconder placeholder, mostrar elementos da câmera
+                document.getElementById('camera-placeholder').classList.add('hidden');
+                document.getElementById('video').style.display = 'block';
+                document.getElementById('guide-overlay').style.display = 'block';
+                document.getElementById('capture-btn').classList.remove('hidden');
+                
+                // Iniciar processamento de frames
+                startFrameProcessing();
+                
+                console.log('Câmera iniciada com sucesso!');
+                
             } catch (err) {
-                console.error('Erro na câmera:', err);
-                alert('Erro ao acessar câmera. Verifique as permissões.');
+                console.error('Erro ao iniciar câmera:', err);
+                showCameraError(err.message);
             }
         }
         
+        function showCameraError(msg) {
+            const errorDiv = document.getElementById('camera-error');
+            errorDiv.textContent = 'Erro: ' + msg;
+            errorDiv.classList.remove('hidden');
+            
+            // Mostrar no debug também
+            document.getElementById('debug-panel').classList.remove('hidden');
+            document.getElementById('debug-msg').textContent = msg;
+        }
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    processUploadedImage(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function processUploadedImage(img) {
+            // Criar canvas para processar a imagem
+            const canvas = document.getElementById('capture-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            // Analisar centro da imagem
+            const colors = analyzeImageColors(ctx, canvas.width, canvas.height);
+            lastFrameColors = colors;
+            
+            // Mostrar preview
+            updatePreviewColors(colors.colorNames);
+            
+            // Validar centro
+            const centerColor = colors.colorNames[4];
+            const expected = STEPS[currentStep].expected;
+            isCenterValid = (centerColor === expected);
+            updateValidationUI(isCenterValid, centerColor, expected);
+            
+            // Habilitar captura se válido
+            if (isCenterValid) {
+                document.getElementById('capture-btn').disabled = false;
+                document.getElementById('capture-btn').classList.add('valid');
+            }
+        }
+        
+        function analyzeImageColors(ctx, width, height) {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const size = Math.min(width, height) * 0.5; // Usar área maior para fotos
+            const cellSize = size / 3;
+            
+            const colors = [];
+            const colorNames = [];
+            
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const x = centerX - size/2 + col * cellSize + cellSize/2;
+                    const y = centerY - size/2 + row * cellSize + cellSize/2;
+                    
+                    const pixel = getAverageColor(ctx, x-10, y-10, 20, 20);
+                    const colorCode = detectColor(pixel.r, pixel.g, pixel.b);
+                    
+                    colors.push({ r: pixel.r, g: pixel.g, b: pixel.b, code: colorCode });
+                    colorNames.push(colorCode);
+                }
+            }
+            
+            return { colors, colorNames };
+        }
+        
+        // ==========================================
+        // PROCESSAMENTO DE FRAME (CÂMERA ATIVA)
+        // ==========================================
+        
         function startFrameProcessing() {
+            if (!isCameraRunning) return;
+            
             const video = document.getElementById('video');
             const canvas = document.getElementById('capture-canvas');
             const ctx = canvas.getContext('2d');
             
             function processFrame() {
+                if (!isCameraRunning) return;
+                
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     ctx.drawImage(video, 0, 0);
                     
-                    // Analisar cores do frame
                     analyzeFrame(ctx, canvas.width, canvas.height);
                 }
+                
                 requestAnimationFrame(processFrame);
             }
             
@@ -588,7 +782,6 @@
             const colors = [];
             const colorNames = [];
             
-            // Extrair cores das 9 posições
             for (let row = 0; row < 3; row++) {
                 for (let col = 0; col < 3; col++) {
                     const x = centerX - size/2 + col * cellSize + cellSize/2;
@@ -604,7 +797,7 @@
             
             lastFrameColors = { colors, colorNames };
             
-            // Validar centro (índice 4)
+            // Validar centro
             const centerColor = colorNames[4];
             const expected = STEPS[currentStep].expected;
             
@@ -615,29 +808,38 @@
         }
         
         function getAverageColor(ctx, x, y, w, h) {
-            const data = ctx.getImageData(Math.max(0, x), Math.max(0, y), w, h).data;
-            let r = 0, g = 0, b = 0;
-            let count = 0;
+            x = Math.max(0, x);
+            y = Math.max(0, y);
+            w = Math.min(w, ctx.canvas.width - x);
+            h = Math.min(h, ctx.canvas.height - y);
             
-            for (let i = 0; i < data.length; i += 4) {
-                r += data[i];
-                g += data[i+1];
-                b += data[i+2];
-                count++;
+            try {
+                const data = ctx.getImageData(x, y, w, h).data;
+                let r = 0, g = 0, b = 0;
+                let count = 0;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    r += data[i];
+                    g += data[i+1];
+                    b += data[i+2];
+                    count++;
+                }
+                
+                return {
+                    r: Math.round(r / count),
+                    g: Math.round(g / count),
+                    b: Math.round(b / count)
+                };
+            } catch (e) {
+                return { r: 0, g: 0, b: 0 };
             }
-            
-            return {
-                r: Math.round(r / count),
-                g: Math.round(g / count),
-                b: Math.round(b / count)
-            };
         }
         
         function detectColor(r, g, b) {
             const hsv = rgbToHsv(r, g, b);
             const h = hsv[0], s = hsv[1], v = hsv[2];
             
-            // Branco
+            // Branco (alta luminosidade, baixa saturação)
             if (v > 0.75 && s < 0.25) return 'U';
             
             // Amarelo
@@ -655,7 +857,7 @@
             // Azul
             if (h >= 200 && h < 260 && s > 0.4 && v > 0.3) return 'B';
             
-            // Fallback
+            // Fallbacks
             if (v > 0.7) return 'U';
             if (h < 30) return 'L';
             if (h < 90) return 'D';
@@ -696,6 +898,8 @@
             const captureBtn = document.getElementById('capture-btn');
             const captureText = document.getElementById('capture-text');
             
+            const colorNames = { U: 'BRANCO', R: 'VERMELHO', F: 'VERDE', D: 'AMARELO', L: 'LARANJA', B: 'AZUL' };
+            
             if (isValid) {
                 validator.classList.add('valid');
                 centerCell.classList.add('valid');
@@ -707,12 +911,13 @@
             } else {
                 validator.classList.remove('valid');
                 centerCell.classList.remove('valid');
-                const colorNames = { U: 'BRANCO', R: 'VERMELHO', F: 'VERDE', D: 'AMARELO', L: 'LARANJA', B: 'AZUL' };
-                msg.textContent = `Centro deve ser ${colorNames[expected]} (detectado: ${colorNames[detected] || 'desconhecido'})`;
+                const detectedName = colorNames[detected] || 'desconhecido';
+                const expectedName = colorNames[expected];
+                msg.textContent = `Centro: ${detectedName} (deve ser ${expectedName})`;
                 msg.className = 'validation-message error';
                 captureBtn.disabled = true;
                 captureBtn.classList.remove('valid');
-                captureText.textContent = 'Centralize o cubo';
+                captureText.textContent = 'Ajuste o cubo';
             }
         }
         
@@ -728,7 +933,6 @@
             cells.forEach((cell, i) => {
                 if (colorNames[i]) {
                     cell.style.background = colorHex[colorNames[i]] || '#334155';
-                    // Destacar centro
                     if (i === 4) {
                         cell.style.border = isCenterValid ? '2px solid #22c55e' : '2px solid #ef4444';
                     }
@@ -742,7 +946,7 @@
             document.getElementById('current-step-title').textContent = `Passo ${currentStep + 1} de 6: Face ${step.name}`;
             document.getElementById('current-step-desc').textContent = step.desc;
             
-            // Reset preview
+            // Reset preview visual
             const preview = document.getElementById('current-face-preview');
             const cells = preview.querySelectorAll('.face-cell');
             cells.forEach((cell, i) => {
@@ -752,7 +956,7 @@
         }
         
         function updateUI() {
-            // Atualizar dots de progresso
+            // Atualizar dots
             document.querySelectorAll('.step-dot').forEach((dot, i) => {
                 dot.classList.remove('active', 'completed');
                 if (i < currentStep) dot.classList.add('completed');
@@ -772,7 +976,6 @@
                     textEl.className = 'mt-2 text-xs text-green-400 status-text';
                     gridEl.style.opacity = '1';
                     
-                    // Preencher cores
                     const cells = gridEl.querySelectorAll('.face-cell');
                     const colorHex = {
                         'U': '#FFFFFF', 'R': '#FF0000', 'F': '#00FF00',
@@ -784,7 +987,6 @@
                 }
             });
             
-            // Habilitar botão solve se todas preenchidas
             const allFilled = ['U', 'R', 'F', 'D', 'L', 'B'].every(f => cubeState[f][0] !== null);
             document.getElementById('solve-btn').disabled = !allFilled;
         }
@@ -799,18 +1001,16 @@
             const face = STEPS[currentStep].face;
             cubeState[face] = [...lastFrameColors.colorNames];
             
-            // Feedback visual
+            // Feedback
             const btn = document.getElementById('capture-btn');
-            const originalText = btn.innerHTML;
+            const originalHTML = btn.innerHTML;
             btn.innerHTML = '<span>✓</span><span>Capturado!</span>';
-            btn.classList.add('bg-green-500');
             
             setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.classList.remove('bg-green-500', 'valid');
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('valid');
                 btn.disabled = true;
                 
-                // Avançar passo
                 currentStep++;
                 updateUI();
                 
@@ -825,11 +1025,8 @@
         
         function finishCapture() {
             document.getElementById('current-step-title').textContent = '✓ Todas as faces capturadas!';
-            document.getElementById('current-step-desc').textContent = 'Clique em "Resolver Cubo" para calcular a solução';
-            document.querySelector('.camera-section').style.opacity = '0.5';
+            document.getElementById('current-step-desc').textContent = 'Clique em "Resolver Cubo"';
             document.getElementById('capture-btn').style.display = 'none';
-            
-            // Construir cubo 3D
             build3DCube();
         }
         
@@ -840,45 +1037,33 @@
         async function solveCube() {
             const btn = document.getElementById('solve-btn');
             btn.disabled = true;
-            btn.innerHTML = '<span class="inline-block animate-spin mr-2">↻</span> Calculando...';
+            btn.innerHTML = 'Calculando...';
             
             try {
-                // Converter para string
                 const stateStr = ['U', 'R', 'F', 'D', 'L', 'B'].map(f => cubeState[f].join('')).join('');
                 
-                // Validar
                 if (!isValidState(stateStr)) {
                     throw new Error('Estado inválido');
                 }
-                
-                // Resolver
-                const startTime = performance.now();
                 
                 let solutionStr;
                 if (typeof cubeSolver !== 'undefined') {
                     solutionStr = cubeSolver.solve(stateStr);
                 } else {
-                    // Fallback simples
-                    solutionStr = "U R U' R' F R U R' U' F'"; // Demo
+                    solutionStr = "U R U' R' F R U R' U' F'";
                 }
-                
-                const endTime = performance.now();
                 
                 solution = solutionStr.split(' ').filter(m => m);
                 currentSolutionStep = 0;
                 
-                // Mostrar solução
                 displaySolution();
-                document.getElementById('solution-panel').style.display = 'block';
-                document.getElementById('solution-panel').classList.add('fade-in');
+                document.getElementById('solution-panel').classList.remove('hidden');
                 document.getElementById('move-count').textContent = solution.length;
                 
                 btn.innerHTML = '✓ Solução encontrada!';
-                btn.classList.add('bg-green-600');
                 
             } catch (err) {
-                console.error(err);
-                alert('Erro ao calcular solução. Verifique se as faces estão corretas.');
+                alert('Erro: ' + err.message);
                 btn.disabled = false;
                 btn.innerHTML = '✨ Resolver Cubo';
             }
@@ -886,22 +1071,11 @@
         
         function isValidState(state) {
             if (state.length !== 54) return false;
-            
-            // Verificar centros
-            const centers = [4, 13, 22, 31, 40, 49]; // Posições dos centros
+            const centers = [4, 13, 22, 31, 40, 49];
             const expected = ['U', 'R', 'F', 'D', 'L', 'B'];
-            
             for (let i = 0; i < 6; i++) {
                 if (state[centers[i]] !== expected[i]) return false;
             }
-            
-            // Verificar contagem
-            const counts = {};
-            for (let c of state) counts[c] = (counts[c] || 0) + 1;
-            for (let c of expected) {
-                if (counts[c] !== 9) return false;
-            }
-            
             return true;
         }
         
@@ -911,9 +1085,8 @@
             
             solution.forEach((move, i) => {
                 const div = document.createElement('div');
-                div.className = 'bg-slate-800 p-2 rounded text-center font-mono font-bold cursor-pointer hover:bg-slate-700 transition';
+                div.className = 'bg-slate-800 p-2 rounded text-center font-mono font-bold cursor-pointer hover:bg-slate-700';
                 div.textContent = move;
-                div.dataset.index = i;
                 div.onclick = () => executeStep(i);
                 container.appendChild(div);
             });
@@ -926,9 +1099,7 @@
         async function playSolution() {
             if (isPlaying) return;
             isPlaying = true;
-            
-            const btn = document.getElementById('play-btn');
-            btn.textContent = '⏸ Pausar';
+            document.getElementById('play-btn').textContent = '⏸ Pausar';
             
             while (currentSolutionStep < solution.length && isPlaying) {
                 await executeMove(solution[currentSolutionStep]);
@@ -938,11 +1109,7 @@
             }
             
             isPlaying = false;
-            btn.textContent = '▶ Executar Tudo';
-            
-            if (currentSolutionStep >= solution.length) {
-                celebrate();
-            }
+            document.getElementById('play-btn').textContent = '▶ Executar Tudo';
         }
         
         function stepSolution() {
@@ -954,10 +1121,8 @@
         }
         
         function executeStep(index) {
-            // Resetar até este passo
-            build3DCube(); // Resetar
+            build3DCube();
             currentSolutionStep = 0;
-            
             (async () => {
                 while (currentSolutionStep <= index) {
                     await executeMove(solution[currentSolutionStep]);
@@ -978,8 +1143,7 @@
         function highlightStep(index) {
             const steps = document.querySelectorAll('#solution-steps > div');
             steps.forEach((s, i) => {
-                if (i === index) s.classList.add('bg-blue-600');
-                else s.classList.remove('bg-blue-600');
+                s.classList.toggle('bg-blue-600', i === index);
             });
             steps[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -989,12 +1153,11 @@
         }
         
         // ==========================================
-        // THREE.JS - VISUALIZAÇÃO 3D
+        // THREE.JS
         // ==========================================
         
         function init3D() {
             const container = document.getElementById('cube3d');
-            
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x0f172a);
             
@@ -1019,17 +1182,14 @@
         
         function build3DCube() {
             if (cubeGroup) scene.remove(cubeGroup);
-            
             cubeGroup = new THREE.Group();
             
             const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
             const colorMap = {
                 'U': 0xFFFFFF, 'R': 0xFF0000, 'F': 0x00FF00,
-                'D': 0xFFFF00, 'L': 0xFFA500, 'B': 0x0000FF',
-                'null': 0x334155
+                'D': 0xFFFF00, 'L': 0xFFA500, 'B': 0x0000FF', 'null': 0x334155
             };
             
-            // Criar cubies
             for (let x = -1; x <= 1; x++) {
                 for (let y = -1; y <= 1; y++) {
                     for (let z = -1; z <= 1; z++) {
@@ -1040,8 +1200,6 @@
                         
                         faces.forEach((face, i) => {
                             let color = 0x111111;
-                            
-                            // Determinar se visível
                             let visible = false;
                             if (i === 0 && x === 1) visible = true;
                             if (i === 1 && x === -1) visible = true;
@@ -1050,18 +1208,13 @@
                             if (i === 4 && z === 1) visible = true;
                             if (i === 5 && z === -1) visible = true;
                             
-                            if (visible) {
-                                // Pegar cor do estado atual
-                                color = getColorForPosition(x, y, z, face);
-                            }
-                            
+                            if (visible) color = colorMap[face];
                             materials.push(new THREE.MeshLambertMaterial({ color: color }));
                         });
                         
                         const cubie = new THREE.Mesh(geometry, materials);
                         cubie.position.set(x, y, z);
                         
-                        // Borda
                         const edges = new THREE.EdgesGeometry(geometry);
                         const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000 }));
                         cubie.add(line);
@@ -1072,21 +1225,6 @@
             }
             
             scene.add(cubeGroup);
-        }
-        
-        function getColorForPosition(x, y, z, face) {
-            // Mapear posição 3D para índice da face
-            // Simplificado: usar estado atual se disponível
-            const colorMap = {
-                'U': 0xFFFFFF, 'R': 0xFF0000, 'F': 0x00FF00,
-                'D': 0xFFFF00, 'L': 0xFFA500, 'B': 0x0000FF'
-            };
-            
-            if (cubeState.U[0] === null) return colorMap[face]; // Estado padrão
-            
-            // Mapeamento complexo de posição para índice de face
-            // Simplificado para demo
-            return colorMap[face] || 0x334155;
         }
         
         function executeMove(move) {
@@ -1115,9 +1253,8 @@
                     }
                 });
                 
-                // Animação
-                const duration = 300;
                 const start = Date.now();
+                const duration = 300;
                 
                 function animate() {
                     const elapsed = Date.now() - start;
@@ -1125,7 +1262,6 @@
                     const ease = 1 - Math.pow(1 - progress, 3);
                     
                     targetCubies.forEach(cubie => {
-                        cubie.position.applyAxisAngle(axis, angle * ease);
                         cubie.rotateOnWorldAxis(axis, angle * ease);
                     });
                     
@@ -1168,6 +1304,14 @@
             solution = [];
             currentSolutionStep = 0;
             isPlaying = false;
+            isCameraRunning = false;
+            
+            // Parar câmera se rodando
+            const video = document.getElementById('video');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
             
             cubeState = {
                 U: Array(9).fill(null), R: Array(9).fill(null), F: Array(9).fill(null),
@@ -1175,6 +1319,15 @@
             };
             
             // Reset UI
+            document.getElementById('camera-placeholder').classList.remove('hidden');
+            document.getElementById('video').style.display = 'none';
+            document.getElementById('guide-overlay').style.display = 'none';
+            document.getElementById('capture-btn').classList.add('hidden');
+            document.getElementById('capture-btn').disabled = true;
+            document.getElementById('capture-btn').classList.remove('valid');
+            document.getElementById('solution-panel').classList.add('hidden');
+            document.getElementById('camera-error').classList.add('hidden');
+            
             document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active', 'completed'));
             document.querySelector('.step-dot[data-step="0"]').classList.add('active');
             
@@ -1186,26 +1339,14 @@
                 el.querySelector('.face-grid').style.opacity = '0.3';
             });
             
-            document.getElementById('capture-btn').style.display = 'flex';
-            document.querySelector('.camera-section').style.opacity = '1';
-            document.getElementById('solution-panel').style.display = 'none';
             document.getElementById('solve-btn').disabled = true;
             document.getElementById('solve-btn').innerHTML = '✨ Resolver Cubo';
-            document.getElementById('solve-btn').classList.remove('bg-green-600');
             
             updateCurrentPreview();
             initFaceGrids();
             build3DCube();
         }
         
-        function celebrate() {
-            // Efeito visual de celebração
-            const btn = document.getElementById('solve-btn');
-            btn.innerHTML = '🎉 Cubo Resolvido!';
-            btn.classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500');
-        }
-        
-        // Responsividade
         window.addEventListener('resize', () => {
             if (camera && renderer) {
                 const container = document.getElementById('cube3d');
